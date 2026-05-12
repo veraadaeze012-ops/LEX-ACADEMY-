@@ -799,6 +799,10 @@ input,textarea{font-family:var(--font)}
 
 <div class="toast-wrap" id="toastWrap"></div>
 <script>
+/* ══ FIREBASE STATE ══ */
+let _curUser = null;
+let _curUid  = null;
+
 /* ══ DATA ══ */
 const LEVELS=[{name:"Builder",min:0,max:500},{name:"Tinkerer",min:500,max:1200},{name:"Technician",min:1200,max:2500},{name:"Engineer",min:2500,max:5000},{name:"Inventor",min:5000,max:10000},{name:"Master",min:10000,max:Infinity}];
 const BADGES=[{id:"first",icon:"🎯",name:"First Step",desc:"Complete your first lesson"},{id:"quiz5",icon:"📝",name:"Quiz Whiz",desc:"Score 80%+ on 5 quizzes"},{id:"builder",icon:"🔨",name:"Builder",desc:"Complete first project"},{id:"streak3",icon:"🔥",name:"On A Roll",desc:"3-day streak"},{id:"streak7",icon:"🏅",name:"Week Warrior",desc:"7-day streak"},{id:"xp500",icon:"⭐",name:"500 Club",desc:"Earn 500 XP"},{id:"xp2500",icon:"🌟",name:"2500 Club",desc:"Earn 2500 XP"},{id:"lessons5",icon:"📖",name:"Bookworm",desc:"5 lessons done"},{id:"lessons10",icon:"🎓",name:"Graduate",desc:"10 lessons done"},{id:"perfect",icon:"💯",name:"Perfectionist",desc:"Score 100% on a quiz"}];
@@ -1025,6 +1029,42 @@ async function loadUserFromFirestore(uid) {
   return _curUser;
 }
 
+/* ══ USER HELPERS ══ */
+function mkUser(name, email) {
+  return {
+    name, email,
+    createdAt: Date.now(),
+    xp: 0, streak: 0,
+    lastLogin: Date.now(),
+    completedLessons: [],
+    completedProjects: [],
+    badges: [],
+    quizHistory: [],
+    likedPosts: [],
+    notifOn: true,
+    goal: 5,
+    activity: []
+  };
+}
+
+function getCurUser() { return _curUser; }
+
+async function saveCurUser(u) {
+  _curUser = u;
+  if (!_curUid) return;
+  try {
+    await window._db.collection("users").doc(_curUid).set(u);
+  } catch(e) { console.error("saveCurUser:", e); }
+}
+
+async function loadUserFromFirestore(uid) {
+  try {
+    const snap = await window._db.collection("users").doc(uid).get();
+    if (snap.exists) { _curUser = snap.data(); }
+  } catch(e) { console.error("loadUser:", e); }
+  return _curUser;
+}
+
 /* ══ AUTH ══ */
 function switchTab(t){
   document.getElementById("tabLogin").classList.toggle("active",t==="login");
@@ -1032,54 +1072,64 @@ function switchTab(t){
   document.getElementById("loginForm").style.display=t==="login"?"block":"none";
   document.getElementById("regForm").style.display=t==="register"?"block":"none";
 }
-function toggleEye(id,btn){const i=document.getElementById(id);i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="text"?"🙈":"👁"}
-function showErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.add("show")}}
-function hideErr(id){const e=document.getElementById(id);if(e)e.classList.remove("show")}
-function setLoading(btnId,txtId,txt,on=true){const b=document.getElementById(btnId);const t=document.getElementById(txtId);if(!b)return;b.disabled=on;t.innerHTML=on?`<div class="spinner"></div>${txt}`:txt}
+function toggleEye(id,btn){
+  const i=document.getElementById(id);
+  i.type=i.type==="password"?"text":"password";
+  btn.textContent=i.type==="text"?"🙈":"👁";
+}
+function showErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.add("show");}}
+function hideErr(id){const e=document.getElementById(id);if(e)e.classList.remove("show");}
+function setLoading(btnId,txtId,txt,on=true){
+  const b=document.getElementById(btnId);
+  const t=document.getElementById(txtId);
+  if(!b||!t)return;
+  b.disabled=on;
+  t.innerHTML=on?'<div class="spinner"></div>'+txt:txt;
+}
 
 async function doLogin(){
-  if(!window._auth){ toast("Still connecting to Firebase, please wait…","err"); return; }
   const email=document.getElementById("liEmail").value.trim().toLowerCase();
   const pass=document.getElementById("liPass").value;
   let ok=true;
-  if(!email||!email.includes("@")){showErr("liEmailErr","Enter a valid email");ok=false}else hideErr("liEmailErr");
-  if(!pass){showErr("liPassErr","Password required");ok=false}else hideErr("liPassErr");
+  hideErr("liErr");
+  if(!email||!email.includes("@")){showErr("liEmailErr","Enter a valid email");ok=false;}else hideErr("liEmailErr");
+  if(!pass){showErr("liPassErr","Password required");ok=false;}else hideErr("liPassErr");
   if(!ok)return;
-  setLoading("liBtn","liBtnTxt","Signing in…");
+  setLoading("liBtn","liBtnTxt","Signing in…",true);
   try {
     const cred = await window._auth.signInWithEmailAndPassword(email, pass);
     _curUid = cred.user.uid;
     await loadUserFromFirestore(_curUid);
-    // Update streak
     const u = _curUser;
     if(u){
-      const today=new Date().toDateString(),last=new Date(u.lastLogin).toDateString(),yest=new Date(Date.now()-86400000).toDateString();
+      const today=new Date().toDateString();
+      const last=new Date(u.lastLogin).toDateString();
+      const yest=new Date(Date.now()-86400000).toDateString();
       if(last!==today){u.streak=last===yest?u.streak+1:1;u.lastLogin=Date.now();await saveCurUser(u);}
     }
-    hideErr("liErr");
     setLoading("liBtn","liBtnTxt","Sign In",false);
     launchApp();
   } catch(e){
-    const msg = e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"||e.code==="auth/user-not-found"
-      ? "Incorrect email or password" : e.message;
-    showErr("liErr", msg);
+    const msg=e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"||e.code==="auth/user-not-found"
+      ?"Incorrect email or password":e.message;
+    showErr("liErr",msg);
     setLoading("liBtn","liBtnTxt","Sign In",false);
   }
 }
 
 async function doRegister(){
-  if(!window._auth){ toast("Still connecting to Firebase, please wait…","err"); return; }
   const name=document.getElementById("rgName").value.trim();
   const email=document.getElementById("rgEmail").value.trim().toLowerCase();
   const pass=document.getElementById("rgPass").value;
   const pass2=document.getElementById("rgPass2").value;
   let ok=true;
-  if(!name){showErr("rgNameErr","Name required");ok=false}else hideErr("rgNameErr");
-  if(!email||!email.includes("@")){showErr("rgEmailErr","Enter a valid email");ok=false}else hideErr("rgEmailErr");
-  if(pass.length<8){showErr("rgPassErr","Password must be 8+ characters");ok=false}else hideErr("rgPassErr");
-  if(pass!==pass2){showErr("rgPass2Err","Passwords do not match");ok=false}else hideErr("rgPass2Err");
+  hideErr("rgErr");
+  if(!name){showErr("rgNameErr","Name required");ok=false;}else hideErr("rgNameErr");
+  if(!email||!email.includes("@")){showErr("rgEmailErr","Enter a valid email");ok=false;}else hideErr("rgEmailErr");
+  if(pass.length<8){showErr("rgPassErr","Min. 8 characters");ok=false;}else hideErr("rgPassErr");
+  if(pass!==pass2){showErr("rgPass2Err","Passwords do not match");ok=false;}else hideErr("rgPass2Err");
   if(!ok)return;
-  setLoading("rgBtn","rgBtnTxt","Creating account…");
+  setLoading("rgBtn","rgBtnTxt","Creating account…",true);
   try {
     const cred = await window._auth.createUserWithEmailAndPassword(email, pass);
     _curUid = cred.user.uid;
@@ -1089,9 +1139,8 @@ async function doRegister(){
     setLoading("rgBtn","rgBtnTxt","Create Account",false);
     showOnboard();
   } catch(e){
-    const msg = e.code==="auth/email-already-in-use"
-      ? "Account already exists for this email" : e.message;
-    showErr("rgErr", msg);
+    const msg=e.code==="auth/email-already-in-use"?"Account already exists for this email":e.message;
+    showErr("rgErr",msg);
     setLoading("rgBtn","rgBtnTxt","Create Account",false);
   }
 }
@@ -1112,11 +1161,13 @@ async function googleSignIn(){
       _curUser = newUser;
       showOnboard();
     }
-  } catch(e){ toast("Google sign-in failed: "+e.message,"err"); }
+  } catch(e){
+    toast("Google sign-in failed: "+e.message,"err");
+    console.error("Google sign-in error:", e);
+  }
 }
 
 async function guestMode(){
-  // Anonymous guest: create a local-only user (no Firebase account)
   _curUid = null;
   _curUser = mkUser("Guest Learner","guest@lexacademy.app");
   showOnboard();
@@ -1129,36 +1180,51 @@ async function doLogout(){
 }
 
 /* ══ ONBOARDING ══ */
-let obStep=0;const OB_TOTAL=4;
-function showOnboard(){document.getElementById("authLayer").style.display="none";document.getElementById("onboardLayer").classList.add("show");renderObProg()}
-function renderObProg(){document.getElementById("obProg").innerHTML=Array.from({length:OB_TOTAL},(_,i)=>`<div class="onboard-pip ${i<=obStep?"done":""}"></div>`).join("")}
-function nextOb(){document.getElementById("ob-"+obStep).classList.remove("active");obStep++;if(obStep>=OB_TOTAL){finishOb();return}document.getElementById("ob-"+obStep).classList.add("active");renderObProg()}
-function selOb(el,grp){document.querySelectorAll("#"+grp+" .ob-opt").forEach(o=>o.classList.remove("sel"));el.classList.add("sel")}
-function finishOb(){document.getElementById("onboardLayer").classList.remove("show");launchApp()}
+let obStep=0; const OB_TOTAL=4;
+function showOnboard(){
+  document.getElementById("authLayer").style.display="none";
+  document.getElementById("onboardLayer").classList.add("show");
+  renderObProg();
+}
+function renderObProg(){
+  document.getElementById("obProg").innerHTML=
+    Array.from({length:OB_TOTAL},(_,i)=>'<div class="onboard-pip '+(i<=obStep?"done":"")+'"></div>').join("");
+}
+function nextOb(){
+  document.getElementById("ob-"+obStep).classList.remove("active");
+  obStep++;
+  if(obStep>=OB_TOTAL){finishOb();return;}
+  document.getElementById("ob-"+obStep).classList.add("active");
+  renderObProg();
+}
+function selOb(el,grp){
+  document.querySelectorAll("#"+grp+" .ob-opt").forEach(o=>o.classList.remove("sel"));
+  el.classList.add("sel");
+}
+function finishOb(){document.getElementById("onboardLayer").classList.remove("show");launchApp();}
 
 /* ══ LAUNCH ══ */
 function launchApp(){
   document.getElementById("authLayer").style.display="none";
   document.getElementById("onboardLayer").classList.remove("show");
   document.getElementById("appShell").classList.add("show");
-  refreshUI();renderHomeGrid();renderLessons();renderProjects();renderComm();renderLB();initQuiz();renderSim();renderNotifs();
+  refreshUI();renderHomeGrid();renderLessons();renderProjects();
+  renderComm();renderLB();initQuiz();renderSim();renderNotifs();
 }
 
 /* ══ REFRESH UI ══ */
-function getLevel(xp){return LEVELS.slice().reverse().find(l=>xp>=l.min)||LEVELS[0]}
+function getLevel(xp){return LEVELS.slice().reverse().find(l=>xp>=l.min)||LEVELS[0];}
 function refreshUI(){
   const u=getCurUser();if(!u)return;
   const ini=u.name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
   const lv=getLevel(u.xp);const li=LEVELS.indexOf(lv);const nx=LEVELS[li+1]||lv;
   const pct=Math.min(100,nx.min>lv.min?((u.xp-lv.min)/(nx.min-lv.min))*100:100);
-  // Sidebar
-  ["sf-av","tbAv","compAv","profAv"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini});
+  ["sf-av","tbAv","compAv","profAv"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini;});
   document.getElementById("sf-name").textContent=u.name;
   document.getElementById("sf-lvl").textContent="Level "+(li+1)+" · "+lv.name;
   document.getElementById("sfXpBar").style.width=pct+"%";
   document.getElementById("sfXpCur").textContent=u.xp+" XP";
   document.getElementById("sfXpNext").textContent=(nx.min-u.xp)+" XP to next";
-  // Topbar/Hero
   document.getElementById("heroTitle").textContent="Welcome back, "+u.name.split(" ")[0]+"! 👋";
   document.getElementById("heroSub").textContent=u.completedLessons.length===0?"Start your first lesson below.":u.completedLessons.length+" lesson"+(u.completedLessons.length>1?"s":"")+" done. Keep going!";
   document.getElementById("strkVal").textContent=u.streak;
@@ -1168,7 +1234,6 @@ function refreshUI(){
   document.getElementById("stP").textContent=u.completedProjects.length;
   const acc=u.quizHistory.length?Math.round(u.quizHistory.reduce((s,q)=>s+q.pct,0)/u.quizHistory.length)+"%":"—";
   document.getElementById("stA").textContent=acc;
-  // Profile
   document.getElementById("profName").textContent=u.name;
   document.getElementById("profLvlLbl").textContent="Level "+(li+1)+" · "+lv.name;
   document.getElementById("profXpFill").style.width=pct+"%";
@@ -1179,8 +1244,9 @@ function refreshUI(){
   document.getElementById("psSt").textContent=u.streak+"🔥";
   document.getElementById("editSub").textContent=u.email;
   renderActivity(u);renderBadges(u);
-  const me=LB_DATA.find(r=>r.isMe);if(me){me.xp=u.xp;me.level=lv.name}
+  const me=LB_DATA.find(r=>r.isMe);if(me){me.xp=u.xp;me.level=lv.name;}
 }
+
 function addXP(amt,reason){
   const u=getCurUser();if(!u)return;
   u.xp+=amt;
@@ -1188,6 +1254,7 @@ function addXP(amt,reason){
   if(u.activity.length>20)u.activity.pop();
   saveCurUser(u);refreshUI();toast("+"+amt+" XP!");checkBadges(u);
 }
+
 function checkBadges(u){
   const e=u.badges||[];const ul=[];
   if(u.completedLessons.length>=1&&!e.includes("first"))ul.push("first");
@@ -1200,21 +1267,24 @@ function checkBadges(u){
   if(u.completedLessons.length>=10&&!e.includes("lessons10"))ul.push("lessons10");
   if(u.quizHistory.find(q=>q.pct===100)&&!e.includes("perfect"))ul.push("perfect");
   if(u.quizHistory.filter(q=>q.pct>=80).length>=5&&!e.includes("quiz5"))ul.push("quiz5");
-  if(ul.length){u.badges=[...e,...ul];saveCurUser(u);ul.forEach(b=>{const bd=BADGES.find(x=>x.id===b);if(bd)toast("Badge: "+bd.icon+" "+bd.name);})}
+  if(ul.length){
+    u.badges=[...e,...ul];saveCurUser(u);
+    ul.forEach(b=>{const bd=BADGES.find(x=>x.id===b);if(bd)toast("Badge: "+bd.icon+" "+bd.name);});
+  }
 }
 
 /* ══ NAVIGATION ══ */
 const PT={home:"Home",lessons:"Lessons",reader:"Lesson",projects:"Projects",quiz:"Quiz",simulator:"Simulator",community:"Community",leaderboard:"Leaderboard",profile:"Profile"};
 function nav(p){
   document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-  document.getElementById("page-"+p).classList.add("active");
+  const pg=document.getElementById("page-"+p);if(pg)pg.classList.add("active");
   document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active"));
   const ni=document.getElementById("ni-"+p);if(ni)ni.classList.add("active");
   document.querySelectorAll(".mob-tab").forEach(x=>x.classList.remove("active"));
   const mt=document.getElementById("mt-"+p);if(mt)mt.classList.add("active");
-  document.getElementById("pageTitle").textContent=PT[p]||p;
-  document.getElementById("mainContent").scrollTop=0;
-  document.getElementById("notifPanel").classList.remove("open");
+  const pt=document.getElementById("pageTitle");if(pt)pt.textContent=PT[p]||p;
+  const mc=document.getElementById("mainContent");if(mc)mc.scrollTop=0;
+  const np=document.getElementById("notifPanel");if(np)np.classList.remove("open");
 }
 
 /* ══ HOME ══ */
@@ -1223,116 +1293,300 @@ function renderHomeGrid(){
   const rec=LD.filter(l=>!u||!u.completedLessons.includes(l.id)).slice(0,4);
   const cl={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};
   const bg={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
-  document.getElementById("homeGrid").innerHTML=rec.length?rec.map(l=>`<div class="lcard" onclick="openLesson('${l.id}')"><span class="lc-icon">${l.icon}</span><div class="lc-lvl" style="color:${cl[l.level]}">${l.level}</div><div class="lc-title">${l.title}</div><div class="lc-meta">${l.dur} · ${l.xp} XP</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>`).join(""):`<div style="grid-column:span 2;text-align:center;padding:32px;color:var(--text3)">🎉 All lessons complete!</div>`;
+  const el=document.getElementById("homeGrid");if(!el)return;
+  el.innerHTML=rec.length
+    ?rec.map(l=>'<div class="lcard" onclick="openLesson(\'''+l.id+'''\')">'+
+      '<span class="lc-icon">'+l.icon+'</span>'+
+      '<div class="lc-lvl" style="color:'+cl[l.level]+'">'+l.level+'</div>'+
+      '<div class="lc-title">'+l.title+'</div>'+
+      '<div class="lc-meta">'+l.dur+' · '+l.xp+' XP</div>'+
+      '<div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>').join("")
+    :'<div style="grid-column:span 2;text-align:center;padding:32px;color:var(--text3)">🎉 All lessons complete!</div>';
 }
+
 function renderActivity(u){
-  const bg={⭐:"var(--amber-dim)",✅:"var(--green-dim)",🔥:"rgba(239,68,68,.08)",🔨:"rgba(139,92,246,.08)",💻:"var(--blue-dim)"};
-  document.getElementById("actList").innerHTML=u.activity.slice(0,6).length?u.activity.slice(0,6).map(a=>`<div class="act-item"><div class="act-ic" style="background:${bg[a.icon]||"var(--bg)"}">${a.icon}</div><div class="act-txt">${a.text}</div><div class="act-time">${a.time}</div></div>`).join(""):`<div class="act-item"><div class="act-txt" style="color:var(--text3)">No activity yet — complete a lesson to get started!</div></div>`;
+  const bg={'⭐':"var(--amber-dim)",'✅':"var(--green-dim)",'🔥':"rgba(239,68,68,.08)",'🔨':"rgba(139,92,246,.08)",'💻':"var(--blue-dim)"};
+  const el=document.getElementById("actList");if(!el)return;
+  el.innerHTML=u.activity.slice(0,6).length
+    ?u.activity.slice(0,6).map(a=>'<div class="act-item"><div class="act-ic" style="background:'+
+      (bg[a.icon]||"var(--bg)")+'">'+a.icon+'</div><div class="act-txt">'+a.text+
+      '</div><div class="act-time">'+a.time+'</div></div>').join("")
+    :'<div class="act-item"><div class="act-txt" style="color:var(--text3)">No activity yet — complete a lesson to get started!</div></div>';
 }
 
 /* ══ LESSONS ══ */
 let curFilter="All";
-function fLessons(f,el){curFilter=f;document.querySelectorAll("#page-lessons .fbtn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderLessons()}
+function fLessons(f,el){curFilter=f;document.querySelectorAll("#page-lessons .fbtn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderLessons();}
 function renderLessons(){
-  const u=getCurUser();const cl={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};const bg={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
-  const list=LD.filter(l=>curFilter==="All"||l.level===curFilter||l.topic===curFilter);
-  document.getElementById("lessonList").innerHTML=list.map(l=>{const done=u&&u.completedLessons.includes(l.id);return`<div class="lrow" onclick="openLesson('${l.id}')"><div class="lrow-ic" style="background:${bg[l.level]}">${l.icon}</div><div class="lrow-body"><div class="lrow-title">${l.title}</div><div class="lrow-meta">${l.topic} · ${l.dur} · ${l.xp} XP</div></div><div class="lrow-right"><span class="diff-badge" style="background:${bg[l.level]};color:${cl[l.level]}">${l.level}</span>${done?`<div class="done-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`:""}</div></div>`}).join("");
+  const u=getCurUser();
+  const cl={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};
+  const bg={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
+  const filtered=LD.filter(l=>curFilter==="All"||l.level===curFilter||l.topic===curFilter);
+  const el=document.getElementById("lessonGrid");if(!el)return;
+  el.innerHTML=filtered.map(l=>{
+    const done=u&&u.completedLessons.includes(l.id);
+    return '<div class="lcard '+(done?"done":"")+'" onclick="openLesson(\'''+l.id+'''\')">'+
+      '<span class="lc-icon">'+l.icon+'</span>'+
+      (done?'<div class="lc-done">✓</div>':"")+
+      '<div class="lc-lvl" style="color:'+cl[l.level]+'">'+l.level+'</div>'+
+      '<div class="lc-title">'+l.title+'</div>'+
+      '<div class="lc-meta">'+l.dur+' · '+l.xp+' XP</div>'+
+      '<div class="lc-bar"><div class="lc-fill" style="width:'+(done?"100":"0")+'%"></div></div></div>';
+  }).join("");
 }
-window._lid=null;
+
 function openLesson(id){
-  const l=LD.find(x=>x.id===id);if(!l)return;window._lid=id;
-  document.getElementById("rIcon").textContent=l.icon;
-  document.getElementById("rTitle").textContent=l.title;
-  document.getElementById("rTags").innerHTML=`<span class="r-tag">${l.level}</span><span class="r-tag">${l.topic}</span><span class="r-tag">${l.dur}</span><span class="r-tag">${l.xp} XP</span>`;
-  document.getElementById("rBody").innerHTML=l.body;
-  const u=getCurUser();const done=u&&u.completedLessons.includes(id);
-  const btn=document.getElementById("rComplete");btn.textContent=done?"✓ Completed":"✓ Mark Complete";btn.className="r-btn"+(done?" ok":"");btn.onclick=done?null:markComplete;
+  const l=LD.find(x=>x.id===id);if(!l)return;
+  const u=getCurUser();
+  const done=u&&u.completedLessons.includes(l.id);
+  const el=document.getElementById("readerBody");if(el)el.innerHTML=l.body;
+  const btn=document.getElementById("lessonDoneBtn");
+  if(btn){btn.textContent=done?"✓ Completed":"Mark Complete & Earn "+l.xp+" XP";btn.disabled=done;}
+  const lt=document.getElementById("lessonTitle");if(lt)lt.textContent=l.title;
   nav("reader");
+  window._currentLesson=l;
 }
-function markComplete(){
-  const id=window._lid;const l=LD.find(x=>x.id===id);if(!l)return;
-  const u=getCurUser();if(!u||u.completedLessons.includes(id))return;
-  u.completedLessons.push(id);u.activity.unshift({icon:"✅",text:"Completed: "+l.title,time:"Just now"});
-  saveCurUser(u);addXP(l.xp,"lesson complete");
-  const btn=document.getElementById("rComplete");if(btn){btn.textContent="✓ Completed";btn.className="r-btn ok";btn.onclick=null}
-  renderLessons();renderHomeGrid();checkBadges(u);
+
+function completeLesson(){
+  const l=window._currentLesson;if(!l)return;
+  const u=getCurUser();if(!u)return;
+  if(u.completedLessons.includes(l.id)){toast("Already completed! ✓");return;}
+  u.completedLessons.push(l.id);
+  u.activity.unshift({icon:"✅",text:"Completed: "+l.title,time:"Just now"});
+  saveCurUser(u);addXP(l.xp,"lesson completed");
+  const btn=document.getElementById("lessonDoneBtn");
+  if(btn){btn.textContent="✓ Completed";btn.disabled=true;}
+  checkBadges(u);renderLessons();
 }
 
 /* ══ PROJECTS ══ */
-let pFilter="All";
-function fProjs(f,el){pFilter=f;document.querySelectorAll("#page-projects .fbtn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderProjects()}
 function renderProjects(){
-  const u=getCurUser();const dc={Beginner:"var(--green)",Intermediate:"var(--amber)",Advanced:"var(--red)"};
-  document.getElementById("projGrid").innerHTML=PD.filter(p=>pFilter==="All"||p.diff===pFilter).map(p=>{const done=u&&u.completedProjects.includes(p.id);return`<div class="pcard" onclick="completeProj('${p.id}','${p.title}',${p.xp})">${done?`<div class="pcard-done">Built ✓</div>`:""}<div class="pcard-thumb">${p.icon}</div><div class="pcard-body"><div class="pcard-title">${p.title}</div><div class="pcard-meta"><span class="pdot" style="background:${dc[p.diff]}"></span>${p.diff} · ${p.time} · ${p.xp} XP</div><div style="display:flex;gap:5px;flex-wrap:wrap">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join("")}</div></div></div>`}).join("");
+  const u=getCurUser();
+  const el=document.getElementById("projGrid");if(!el)return;
+  el.innerHTML=PD.map(p=>{
+    const done=u&&u.completedProjects.includes(p.id);
+    const dc={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
+    const tc={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};
+    return '<div class="proj-card '+(done?"done":"")+'">'+
+      '<div class="pc-head"><span class="pc-icon">'+p.icon+'</span>'+
+      (done?'<span class="pc-done">✓ Built</span>':'<span class="pc-diff" style="background:'+dc[p.diff]+';color:'+tc[p.diff]+'">'+p.diff+'</span>')+
+      '</div><div class="pc-title">'+p.title+'</div>'+
+      '<div class="pc-time">⏱ '+p.time+'</div>'+
+      '<div class="pc-tags">'+p.tags.map(t=>'<span class="pc-tag">'+t+'</span>').join("")+'</div>'+
+      '<button class="pc-btn'+(done?' done':"")+'" onclick="completeProj(\'''+p.id+''',\''''+p.title+''','+(p.xp||150)+')" '+(done?"disabled":"")+'>'+
+      (done?"✓ Completed":"Mark as Built · +'+(p.xp||150)+' XP")+'</button></div>';
+  }).join("");
 }
-function completeProj(id,title,xp){const u=getCurUser();if(!u)return;if(u.completedProjects.includes(id)){toast("Already built! 🔨");return}u.completedProjects.push(id);u.activity.unshift({icon:"🔨",text:"Built: "+title,time:"Just now"});saveCurUser(u);addXP(xp,"project built");renderProjects();checkBadges(u)}
+
+function completeProj(id,title,xp){
+  const u=getCurUser();if(!u)return;
+  if(u.completedProjects.includes(id)){toast("Already built! 🔨");return;}
+  u.completedProjects.push(id);
+  u.activity.unshift({icon:"🔨",text:"Built: "+title,time:"Just now"});
+  saveCurUser(u);addXP(xp,"project built");renderProjects();checkBadges(u);
+}
 
 /* ══ QUIZ ══ */
 let qI=0,qSc=0,qAns=false;
-function initQuiz(){qI=0;qSc=0;qAns=false;renderQ()}
+function initQuiz(){qI=0;qSc=0;qAns=false;renderQ();}
 function renderQ(){
-  const w=document.getElementById("quizWrap");
+  const w=document.getElementById("quizWrap");if(!w)return;
   if(qI>=QD.length){
     const pct=Math.round(qSc/QD.length*100);
-    const u=getCurUser();if(u){u.quizHistory.push({pct,date:Date.now()});saveCurUser(u);addXP(pct,"quiz completed");checkBadges(u)}
-    w.innerHTML=`<div class="q-result"><div class="qr-circle" style="border-color:${pct>=80?"var(--green)":pct>=60?"var(--amber)":"var(--red)"}"><div class="qr-pct">${pct}%</div><div class="qr-of">${qSc}/${QD.length}</div></div><div class="qr-title">${pct>=80?"Excellent! 🏆":pct>=60?"Good work! 👍":"Keep studying! 💪"}</div><div class="qr-sub">${pct>=80?"Strong understanding of the material!":pct>=60?"Review some lessons to improve.":"Head back to lessons and try again."}</div><div class="qr-actions"><button class="qr-btn" onclick="nav('lessons')">Back to Lessons</button><button class="qr-btn p" onclick="initQuiz()">Try Again</button></div></div>`;return;
+    const u=getCurUser();
+    if(u){u.quizHistory.push({pct,date:Date.now()});saveCurUser(u);addXP(pct,"quiz completed");checkBadges(u);}
+    w.innerHTML='<div class="q-result">'+
+      '<div class="qr-circle" style="border-color:'+(pct>=80?"var(--green)":pct>=60?"var(--amber)":"var(--red)")+'">'+
+      '<div class="qr-pct">'+pct+'%</div><div class="qr-of">'+qSc+'/'+QD.length+'</div></div>'+
+      '<div class="qr-title">'+(pct>=80?"Excellent! 🏆":pct>=60?"Good work! 👍":"Keep studying! 💪")+'</div>'+
+      '<div class="qr-sub">'+(pct>=80?"Strong understanding!":pct>=60?"Review some lessons.":"Head back to lessons.")+'</div>'+
+      '<div class="qr-actions">'+
+      '<button class="qr-btn" onclick="nav('+"'lessons'"+')">Back to Lessons</button>'+
+      '<button class="qr-btn p" onclick="initQuiz()">Try Again</button></div></div>';
+    return;
   }
   const q=QD[qI];const pb=Math.round((qI/QD.length)*100);const L=["A","B","C","D"];
-  w.innerHTML=`<div class="q-meta"><span class="q-cnt">${qI+1} / ${QD.length}</span><div class="q-pbar"><div class="q-pbar-fill" style="width:${pb}%"></div></div><span class="q-xp">+${qSc*10} XP</span></div><div class="q-card"><div class="q-topic">${q.topic}</div><div class="q-q">${q.q}</div><div class="q-opts">${q.opts.map((o,i)=>`<button class="q-opt" onclick="ansQ(${i})"><span class="q-letter">${L[i]}</span>${o}</button>`).join("")}</div><button class="q-next" id="qNext" disabled onclick="nextQ()">Continue &#8594;</button></div>`;
+  w.innerHTML=
+    '<div class="q-meta"><span class="q-cnt">'+(qI+1)+' / '+QD.length+'</span>'+
+    '<div class="q-pbar"><div class="q-pbar-fill" style="width:'+pb+'%"></div></div>'+
+    '<span class="q-xp">+'+(qSc*10)+' XP</span></div>'+
+    '<div class="q-card"><div class="q-topic">'+q.topic+'</div>'+
+    '<div class="q-q">'+q.q+'</div>'+
+    '<div class="q-opts">'+ q.opts.map((o,i)=>
+      '<button class="q-opt" onclick="ansQ('+i+')"><span class="q-letter">'+L[i]+'</span>'+o+'</button>'
+    ).join("")+'</div>'+
+    '<button class="q-next" id="qNext" disabled onclick="nextQ()">Continue &#8594;</button></div>';
 }
-function ansQ(i){if(qAns)return;qAns=true;const q=QD[qI];document.querySelectorAll(".q-opt").forEach((o,idx)=>{o.disabled=true;if(idx===q.ans)o.classList.add("correct");else if(idx===i&&i!==q.ans)o.classList.add("wrong")});if(i===q.ans)qSc++;const card=document.querySelector(".q-card");const exp=document.createElement("div");exp.className="q-exp";exp.textContent=q.exp;card.insertBefore(exp,document.getElementById("qNext"));document.getElementById("qNext").disabled=false}
-function nextQ(){qI++;qAns=false;renderQ()}
+function ansQ(i){
+  if(qAns)return;qAns=true;
+  const q=QD[qI];
+  document.querySelectorAll(".q-opt").forEach((o,idx)=>{
+    o.disabled=true;
+    if(idx===q.ans)o.classList.add("correct");
+    else if(idx===i&&i!==q.ans)o.classList.add("wrong");
+  });
+  if(i===q.ans)qSc++;
+  const card=document.querySelector(".q-card");
+  const exp=document.createElement("div");exp.className="q-exp";exp.textContent=q.exp;
+  const nxt=document.getElementById("qNext");
+  if(nxt){card.insertBefore(exp,nxt);nxt.disabled=false;}
+}
+function nextQ(){qI++;qAns=false;renderQ();}
 
 /* ══ SIMULATOR ══ */
 function renderSim(){
-  document.getElementById("simTpls").innerHTML=SIM_TPLS.map(t=>`<div class="stpl" onclick="openWokwi('${t.sketch}')"><span class="stpl-icon">${t.icon}</span><div class="stpl-title">${t.title}</div><div class="stpl-desc">${t.desc}</div><span class="stpl-badge">Open in Wokwi ↗</span></div>`).join("");
+  const el=document.getElementById("simTpls");if(!el)return;
+  el.innerHTML=SIM_TPLS.map(t=>
+    '<div class="stpl" onclick="openWokwi(\''''+t.sketch+'''\')">'+
+    '<span class="stpl-icon">'+t.icon+'</span>'+
+    '<div class="stpl-title">'+t.title+'</div>'+
+    '<div class="stpl-desc">'+t.desc+'</div>'+
+    '<span class="stpl-badge">Open in Wokwi ↗</span></div>'
+  ).join("");
 }
 function openWokwi(sketch){
   const url=sketch&&WOKWI_URLS[sketch]?WOKWI_URLS[sketch]:"https://wokwi.com/projects/new/arduino-uno";
   window.open(url,"_blank","noopener");
-  const u=getCurUser();if(u){u.activity.unshift({icon:"💻",text:"Opened Wokwi Simulator",time:"Just now"});saveCurUser(u);refreshUI()}
+  const u=getCurUser();
+  if(u){u.activity.unshift({icon:"💻",text:"Opened Wokwi Simulator",time:"Just now"});saveCurUser(u);refreshUI();}
   toast("Opening Wokwi — no account needed! 🚀");
 }
 
 /* ══ COMMUNITY ══ */
 let commTab="latest";let commPosts=[...CP];
-function setCommTab(t,el){commTab=t;document.querySelectorAll(".comm-tab").forEach(x=>x.classList.remove("active"));el.classList.add("active");renderComm()}
+function setCommTab(t,el){commTab=t;document.querySelectorAll(".comm-tab").forEach(x=>x.classList.remove("active"));el.classList.add("active");renderComm();}
 function renderComm(){
-  const u=getCurUser();let posts=[...commPosts];if(commTab==="trending")posts.sort((a,b)=>b.likes-a.likes);
-  document.getElementById("postList").innerHTML=posts.map(p=>{const liked=u&&u.likedPosts&&u.likedPosts.includes(p.id);return`<div class="post-card"><div class="post-head"><div class="post-av" style="background:${p.av}">${p.user.charAt(0)}</div><div class="post-ui"><div class="post-user">${p.user}</div><div class="post-role">${p.role}</div></div><div class="post-time">${p.time}</div></div><div class="post-text">${p.text}</div><div class="post-tags">${p.tags.map(t=>`<span class="post-tag">${t}</span>`).join("")}</div><div class="post-foot"><button class="p-action ${liked?"liked":""}" onclick="toggleLike('${p.id}',this)"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${p.likes}</button><button class="p-action" onclick="toast('Reply coming soon!')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${p.replies}</button><button class="p-action" onclick="toast('Link copied!')"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button></div></div>`}).join("");
+  const u=getCurUser();let posts=[...commPosts];
+  if(commTab==="trending")posts.sort((a,b)=>b.likes-a.likes);
+  const el=document.getElementById("postList");if(!el)return;
+  el.innerHTML=posts.map(p=>{
+    const liked=u&&u.likedPosts&&u.likedPosts.includes(p.id);
+    return '<div class="post-card">'+
+      '<div class="post-head"><div class="post-av" style="background:'+p.av+'">'+p.user.charAt(0)+'</div>'+
+      '<div class="post-ui"><div class="post-user">'+p.user+'</div><div class="post-role">'+p.role+'</div></div>'+
+      '<div class="post-time">'+p.time+'</div></div>'+
+      '<div class="post-text">'+p.text+'</div>'+
+      '<div class="post-tags">'+ p.tags.map(t=>'<span class="post-tag">'+t+'</span>').join("")+'</div>'+
+      '<div class="post-foot">'+
+      '<button class="p-action '+(liked?"liked":"")+'" onclick="toggleLike(\''''+p.id+'''\'',this)">'+
+      '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'+p.likes+'</button>'+
+      '<button class="p-action" onclick="toast('+"'Reply coming soon!'"+ ')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+p.replies+'</button>'+
+      '<button class="p-action" onclick="toast('+"'Link copied!'"+ ')"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>'+
+      '</div></div>';
+  }).join("");
 }
-function toggleLike(id,el){const u=getCurUser();if(!u)return;const p=commPosts.find(x=>x.id===id);if(!p)return;if(!u.likedPosts)u.likedPosts=[];const i=u.likedPosts.indexOf(id);if(i>-1){u.likedPosts.splice(i,1);p.likes--}else{u.likedPosts.push(id);p.likes++}saveCurUser(u);renderComm()}
-function postMsg(){const inp=document.getElementById("compInput");const txt=inp.value.trim();if(!txt)return;const u=getCurUser();commPosts.unshift({id:"u"+Date.now(),user:u?u.name:"You",role:"Member",av:"#111",time:"Just now",text:txt,tags:[],likes:0,replies:0});inp.value="";renderComm();toast("Posted! 🚀","ok")}
+function toggleLike(id,el){
+  const u=getCurUser();if(!u)return;
+  const p=commPosts.find(x=>x.id===id);if(!p)return;
+  if(!u.likedPosts)u.likedPosts=[];
+  const i=u.likedPosts.indexOf(id);
+  if(i>-1){u.likedPosts.splice(i,1);p.likes--;}else{u.likedPosts.push(id);p.likes++;}
+  saveCurUser(u);renderComm();
+}
+function postMsg(){
+  const inp=document.getElementById("compInput");if(!inp)return;
+  const txt=inp.value.trim();if(!txt)return;
+  const u=getCurUser();
+  commPosts.unshift({id:"u"+Date.now(),user:u?u.name:"You",role:"Member",av:"#111",time:"Just now",text:txt,tags:[],likes:0,replies:0});
+  inp.value="";renderComm();toast("Posted! 🚀","ok");
+}
 
 /* ══ LEADERBOARD ══ */
 function renderLB(){
-  const u=getCurUser();const me=LB_DATA.find(r=>r.isMe);if(u&&me){me.xp=u.xp;me.level=getLevel(u.xp).name}
+  const u=getCurUser();const me=LB_DATA.find(r=>r.isMe);
+  if(u&&me){me.xp=u.xp;me.level=getLevel(u.xp).name;}
   const sorted=[...LB_DATA].sort((a,b)=>b.xp-a.xp);
-  const top3=sorted.slice(0,3);const avC=["#1a1a1a","#333","#555"];
+  const top3=sorted.slice(0,3);
+  const avC=["#1a1a1a","#333","#555"];
   const podOrd=[1,0,2];
-  document.getElementById("lbPodium").innerHTML=podOrd.map(i=>{const p=top3[i];if(!p)return"";const isF=i===0;return`<div class="lb-pod ${isF?"first":""}"><div class="lb-rank">#${i+1}</div>${isF?`<div class="lb-crown">👑</div>`:""}<div class="lb-av" style="background:${avC[i]}">${p.name.charAt(0)}</div><div class="lb-pname">${p.name}${p.isMe?" (You)":""}</div><div class="lb-pxp">${p.xp.toLocaleString()} XP</div></div>`}).join("");
-  document.getElementById("lbList").innerHTML=sorted.slice(3).map((p,i)=>`<div class="lb-row ${p.isMe?"me":""}"><span class="lb-rrank">${i+4}</span><div class="lb-rav" style="background:${p.av||"#333"}">${p.name.charAt(0)}</div><div><div class="lb-rname">${p.name}${p.isMe?" (You)":""}</div><div class="lb-rlvl">${p.level}</div></div><span class="lb-rxp">${p.xp.toLocaleString()} XP</span></div>`).join("");
+  const lbp=document.getElementById("lbPodium");
+  if(lbp)lbp.innerHTML=podOrd.map(i=>{
+    const p=top3[i];if(!p)return"";const isF=i===0;
+    return '<div class="lb-pod '+(isF?"first":"")+'">'+
+      '<div class="lb-rank">#'+(i+1)+'</div>'+(isF?'<div class="lb-crown">👑</div>':"")+
+      '<div class="lb-av" style="background:'+(avC[i]||"#333")+'">'+p.name.charAt(0)+'</div>'+
+      '<div class="lb-pname">'+p.name+(p.isMe?" (You)":"")+'</div>'+
+      '<div class="lb-pxp">'+p.xp.toLocaleString()+' XP</div></div>';
+  }).join("");
+  const lbl=document.getElementById("lbList");
+  if(lbl)lbl.innerHTML=sorted.slice(3).map((p,i)=>
+    '<div class="lb-row '+(p.isMe?"me":"")+'">'+
+    '<span class="lb-rrank">'+(i+4)+'</span>'+
+    '<div class="lb-rav" style="background:'+(p.av||"#333")+'">'+p.name.charAt(0)+'</div>'+
+    '<div><div class="lb-rname">'+p.name+(p.isMe?" (You)":"")+'</div><div class="lb-rlvl">'+p.level+'</div></div>'+
+    '<span class="lb-rxp">'+p.xp.toLocaleString()+' XP</span></div>'
+  ).join("");
 }
 
 /* ══ BADGES ══ */
-function renderBadges(u){const e=u.badges||[];document.getElementById("badgeGrid").innerHTML=BADGES.map(b=>{const earned=e.includes(b.id);return`<div class="badge-item" title="${b.desc}"><div class="badge-ic ${earned?"earned":"locked"}">${b.icon}</div><div class="badge-nm">${b.name}</div></div>`}).join("")}
+function renderBadges(u){
+  const e=u.badges||[];
+  const el=document.getElementById("badgeGrid");if(!el)return;
+  el.innerHTML=BADGES.map(b=>{
+    const earned=e.includes(b.id);
+    return '<div class="badge-item" title="'+b.desc+'">'+
+      '<div class="badge-ic '+(earned?"earned":"locked")+'">'+b.icon+'</div>'+
+      '<div class="badge-nm">'+b.name+'</div></div>';
+  }).join("");
+}
 
 /* ══ PROFILE ══ */
-function editProfile(){const u=getCurUser();if(!u)return;const n=prompt("Your name:",u.name);if(n&&n.trim()){u.name=n.trim();saveCurUser(u);refreshUI();toast("Profile updated ✓","ok")}}
-function toggleSetting(key,el){const u=getCurUser();if(!u)return;el.classList.toggle("off");if(key==="notifs")u.notifOn=!el.classList.contains("off");saveCurUser(u)}
-function setGoal(v,el){document.querySelectorAll(".goal-btn").forEach(b=>b.classList.remove("active"));el.classList.add("active");const u=getCurUser();if(!u)return;u.goal=v;saveCurUser(u);toast("Goal: "+v+" lessons/week")}
+function editProfile(){
+  const u=getCurUser();if(!u)return;
+  const n=prompt("Your name:",u.name);
+  if(n&&n.trim()){u.name=n.trim();saveCurUser(u);refreshUI();toast("Profile updated ✓","ok");}
+}
+function toggleSetting(key,el){
+  const u=getCurUser();if(!u)return;
+  el.classList.toggle("off");
+  if(key==="notifs")u.notifOn=!el.classList.contains("off");
+  saveCurUser(u);
+}
+function setGoal(v,el){
+  document.querySelectorAll(".goal-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  const u=getCurUser();if(!u)return;
+  u.goal=v;saveCurUser(u);toast("Goal: "+v+" lessons/week");
+}
 
 /* ══ NOTIFICATIONS ══ */
-function renderNotifs(){const n=NOTIFS.filter(x=>x.unread).length;document.getElementById("nbDot").style.display=n?"block":"none";document.getElementById("notifList").innerHTML=NOTIFS.map(n=>`<div class="notif-item ${n.unread?"unread":""}" onclick="this.classList.remove('unread')"><div class="ni-icon">${n.icon}</div><div><div class="ni-text">${n.text}</div><div class="ni-time">${n.time}</div></div></div>`).join("")}
-function toggleNotif(){document.getElementById("notifPanel").classList.toggle("open")}
-function clearNotifs(){NOTIFS.forEach(n=>n.unread=false);document.getElementById("nbDot").style.display="none";document.getElementById("notifPanel").classList.remove("open");renderNotifs()}
-document.addEventListener("click",e=>{const p=document.getElementById("notifPanel");const b=document.getElementById("notifBtn");if(p&&!p.contains(e.target)&&!b.contains(e.target))p.classList.remove("open")});
+function renderNotifs(){
+  const n=NOTIFS.filter(x=>x.unread).length;
+  const dot=document.getElementById("nbDot");if(dot)dot.style.display=n?"block":"none";
+  const nl=document.getElementById("notifList");if(!nl)return;
+  nl.innerHTML=NOTIFS.map(n=>
+    '<div class="notif-item '+(n.unread?"unread":"")+'" onclick="this.classList.remove('+"'unread'"+ ')"><div class="ni-icon">'+n.icon+'</div>'+
+    '<div><div class="ni-text">'+n.text+'</div><div class="ni-time">'+n.time+'</div></div></div>'
+  ).join("");
+}
+function toggleNotif(){const p=document.getElementById("notifPanel");if(p)p.classList.toggle("open");}
+function clearNotifs(){
+  NOTIFS.forEach(n=>n.unread=false);
+  const dot=document.getElementById("nbDot");if(dot)dot.style.display="none";
+  const p=document.getElementById("notifPanel");if(p)p.classList.remove("open");
+  renderNotifs();
+}
+document.addEventListener("click",e=>{
+  const p=document.getElementById("notifPanel");
+  const b=document.getElementById("notifBtn");
+  if(p&&b&&!p.contains(e.target)&&!b.contains(e.target))p.classList.remove("open");
+});
 
 /* ══ SEARCH ══ */
-function doSearch(v){if(!v.trim())return;const q=v.toLowerCase();const m=LD.find(l=>l.title.toLowerCase().includes(q)||l.topic.toLowerCase().includes(q));if(m)openLesson(m.id);else toast("No results found")}
+function doSearch(v){
+  if(!v.trim())return;
+  const q=v.toLowerCase();
+  const m=LD.find(l=>l.title.toLowerCase().includes(q)||l.topic.toLowerCase().includes(q));
+  if(m)openLesson(m.id);else toast("No results found");
+}
 
 /* ══ TOAST ══ */
-function toast(msg,type=""){const w=document.getElementById("toastWrap");const t=document.createElement("div");t.className="toast "+(type||"");t.textContent=msg;w.appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="opacity .25s";setTimeout(()=>t.remove(),260)},2800)}
+function toast(msg,type=""){
+  const w=document.getElementById("toastWrap");if(!w)return;
+  const t=document.createElement("div");t.className="toast "+(type||"");t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>{t.style.opacity="0";t.style.transition="opacity .25s";setTimeout(()=>t.remove(),260);},2800);
+}
 
 /* ══ BOOT ══ */
 (function boot(){
@@ -1349,18 +1603,15 @@ function toast(msg,type=""){const w=document.getElementById("toastWrap");const t
         }
       } else {
         document.getElementById("authLayer").style.display="flex";
-        document.getElementById("liPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
-        document.getElementById("rgPass2").addEventListener("keydown",e=>{if(e.key==="Enter")doRegister()});
+        const lp=document.getElementById("liPass");
+        if(lp)lp.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+        const rp=document.getElementById("rgPass2");
+        if(rp)rp.addEventListener("keydown",e=>{if(e.key==="Enter")doRegister();});
       }
     });
   }
-
-  // Firebase module fires "fbReady" when done; if already loaded just go
-  if(window._auth){
-    startApp();
-  } else {
-    window.addEventListener("fbReady", startApp, { once: true });
-  }
+  if(window._auth){ startApp(); }
+  else { window.addEventListener("fbReady",startApp,{once:true}); }
 })();
 </script>
 </body>
