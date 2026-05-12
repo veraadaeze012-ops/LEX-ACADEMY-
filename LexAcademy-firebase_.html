@@ -6,21 +6,12 @@
 <title>Lex Academy</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- ══ FIREBASE SDK ══ -->
-<!-- 🔑 REPLACE the config values below with your own Firebase project config -->
-<!-- Go to: Firebase Console → Your Project → Project Settings → Your Apps → SDK setup -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-    signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  // ── YOUR FIREBASE CONFIG ──────────────────────────────────────────────────
-  const firebaseConfig = {
+<!-- ══ FIREBASE SDK (compat) ══ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
     apiKey:            "AIzaSyBm2y7fNCHshVvS0HDJXNVlLxKtZ7384DI",
     authDomain:        "lex-academy-3dbba.firebaseapp.com",
     projectId:         "lex-academy-3dbba",
@@ -28,19 +19,10 @@
     messagingSenderId: "143935846024",
     appId:             "1:143935846024:web:8ddbf2cb34aa9c7233513d",
     measurementId:     "G-TRH7XW5XT4"
-  };
-  // ─────────────────────────────────────────────────────────────────────────
-
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-  const googleProvider = new GoogleAuthProvider();
-
-  // Expose to global scope so non-module script below can use them
-  window._fb = { auth, db, googleProvider,
-    createUserWithEmailAndPassword, signInWithEmailAndPassword,
-    signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
-    doc, getDoc, setDoc, updateDoc, serverTimestamp };
+  });
+  window._auth = firebase.auth();
+  window._db   = firebase.firestore();
+  window.dispatchEvent(new Event("fbReady"));
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1029,23 +1011,19 @@ function getCurUser() { return _curUser; }
 async function saveCurUser(u) {
   _curUser = u;
   if (!_curUid) return;
-  const { db, doc, setDoc } = window._fb;
   try {
-    await setDoc(doc(db, "users", _curUid), u);
+    await window._db.collection("users").doc(_curUid).set(u);
   } catch (e) { console.error("saveCurUser:", e); }
 }
 
 // Load user document from Firestore into cache
 async function loadUserFromFirestore(uid) {
-  const { db, doc, getDoc } = window._fb;
-  const snap = await getDoc(doc(db, "users", uid));
-  if (snap.exists()) {
+  const snap = await window._db.collection("users").doc(uid).get();
+  if (snap.exists) {
     _curUser = snap.data();
   }
   return _curUser;
 }
-
-/* ══ AUTH ══ */
 
 /* ══ AUTH ══ */
 function switchTab(t){
@@ -1060,6 +1038,7 @@ function hideErr(id){const e=document.getElementById(id);if(e)e.classList.remove
 function setLoading(btnId,txtId,txt,on=true){const b=document.getElementById(btnId);const t=document.getElementById(txtId);if(!b)return;b.disabled=on;t.innerHTML=on?`<div class="spinner"></div>${txt}`:txt}
 
 async function doLogin(){
+  if(!window._auth){ toast("Still connecting to Firebase, please wait…","err"); return; }
   const email=document.getElementById("liEmail").value.trim().toLowerCase();
   const pass=document.getElementById("liPass").value;
   let ok=true;
@@ -1068,8 +1047,7 @@ async function doLogin(){
   if(!ok)return;
   setLoading("liBtn","liBtnTxt","Signing in…");
   try {
-    const { auth, signInWithEmailAndPassword } = window._fb;
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    const cred = await window._auth.signInWithEmailAndPassword(email, pass);
     _curUid = cred.user.uid;
     await loadUserFromFirestore(_curUid);
     // Update streak
@@ -1090,6 +1068,7 @@ async function doLogin(){
 }
 
 async function doRegister(){
+  if(!window._auth){ toast("Still connecting to Firebase, please wait…","err"); return; }
   const name=document.getElementById("rgName").value.trim();
   const email=document.getElementById("rgEmail").value.trim().toLowerCase();
   const pass=document.getElementById("rgPass").value;
@@ -1102,11 +1081,10 @@ async function doRegister(){
   if(!ok)return;
   setLoading("rgBtn","rgBtnTxt","Creating account…");
   try {
-    const { auth, db, createUserWithEmailAndPassword, doc, setDoc } = window._fb;
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const cred = await window._auth.createUserWithEmailAndPassword(email, pass);
     _curUid = cred.user.uid;
     const newUser = mkUser(name, email);
-    await setDoc(doc(db, "users", _curUid), newUser);
+    await window._db.collection("users").doc(_curUid).set(newUser);
     _curUser = newUser;
     setLoading("rgBtn","rgBtnTxt","Create Account",false);
     showOnboard();
@@ -1120,17 +1098,17 @@ async function doRegister(){
 
 async function googleSignIn(){
   try {
-    const { auth, db, googleProvider, signInWithPopup, doc, getDoc, setDoc } = window._fb;
-    const result = await signInWithPopup(auth, googleProvider);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await window._auth.signInWithPopup(provider);
     const user = result.user;
     _curUid = user.uid;
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if(snap.exists()){
+    const snap = await window._db.collection("users").doc(user.uid).get();
+    if(snap.exists){
       _curUser = snap.data();
       launchApp();
     } else {
       const newUser = mkUser(user.displayName||"Learner", user.email);
-      await setDoc(doc(db, "users", user.uid), newUser);
+      await window._db.collection("users").doc(user.uid).set(newUser);
       _curUser = newUser;
       showOnboard();
     }
@@ -1145,8 +1123,7 @@ async function guestMode(){
 }
 
 async function doLogout(){
-  const { auth, signOut } = window._fb;
-  try { await signOut(auth); } catch(_){}
+  try { await window._auth.signOut(); } catch(_){}
   _curUser = null; _curUid = null;
   location.reload();
 }
@@ -1359,15 +1336,8 @@ function toast(msg,type=""){const w=document.getElementById("toastWrap");const t
 
 /* ══ BOOT ══ */
 (function boot(){
-  // Wait for Firebase to be ready (module script loads async)
-  function waitForFb(cb, attempts=0){
-    if(window._fb){ cb(); return; }
-    if(attempts>40){ console.error("Firebase SDK not loaded"); return; }
-    setTimeout(()=>waitForFb(cb,attempts+1),100);
-  }
-  waitForFb(()=>{
-    const { auth, onAuthStateChanged } = window._fb;
-    onAuthStateChanged(auth, async (firebaseUser)=>{
+  function startApp(){
+    window._auth.onAuthStateChanged(async (firebaseUser)=>{
       if(firebaseUser){
         _curUid = firebaseUser.uid;
         await loadUserFromFirestore(_curUid);
@@ -1375,17 +1345,22 @@ function toast(msg,type=""){const w=document.getElementById("toastWrap");const t
           document.getElementById("authLayer").style.display="none";
           launchApp();
         } else {
-          // Logged in but no Firestore doc — show auth screen
           document.getElementById("authLayer").style.display="flex";
         }
       } else {
-        // Not logged in
         document.getElementById("authLayer").style.display="flex";
         document.getElementById("liPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
         document.getElementById("rgPass2").addEventListener("keydown",e=>{if(e.key==="Enter")doRegister()});
       }
     });
-  });
+  }
+
+  // Firebase module fires "fbReady" when done; if already loaded just go
+  if(window._auth){
+    startApp();
+  } else {
+    window.addEventListener("fbReady", startApp, { once: true });
+  }
 })();
 </script>
 </body>
