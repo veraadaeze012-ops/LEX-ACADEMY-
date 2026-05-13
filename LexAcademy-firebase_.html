@@ -455,10 +455,10 @@ input,textarea{font-family:var(--font)}
     </div>
     <div class="auth-body">
       <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-        <button class="auth-tab" id="tabReg" onclick="switchTab('register')">Create Account</button>
+        <button class="auth-tab" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab active" id="tabReg" onclick="switchTab('register')">Create Account</button>
       </div>
-      <div id="loginForm">
+      <div id="loginForm" style="display:none">
         <div class="form-group"><label class="form-label">Email address</label>
           <input class="form-input" id="liEmail" type="email" placeholder="you@example.com" autocomplete="email">
           <div class="form-error" id="liEmailErr"></div></div>
@@ -478,28 +478,93 @@ input,textarea{font-family:var(--font)}
         <button class="oauth-btn" onclick="guestMode()">&#128640; Continue as Guest</button>
         <div class="auth-switch">No account? <span onclick="switchTab('register')">Create one free</span></div>
       </div>
-      <div id="regForm" style="display:none">
-        <div class="form-group"><label class="form-label">Full name</label>
-          <input class="form-input" id="rgName" type="text" placeholder="Alex Johnson" autocomplete="name">
-          <div class="form-error" id="rgNameErr"></div></div>
-        <div class="form-group"><label class="form-label">Email address</label>
-          <input class="form-input" id="rgEmail" type="email" placeholder="you@example.com" autocomplete="email">
-          <div class="form-error" id="rgEmailErr"></div></div>
-        <div class="form-group"><label class="form-label">Password</label>
-          <div class="form-input-wrap">
-            <input class="form-input" id="rgPass" type="password" placeholder="Min. 8 characters" autocomplete="new-password">
-            <button class="form-eye" onclick="toggleEye('rgPass',this)">&#128065;</button>
+      <div id="regForm">
+        <!-- Step indicators -->
+        <div id="regStepDots" style="display:flex;gap:6px;justify-content:center;margin-bottom:18px">
+          <div class="reg-dot active" id="rdot0"></div>
+          <div class="reg-dot" id="rdot1"></div>
+          <div class="reg-dot" id="rdot2"></div>
+        </div>
+
+        <!-- Step 1: Personal Info -->
+        <div id="regStep0">
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="font-size:28px">👤</div>
+            <div style="font-weight:600;font-size:15px;margin-top:4px">Personal Info</div>
+            <div style="font-size:12px;color:var(--text3)">Step 1 of 3</div>
           </div>
-          <div class="form-error" id="rgPassErr"></div></div>
-        <div class="form-group"><label class="form-label">Confirm password</label>
-          <div class="form-input-wrap">
-            <input class="form-input" id="rgPass2" type="password" placeholder="Repeat password" autocomplete="new-password">
-            <button class="form-eye" onclick="toggleEye('rgPass2',this)">&#128065;</button>
+          <div class="form-group"><label class="form-label">Full name</label>
+            <input class="form-input" id="rgName" type="text" placeholder="e.g. Alex Johnson" autocomplete="name">
+            <div class="form-error" id="rgNameErr"></div></div>
+          <div class="form-group"><label class="form-label">Phone number</label>
+            <input class="form-input" id="rgPhone" type="tel" placeholder="e.g. +234 801 234 5678" autocomplete="tel">
+            <div class="form-error" id="rgPhoneErr"></div></div>
+          <div class="form-group"><label class="form-label">Date of birth</label>
+            <input class="form-input" id="rgDob" type="date" autocomplete="bday">
+            <div class="form-error" id="rgDobErr"></div></div>
+          <button class="auth-btn" onclick="regNext0()">Continue &rarr;</button>
+        </div>
+
+        <!-- Step 2: Account Info -->
+        <div id="regStep1" style="display:none">
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="font-size:28px">✉️</div>
+            <div style="font-weight:600;font-size:15px;margin-top:4px">Account Details</div>
+            <div style="font-size:12px;color:var(--text3)">Step 2 of 3</div>
           </div>
-          <div class="form-error" id="rgPass2Err"></div></div>
-        <div class="form-error" id="rgErr" style="margin-bottom:10px;font-size:13px"></div>
-        <button class="auth-btn" id="rgBtn" onclick="doRegister()"><span id="rgBtnTxt">Create Account</span></button>
-        <div class="auth-switch">Have an account? <span onclick="switchTab('login')">Sign in</span></div>
+          <div class="form-group"><label class="form-label">Email address</label>
+            <input class="form-input" id="rgEmail" type="email" placeholder="you@example.com" autocomplete="email">
+            <div class="form-error" id="rgEmailErr"></div></div>
+          <div class="form-group"><label class="form-label">Username</label>
+            <input class="form-input" id="rgUsername" type="text" placeholder="e.g. alexbuilder" autocomplete="username">
+            <div class="form-error" id="rgUsernameErr"></div></div>
+          <div class="form-group"><label class="form-label">Country</label>
+            <select class="form-input" id="rgCountry">
+              <option value="">Select your country…</option>
+              <option value="NG">Nigeria 🇳🇬</option>
+              <option value="GH">Ghana 🇬🇭</option>
+              <option value="KE">Kenya 🇰🇪</option>
+              <option value="ZA">South Africa 🇿🇦</option>
+              <option value="US">United States 🇺🇸</option>
+              <option value="GB">United Kingdom 🇬🇧</option>
+              <option value="CA">Canada 🇨🇦</option>
+              <option value="IN">India 🇮🇳</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <div class="form-error" id="rgCountryErr"></div></div>
+          <div style="display:flex;gap:8px">
+            <button class="auth-btn" style="background:var(--bg);color:var(--text);border:1px solid var(--border-med);flex:0 0 80px" onclick="regBack0()">&larr; Back</button>
+            <button class="auth-btn" style="flex:1" onclick="regNext1()">Continue &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Password -->
+        <div id="regStep2" style="display:none">
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="font-size:28px">🔒</div>
+            <div style="font-weight:600;font-size:15px;margin-top:4px">Secure Your Account</div>
+            <div style="font-size:12px;color:var(--text3)">Step 3 of 3</div>
+          </div>
+          <div class="form-group"><label class="form-label">Password</label>
+            <div class="form-input-wrap">
+              <input class="form-input" id="rgPass" type="password" placeholder="Min. 8 characters" autocomplete="new-password">
+              <button class="form-eye" onclick="toggleEye('rgPass',this)">&#128065;</button>
+            </div>
+            <div class="form-error" id="rgPassErr"></div></div>
+          <div class="form-group"><label class="form-label">Confirm password</label>
+            <div class="form-input-wrap">
+              <input class="form-input" id="rgPass2" type="password" placeholder="Repeat password" autocomplete="new-password">
+              <button class="form-eye" onclick="toggleEye('rgPass2',this)">&#128065;</button>
+            </div>
+            <div class="form-error" id="rgPass2Err"></div></div>
+          <div class="form-error" id="rgErr" style="margin-bottom:10px;font-size:13px;font-weight:500"></div>
+          <div style="display:flex;gap:8px">
+            <button class="auth-btn" style="background:var(--bg);color:var(--text);border:1px solid var(--border-med);flex:0 0 80px" onclick="regBack1()">&larr; Back</button>
+            <button class="auth-btn" style="flex:1" id="rgBtn" onclick="doRegister()"><span id="rgBtnTxt">Create Account 🚀</span></button>
+          </div>
+        </div>
+
+        <div class="auth-switch" style="margin-top:14px">Have an account? <span onclick="switchTab('login')">Sign in</span></div>
       </div>
     </div>
   </div>
@@ -991,9 +1056,13 @@ const NOTIFS=[
 let _curUser = null;
 let _curUid  = null;
 
-function mkUser(name, email) {
+function mkUser(name, email, extras={}) {
   return {
     name, email,
+    phone: extras.phone||"",
+    dob: extras.dob||"",
+    username: extras.username||"",
+    country: extras.country||"",
     createdAt: Date.now(),
     xp: 0, streak: 0,
     lastLogin: Date.now(),
@@ -1030,9 +1099,13 @@ async function loadUserFromFirestore(uid) {
 }
 
 /* ══ USER HELPERS ══ */
-function mkUser(name, email) {
+function mkUser(name, email, extras={}) {
   return {
     name, email,
+    phone: extras.phone||"",
+    dob: extras.dob||"",
+    username: extras.username||"",
+    country: extras.country||"",
     createdAt: Date.now(),
     xp: 0, streak: 0,
     lastLogin: Date.now(),
@@ -1088,6 +1161,10 @@ function setLoading(btnId,txtId,txt,on=true){
 }
 
 async function doLogin(){
+  if(!window._auth){
+    showErr("liErr","Firebase not loaded yet — please wait 3 seconds and try again.");
+    return;
+  }
   const email=document.getElementById("liEmail").value.trim().toLowerCase();
   const pass=document.getElementById("liPass").value;
   let ok=true;
@@ -1110,22 +1187,65 @@ async function doLogin(){
     setLoading("liBtn","liBtnTxt","Sign In",false);
     launchApp();
   } catch(e){
-    const msg=e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"||e.code==="auth/user-not-found"
-      ?"Incorrect email or password":e.message;
+    console.error("LOGIN ERROR:", e.code, e.message);
+    let msg = e.message;
+    if(e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"||e.code==="auth/user-not-found")
+      msg="Incorrect email or password.";
+    else if(e.code==="auth/too-many-requests") msg="Too many attempts. Please wait and try again.";
+    else if(e.code==="auth/network-request-failed") msg="Network error — check your internet.";
+    else if(e.code==="auth/operation-not-allowed") msg="Sign-in not enabled in Firebase Console.";
+    else msg = e.code ? e.code+": "+e.message : e.message;
     showErr("liErr",msg);
     setLoading("liBtn","liBtnTxt","Sign In",false);
   }
 }
 
-async function doRegister(){
+/* ══ REGISTER STEPS ══ */
+function regSetStep(n){
+  [0,1,2].forEach(i=>{
+    document.getElementById("regStep"+i).style.display=i===n?"block":"none";
+    const d=document.getElementById("rdot"+i);
+    if(d)d.classList.toggle("active",i===n);
+  });
+}
+function regNext0(){
   const name=document.getElementById("rgName").value.trim();
+  const phone=document.getElementById("rgPhone").value.trim();
+  const dob=document.getElementById("rgDob").value;
+  let ok=true;
+  if(!name){showErr("rgNameErr","Full name required");ok=false;}else hideErr("rgNameErr");
+  if(!phone){showErr("rgPhoneErr","Phone number required");ok=false;}else hideErr("rgPhoneErr");
+  if(!dob){showErr("rgDobErr","Date of birth required");ok=false;}else hideErr("rgDobErr");
+  if(ok)regSetStep(1);
+}
+function regBack0(){regSetStep(0);}
+function regNext1(){
   const email=document.getElementById("rgEmail").value.trim().toLowerCase();
-  const pass=document.getElementById("rgPass").value;
-  const pass2=document.getElementById("rgPass2").value;
+  const username=document.getElementById("rgUsername").value.trim();
+  const country=document.getElementById("rgCountry").value;
+  let ok=true;
+  if(!email||!email.includes("@")){showErr("rgEmailErr","Enter a valid email");ok=false;}else hideErr("rgEmailErr");
+  if(!username||username.length<3){showErr("rgUsernameErr","Username must be at least 3 characters");ok=false;}else hideErr("rgUsernameErr");
+  if(!country){showErr("rgCountryErr","Please select your country");ok=false;}else hideErr("rgCountryErr");
+  if(ok)regSetStep(2);
+}
+function regBack1(){regSetStep(1);}
+
+async function doRegister(){
+  if(!window._auth){
+    showErr("rgErr","Firebase not loaded yet — please wait and try again.");
+    return;
+  }
+  const name     = document.getElementById("rgName").value.trim();
+  const phone    = document.getElementById("rgPhone").value.trim();
+  const dob      = document.getElementById("rgDob").value;
+  const email    = document.getElementById("rgEmail").value.trim().toLowerCase();
+  const username = document.getElementById("rgUsername").value.trim();
+  const country  = document.getElementById("rgCountry").value;
+  const pass     = document.getElementById("rgPass").value;
+  const pass2    = document.getElementById("rgPass2").value;
   let ok=true;
   hideErr("rgErr");
-  if(!name){showErr("rgNameErr","Name required");ok=false;}else hideErr("rgNameErr");
-  if(!email||!email.includes("@")){showErr("rgEmailErr","Enter a valid email");ok=false;}else hideErr("rgEmailErr");
   if(pass.length<8){showErr("rgPassErr","Min. 8 characters");ok=false;}else hideErr("rgPassErr");
   if(pass!==pass2){showErr("rgPass2Err","Passwords do not match");ok=false;}else hideErr("rgPass2Err");
   if(!ok)return;
@@ -1133,15 +1253,23 @@ async function doRegister(){
   try {
     const cred = await window._auth.createUserWithEmailAndPassword(email, pass);
     _curUid = cred.user.uid;
-    const newUser = mkUser(name, email);
+    const newUser = mkUser(name, email, {phone, dob, username, country});
     await window._db.collection("users").doc(_curUid).set(newUser);
     _curUser = newUser;
-    setLoading("rgBtn","rgBtnTxt","Create Account",false);
+    setLoading("rgBtn","rgBtnTxt","Create Account 🚀",false);
     showOnboard();
   } catch(e){
-    const msg=e.code==="auth/email-already-in-use"?"Account already exists for this email":e.message;
+    console.error("REGISTER ERROR:", e.code, e.message);
+    let msg = e.message;
+    if(e.code==="auth/email-already-in-use") msg="Account already exists — try signing in.";
+    else if(e.code==="auth/invalid-email") msg="Invalid email address.";
+    else if(e.code==="auth/weak-password") msg="Password too weak — use 8+ characters.";
+    else if(e.code==="auth/network-request-failed") msg="Network error — check your internet.";
+    else if(e.code==="auth/operation-not-allowed") msg="Email sign-up not enabled in Firebase Console.";
+    else if(e.code==="auth/too-many-requests") msg="Too many attempts — wait a moment and retry.";
+    else msg = e.code ? e.code+": "+e.message : e.message;
     showErr("rgErr",msg);
-    setLoading("rgBtn","rgBtnTxt","Create Account",false);
+    setLoading("rgBtn","rgBtnTxt","Create Account 🚀",false);
   }
 }
 
