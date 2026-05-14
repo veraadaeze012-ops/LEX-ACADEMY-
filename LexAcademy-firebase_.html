@@ -1374,17 +1374,22 @@ const DEFAULT_POSTS = [
 let db, postsListener = null;
 
 function initCommunity() {
-  db.ref('community/posts').once('value').then(snap => {
+  // Use a seeded flag so defaults are NEVER pushed more than once
+  db.ref('community/seeded').once('value').then(snap => {
     if (!snap.exists()) {
+      const batch = {};
       DEFAULT_POSTS.forEach(p => {
-        db.ref('community/posts').push({
-          user:p.user, av:p.av, text:p.text,
-          likes:p.likes, timestamp:p.timestamp, likedBy:{}
-        });
+        const key = db.ref('community/posts').push().key;
+        batch['community/posts/' + key] = {
+          user: p.user, av: p.av, text: p.text,
+          likes: p.likes, timestamp: p.timestamp,
+          likedBy: { _placeholder: true }
+        };
       });
+      batch['community/seeded'] = true;
+      db.ref().update(batch); // atomic write — all or nothing
     }
   });
-  // Start real-time listener immediately on login (not just community page)
   startPostsListener();
 }
 
