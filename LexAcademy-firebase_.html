@@ -1429,9 +1429,19 @@ function renderPosts(posts) {
       <div class="post-text">${escHtml(p.text || '')}</div>
       <div class="post-actions">
         <button class="post-action ${liked ? 'liked' : ''}" onclick="likePost('${p.id}',${liked})">${liked ? '♥' : '♡'} ${likeCount}</button>
-        <button class="post-action">💬 Reply</button>
-        <button class="post-action">↗ Share</button>
+        <button class="post-action" onclick="toggleReply('${p.id}')">💬 Reply</button>
       </div>
+      <div id="reply-${p.id}" style="display:none;margin-top:10px">
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <textarea id="reply-input-${p.id}" placeholder="Write a reply…" rows="2" maxlength="300" style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--text);resize:none;background:var(--bg);outline:none"></textarea>
+          <button onclick="submitReply('${p.id}')" style="background:var(--dark);color:#fff;border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);flex-shrink:0;margin-top:2px">Send</button>
+        </div>
+      </div>
+      ${p.replies ? '<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">' + Object.values(p.replies).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).map(r=>`
+        <div style="display:flex;gap:8px;align-items:flex-start;background:var(--bg);border-radius:8px;padding:8px 10px">
+          <div style="width:24px;height:24px;border-radius:50%;background:${r.authorColor||'#555'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0">${escHtml((r.user||'?').charAt(0).toUpperCase())}</div>
+          <div><div style="font-size:12px;font-weight:500;margin-bottom:2px">${escHtml(r.user||'Student')}</div><div style="font-size:13px;color:var(--text2);line-height:1.55">${escHtml(r.text||'')}</div></div>
+        </div>`).join('') + '</div>' : ''}
     </div>`;
   }).join('');
 }
@@ -1441,6 +1451,37 @@ function likePost(postId, currentlyLiked) {
   if (!uid) return;
   const ref = db.ref(`community/posts/${postId}/likedBy/${uid}`);
   if (currentlyLiked) ref.remove(); else ref.set(true);
+}
+
+function toggleReply(postId) {
+  const box = document.getElementById('reply-' + postId);
+  if (!box) return;
+  const isOpen = box.style.display === 'block';
+  box.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    const inp = document.getElementById('reply-input-' + postId);
+    if (inp) inp.focus();
+  }
+}
+
+function submitReply(postId) {
+  const inp = document.getElementById('reply-input-' + postId);
+  if (!inp) return;
+  const txt = inp.value.trim();
+  if (!txt) return;
+  const user = auth.currentUser;
+  if (!user) return;
+  const name  = userProfile.displayName || user.displayName || user.email?.split('@')[0] || 'Student';
+  const color = userProfile.avatarColor || colorFromUid(user.uid);
+  inp.value = '';
+  document.getElementById('reply-' + postId).style.display = 'none';
+  db.ref('community/posts/' + postId + '/replies').push({
+    user: name,
+    authorColor: color,
+    authorUid: user.uid,
+    text: txt,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+  });
 }
 
 function postMessage() {
