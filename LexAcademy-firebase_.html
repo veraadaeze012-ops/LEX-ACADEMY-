@@ -1394,15 +1394,16 @@ function startPostsListener() {
     postsListener = null;
   }
   const errEl = document.getElementById('communityError');
-  // orderByChild('timestamp') + limitToLast ensures new pushes always arrive in the snapshot
-  postsListener = db.ref('community/posts')
-    .orderByChild('timestamp')
-    .limitToLast(200)
-    .on('value',
+  // Plain .on('value') — no orderByChild. That query drops newly pushed posts
+  // because ServerValue.TIMESTAMP is not resolved client-side, so new items
+  // temporarily have no timestamp and fall outside an ordered window.
+  // Sort newest-first client-side instead — always reliable.
+  postsListener = db.ref('community/posts').on('value',
     snap => {
       if (errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
       const posts = [];
-      snap.forEach(child => posts.unshift({ id: child.key, ...child.val() }));
+      snap.forEach(child => posts.push({ id: child.key, ...child.val() }));
+      posts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
       renderPosts(posts);
     },
     err => {
@@ -1420,7 +1421,7 @@ function renderPosts(posts) {
   const listEl = document.getElementById('postList');
   if (!listEl) return;
 
-  // Remove any optimistic card — real data is arriving
+  // Always remove the optimistic card before rendering real data
   const opt = document.getElementById('optimistic-post');
   if (opt) opt.remove();
 
@@ -1428,24 +1429,25 @@ function renderPosts(posts) {
     listEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">No posts yet. Be the first to share something!</div>';
     return;
   }
+
   listEl.innerHTML = posts.map(p => {
-    const likedBy = p.likedBy || {};
-    const liked = uid && likedBy[uid];
+    const likedBy = (p.likedBy && typeof p.likedBy === 'object') ? p.likedBy : {};
+    const liked = !!(uid && likedBy[uid]);
     const likeCount = Object.keys(likedBy).length || (p.likes || 0);
     const timeStr = formatPostTime(p.timestamp);
     const hasPhoto = p.authorPhoto && p.authorPhoto.startsWith('data:');
     const avContent = hasPhoto
-      ? `<img src="${p.authorPhoto}" alt="${escHtml(p.user)}">`
-      : escHtml((p.user||'?').charAt(0).toUpperCase());
+      ? `<img src="${escHtml(p.authorPhoto)}" alt="${escHtml(p.user||'')}">`
+      : escHtml(((p.user||'?').charAt(0)).toUpperCase());
     const avBg = p.authorColor || p.av || '#333';
     return `<div class="post-card">
       <div class="post-head">
         <div class="post-av" style="background:${hasPhoto?'transparent':avBg}">${avContent}</div>
-        <div><div class="post-user">${escHtml(p.user)}</div><div class="post-time">${timeStr}</div></div>
+        <div><div class="post-user">${escHtml(p.user||'Student')}</div><div class="post-time">${timeStr}</div></div>
       </div>
-      <div class="post-text">${escHtml(p.text)}</div>
+      <div class="post-text">${escHtml(p.text||'')}</div>
       <div class="post-actions">
-        <button class="post-action ${liked?'liked':''}" onclick="likePost('${p.id}',${!!liked})">${liked?'♥':'♡'} ${likeCount}</button>
+        <button class="post-action ${liked?'liked':''}" onclick="likePost('${p.id}',${liked})">${liked?'♥':'♡'} ${likeCount}</button>
         <button class="post-action">💬 Reply</button>
         <button class="post-action">↗ Share</button>
       </div>
