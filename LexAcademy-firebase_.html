@@ -1429,20 +1429,10 @@ function renderPosts(posts) {
       <div class="post-text">${escHtml(p.text || '')}</div>
       <div class="post-actions">
         <button class="post-action ${liked ? 'liked' : ''}" onclick="likePost('${p.id}',${liked})">${liked ? '♥' : '♡'} ${likeCount}</button>
-        <button class="post-action" onclick="toggleReply('${p.id}')">💬 Reply</button>
+        <button class="post-action">💬 Reply</button>
+        <button class="post-action">↗ Share</button>
       </div>
-      <div class="reply-box" id="reply-${p.id}" style="display:none;margin-top:10px;display:none">
-        <div style="display:flex;gap:8px;align-items:flex-start">
-          <textarea class="compose-input" id="reply-input-${p.id}" placeholder="Write a reply…" rows="2" maxlength="300" style="border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;resize:none;width:100%;background:var(--bg)"></textarea>
-          <button class="compose-post" onclick="submitReply('${p.id}')" style="margin-top:2px;flex-shrink:0">Send</button>
-        </div>
-      </div>
-      ${(p.replies && Object.keys(p.replies).length) ? \`<div class="replies-list" style="margin-top:10px;display:flex;flex-direction:column;gap:6px">\${Object.values(p.replies).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).map(r=>\`
-        <div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:var(--bg);border-radius:8px">
-          <div class="post-av" style="width:24px;height:24px;font-size:9px;flex-shrink:0;background:\${r.authorColor||'#333'}">\${escHtml((r.user||'?').charAt(0).toUpperCase())}</div>
-          <div><div style="font-size:12px;font-weight:500;margin-bottom:2px">\${escHtml(r.user||'Student')}</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5">\${escHtml(r.text||'')}</div></div>
-        </div>\`).join('')}</div>\` : ''}
-    </div>\`;
+    </div>`;
   }).join('');
 }
 
@@ -1451,37 +1441,6 @@ function likePost(postId, currentlyLiked) {
   if (!uid) return;
   const ref = db.ref(`community/posts/${postId}/likedBy/${uid}`);
   if (currentlyLiked) ref.remove(); else ref.set(true);
-}
-
-function toggleReply(postId) {
-  const box = document.getElementById('reply-' + postId);
-  if (!box) return;
-  const isOpen = box.style.display === 'block';
-  box.style.display = isOpen ? 'none' : 'block';
-  if (!isOpen) {
-    const input = document.getElementById('reply-input-' + postId);
-    if (input) input.focus();
-  }
-}
-
-function submitReply(postId) {
-  const input = document.getElementById('reply-input-' + postId);
-  if (!input) return;
-  const txt = input.value.trim();
-  if (!txt) return;
-  const user = auth.currentUser;
-  if (!user) return;
-  const name  = userProfile.displayName || user.displayName || user.email?.split('@')[0] || 'Student';
-  const color = userProfile.avatarColor || colorFromUid(user.uid);
-  input.value = '';
-  document.getElementById('reply-' + postId).style.display = 'none';
-  db.ref('community/posts/' + postId + '/replies').push({
-    user: name,
-    authorColor: color,
-    authorUid: user.uid,
-    text: txt,
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-  });
 }
 
 function postMessage() {
@@ -2124,30 +2083,25 @@ function switchPanel(to) {
 }
 
 async function handleLogin() {
-  const emailEl = document.getElementById('loginEmail');
-  const pwEl    = document.getElementById('loginPw');
-  const err     = document.getElementById('loginError');
-  const email   = emailEl.value.trim();
-  const pw      = pwEl.value;
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+  const err   = document.getElementById('loginError');
   err.classList.remove('show');
   if (!email || !pw) {
     err.textContent = 'Please enter your email and password.';
     err.classList.add('show');
-    if (!email) emailEl.classList.add('invalid');
-    if (!pw)    pwEl.classList.add('invalid');
-    setTimeout(() => document.querySelectorAll('.auth-input').forEach(i => i.classList.remove('invalid')), 1800);
+    if (!email) document.getElementById('loginEmail').classList.add('invalid');
+    if (!pw)    document.getElementById('loginPw').classList.add('invalid');
+    setTimeout(()=>document.querySelectorAll('.auth-input').forEach(i=>i.classList.remove('invalid')), 1800);
     return;
   }
   const btn = document.querySelector('#panelLogin .auth-btn');
-  if (!btn) return;
-  btn.textContent = 'Signing in…'; btn.disabled = true;
+  btn.textContent='Signing in…'; btn.disabled=true;
   try {
     await auth.signInWithEmailAndPassword(email, pw);
-    // onAuthStateChanged handles the rest
   } catch(e) {
-    btn.textContent = 'Sign in →'; btn.disabled = false;
-    err.textContent = firebaseErrMsg(e.code);
-    err.classList.add('show');
+    btn.textContent='Sign in →'; btn.disabled=false;
+    err.textContent=firebaseErrMsg(e.code); err.classList.add('show');
   }
 }
 
@@ -2236,10 +2190,8 @@ function firebaseErrMsg(code) {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  const screen = document.getElementById('authScreen');
-  // Only trigger if auth screen is actually visible
-  if (!screen || screen.classList.contains('hidden') || screen.style.display === 'none') return;
+  if (e.key!=='Enter') return;
+  if (document.getElementById('authScreen').style.display==='none') return;
   if (document.getElementById('panelLogin').classList.contains('active')) handleLogin();
   else handleSignup();
 });
