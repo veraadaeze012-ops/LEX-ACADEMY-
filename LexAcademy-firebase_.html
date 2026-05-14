@@ -1388,30 +1388,34 @@ function initCommunity() {
   startPostsListener();
 }
 
+let postsRef = null;
+
 function startPostsListener() {
-  if (postsListener) {
-    db.ref('community/posts').off('value', postsListener);
+  // Detach old listener using the SAME ref object (critical — new db.ref() won't detach)
+  if (postsRef && postsListener) {
+    postsRef.off('value', postsListener);
+    postsRef = null;
     postsListener = null;
   }
+
   const errEl = document.getElementById('communityError');
-  // Plain .on('value') — no orderByChild. That query drops newly pushed posts
-  // because ServerValue.TIMESTAMP is not resolved client-side, so new items
-  // temporarily have no timestamp and fall outside an ordered window.
-  // Sort newest-first client-side instead — always reliable.
-  postsListener = db.ref('community/posts').on('value',
+  postsRef = db.ref('community/posts');
+
+  postsListener = postsRef.on('value',
     snap => {
       if (errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
       const posts = [];
       snap.forEach(child => posts.push({ id: child.key, ...child.val() }));
+      // Sort newest-first client-side — never use orderByChild with ServerValue.TIMESTAMP
       posts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
       renderPosts(posts);
     },
     err => {
-      console.error('Community listener error:', err);
-      if (errEl) {
-        errEl.textContent = 'Could not load posts. Check your Firebase database rules — they should allow authenticated reads/writes.';
-        errEl.classList.add('show');
-      }
+      console.error('Community listener error:', err.code, err.message);
+      const msg = err.code === 'PERMISSION_DENIED'
+        ? 'Permission denied — go to Firebase Console → Realtime Database → Rules and set both .read and .write to "auth != null", then click Publish.'
+        : 'Could not load posts: ' + err.message;
+      if (errEl) { errEl.textContent = msg; errEl.classList.add('show'); }
     }
   );
 }
@@ -1421,17 +1425,17 @@ function renderPosts(posts) {
   const listEl = document.getElementById('postList');
   if (!listEl) return;
 
-  // Always remove the optimistic card before rendering real data
-  const opt = document.getElementById('optimistic-post');
-  if (opt) opt.remove();
-
   if (!posts.length) {
+    // Remove optimistic card and show empty state
+    const opt = document.getElementById('optimistic-post');
+    if (opt) opt.remove();
     listEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">No posts yet. Be the first to share something!</div>';
     return;
   }
 
-  listEl.innerHTML = posts.map(p => {
-    const likedBy = (p.likedBy && typeof p.likedBy === 'object') ? p.likedBy : {};
+  const html = posts.map(p => {
+    const rawLikedBy = (p.likedBy && typeof p.likedBy === 'object') ? p.likedBy : {};
+    const likedBy = Object.fromEntries(Object.entries(rawLikedBy).filter(([k]) => k !== '_placeholder'));
     const liked = !!(uid && likedBy[uid]);
     const likeCount = Object.keys(likedBy).length || (p.likes || 0);
     const timeStr = formatPostTime(p.timestamp);
@@ -1440,7 +1444,7 @@ function renderPosts(posts) {
       ? `<img src="${escHtml(p.authorPhoto)}" alt="${escHtml(p.user||'')}">`
       : escHtml(((p.user||'?').charAt(0)).toUpperCase());
     const avBg = p.authorColor || p.av || '#333';
-    return `<div class="post-card">
+    return `<div class="post-card" data-post-id="${p.id}">
       <div class="post-head">
         <div class="post-av" style="background:${hasPhoto?'transparent':avBg}">${avContent}</div>
         <div><div class="post-user">${escHtml(p.user||'Student')}</div><div class="post-time">${timeStr}</div></div>
@@ -1453,6 +1457,11 @@ function renderPosts(posts) {
       </div>
     </div>`;
   }).join('');
+
+  // Remove optimistic card then set real content
+  const opt = document.getElementById('optimistic-post');
+  if (opt) opt.remove();
+  listEl.innerHTML = html;
 }
 
 function likePost(postId, currentlyLiked) {
@@ -1471,61 +1480,22 @@ function postMessage() {
   if (!user)  return;
   const uid   = user.uid;
 
-  // Reject HTML / links
   if (/<[a-z]/i.test(txt) || /https?:\/\//i.test(txt)) {
     alert('Posts can only contain text and emoji — no links or HTML allowed.');
     return;
   }
 
-  // Disable button immediately to prevent double-posts
-  if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
-
   const name  = userProfile.displayName || user.displayName || user.email?.split('@')[0] || 'Student';
   const color = userProfile.avatarColor || colorFromUid(uid);
   const photo = userProfile.photo || '';
 
-  // Optimistic local render — show the post instantly without waiting for Firebase
-  const optimisticPost = {
-    id: '__optimistic__',
-    user: name,
-    av: color,
-    authorColor: color,
-    authorPhoto: photo,
-    authorUid: uid,
-    text: txt,
-    timestamp: Date.now(),
-    likedBy: null,   // null avoids the "empty object stripped" Firebase quirk
-  };
-  const listEl = document.getElementById('postList');
-  if (listEl) {
-    const tempCard = document.createElement('div');
-    tempCard.id = 'optimistic-post';
-    tempCard.className = 'post-card';
-    tempCard.style.opacity = '0.6';
-    const hasPhoto = photo && photo.startsWith('data:');
-    const avContent = hasPhoto
-      ? `<img src="${photo}" alt="${escHtml(name)}">`
-      : escHtml((name||'?').charAt(0).toUpperCase());
-    tempCard.innerHTML = `
-      <div class="post-head">
-        <div class="post-av" style="background:${hasPhoto?'transparent':color}">${avContent}</div>
-        <div><div class="post-user">${escHtml(name)}</div><div class="post-time">Just now</div></div>
-      </div>
-      <div class="post-text">${escHtml(txt)}</div>
-      <div class="post-actions">
-        <button class="post-action">♡ 0</button>
-        <button class="post-action">💬 Reply</button>
-        <button class="post-action">↗ Share</button>
-      </div>`;
-    listEl.insertBefore(tempCard, listEl.firstChild);
-    listEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // Disable button to prevent double-posts
+  if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
 
-  // Clear input right away
+  // Clear input immediately for good UX
   input.value = '';
   closeEmojiPanel();
 
-  // Push to Firebase — use null for likedBy so Firebase stores the key
   db.ref('community/posts').push({
     user: name,
     av: color,
@@ -1534,22 +1504,23 @@ function postMessage() {
     authorUid: uid,
     text: txt,
     timestamp: firebase.database.ServerValue.TIMESTAMP,
-    likedBy: null,
+    likedBy: { _placeholder: true },
   }).then(() => {
-    // Real post will arrive via the listener and replace the optimistic card
-  }).catch(err => {
-    // Rollback optimistic card and restore input
-    const opt = document.getElementById('optimistic-post');
-    if (opt) opt.remove();
-    input.value = txt;
-    const errEl = document.getElementById('communityError');
-    if (errEl) {
-      errEl.textContent = 'Post failed: ' + (err.message || 'Unknown error. Check your connection.');
-      errEl.classList.add('show');
-      setTimeout(() => errEl.classList.remove('show'), 6000);
-    }
-  }).finally(() => {
     if (btn) { btn.disabled = false; btn.textContent = 'Post'; }
+    // Listener will fire automatically and show the new post
+  }).catch(err => {
+    // Restore input on failure
+    input.value = txt;
+    if (btn) { btn.disabled = false; btn.textContent = 'Post'; }
+    const errEl = document.getElementById('communityError');
+    const msg = err.code === 'PERMISSION_DENIED'
+      ? 'Permission denied — your Firebase rules need: .read and .write set to "auth != null". Go to Firebase Console → Realtime Database → Rules.'
+      : 'Post failed: ' + (err.message || 'Check your internet connection.');
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.classList.add('show');
+      setTimeout(() => errEl.classList.remove('show'), 8000);
+    }
   });
 }
 
