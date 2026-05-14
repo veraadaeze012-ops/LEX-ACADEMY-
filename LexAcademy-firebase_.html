@@ -8,6 +8,7 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -252,29 +253,29 @@ body{overflow:hidden}
 .result-btn{padding:11px 26px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer}
 
 /* ══════════════════════════════════════
-   SIMULATOR
+   WOKWI SIMULATOR
 ══════════════════════════════════════ */
-.sim-layout{display:grid;grid-template-columns:1fr 250px;gap:14px;height:calc(100vh - 148px)}
-.sim-editor{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;display:flex;flex-direction:column}
-.sim-toolbar{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--border);background:var(--surface-dim)}
-.sim-filename{font-size:12px;font-weight:500;color:var(--text2);flex:1;font-family:var(--mono)}
-.btn-run{background:var(--green);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;transition:opacity .15s}
-.btn-run:hover{opacity:.9}
-.btn-reset{background:none;border:1px solid var(--border);border-radius:20px;padding:6px 11px;font-size:12px;cursor:pointer;font-family:var(--font);color:var(--text2);transition:border-color .12s}
-.btn-reset:hover{border-color:var(--text3)}
-.code-area{flex:1;padding:16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;background:#111;color:#f0f0f0;border:none;outline:none;resize:none;overflow-y:auto;tab-size:2;min-height:200px}
-.sim-panel{display:flex;flex-direction:column;gap:10px;overflow-y:auto}
-.sim-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px}
-.sim-card-title{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
-.robot-canvas{background:var(--bg);border-radius:var(--r-xs);height:110px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px}
-.robot-emoji{font-size:38px}
-.leds{display:flex;gap:5px}
-.led{width:9px;height:9px;border-radius:50%;background:var(--bg);border:1px solid var(--border);transition:all .25s}
-.led.on{background:var(--green);border-color:var(--green);box-shadow:0 0 6px var(--green)}
-.serial-box{background:#111;border-radius:var(--r-xs);padding:10px;font-family:var(--mono);font-size:11px;color:#28cd41;height:80px;overflow-y:auto;white-space:pre-wrap;line-height:1.6;margin-top:10px}
-.tpl-list{display:flex;flex-direction:column;gap:1px}
-.tpl-btn{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 9px;border-radius:var(--r-xs);border:none;background:none;font-family:var(--font);font-size:13px;color:var(--text2);cursor:pointer;transition:background .1s}
-.tpl-btn:hover{background:var(--bg);color:var(--text)}
+.wokwi-wrap{display:flex;flex-direction:column;height:calc(100vh - 148px);gap:0}
+.wokwi-toolbar{display:flex;align-items:center;gap:7px;padding:0 0 12px;flex-shrink:0;flex-wrap:wrap}
+.wokwi-toolbar-label{font-size:12px;color:var(--text2);font-weight:500;margin-right:2px;white-space:nowrap}
+.wokwi-frame{flex:1;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);background:#1a1a1a;min-height:360px;position:relative}
+.wokwi-frame iframe{width:100%;height:100%;border:none;display:block}
+.wokwi-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#1a1a1a;color:rgba(255,255,255,.5);font-size:13px;pointer-events:none;transition:opacity .3s}
+.wokwi-loading-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.wokwi-open-btn{
+  margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+  background:var(--dark);color:#fff;border:none;border-radius:20px;
+  padding:7px 14px;font-family:var(--font);font-size:12px;font-weight:500;
+  cursor:pointer;text-decoration:none;transition:opacity .15s;white-space:nowrap;
+}
+.wokwi-open-btn:hover{opacity:.85}
+.wokwi-open-btn svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wokwi-credit{font-size:11px;color:var(--text3);padding:6px 0 0;text-align:right}
+.wokwi-credit a{color:var(--text3)}
+.tpl-btn{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .12s;white-space:nowrap}
+.tpl-btn:hover{border-color:var(--text3);color:var(--text)}
+.tpl-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
 .tpl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 /* Mobile simulator stacks */
 @media(max-width:768px){
@@ -677,59 +678,40 @@ body{overflow:hidden}
 
     <!-- SIMULATOR -->
     <div class="page" id="page-simulator">
-      <div class="sim-layout">
-        <div class="sim-editor">
-          <div class="sim-toolbar">
-            <span class="sim-filename">sketch.ino</span>
-            <button class="btn-reset" onclick="resetCode()">Reset</button>
-            <button class="btn-run" onclick="runCode()">▶ Run</button>
-          </div>
-          <textarea class="code-area" id="codeArea" spellcheck="false">void setup() {
-  Serial.begin(9600);
-  pinMode(13, OUTPUT);
-}
-
-void loop() {
-  digitalWrite(13, HIGH);
-  Serial.println("LED: ON");
-  delay(1000);
-  digitalWrite(13, LOW);
-  Serial.println("LED: OFF");
-  delay(1000);
-}</textarea>
+      <div class="wokwi-wrap">
+        <div class="wokwi-toolbar">
+          <span class="wokwi-toolbar-label">Template:</span>
+          <button class="tpl-btn active" id="tpl-blink" onclick="loadWokwi('blink',this)"><span class="tpl-dot" style="background:var(--amber)"></span>Blink LED</button>
+          <button class="tpl-btn" id="tpl-servo" onclick="loadWokwi('servo',this)"><span class="tpl-dot" style="background:var(--blue)"></span>Servo Sweep</button>
+          <button class="tpl-btn" id="tpl-sensor" onclick="loadWokwi('sensor',this)"><span class="tpl-dot" style="background:var(--green)"></span>Ultrasonic Sensor</button>
+          <button class="tpl-btn" id="tpl-motor" onclick="loadWokwi('motor',this)"><span class="tpl-dot" style="background:var(--purple)"></span>DC Motor</button>
+          <a class="wokwi-open-btn" id="wokwiOpenBtn" href="https://wokwi.com/projects/322062421191774803" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open in Wokwi
+          </a>
         </div>
-        <div class="sim-panel">
-          <div class="sim-card">
-            <div class="sim-card-title">Hardware Preview</div>
-            <div class="robot-canvas">
-              <div class="robot-emoji">🤖</div>
-              <div class="leds">
-                <span class="led" id="led0"></span>
-                <span class="led" id="led1"></span>
-                <span class="led" id="led2"></span>
-                <span class="led" id="led3"></span>
-              </div>
-            </div>
-            <div class="sim-card-title" style="margin-top:12px">Serial Monitor</div>
-            <div class="serial-box" id="serialBox">Ready. Press Run to start...</div>
+        <div class="wokwi-frame" id="wokwiFrame">
+          <div class="wokwi-loading" id="wokwiLoading">
+            <div class="wokwi-loading-dot"></div>
+            <span>Loading Wokwi simulator…</span>
           </div>
-          <div class="sim-card">
-            <div class="sim-card-title">Templates</div>
-            <div class="tpl-list">
-              <button class="tpl-btn" onclick="loadTemplate('blink')"><span class="tpl-dot" style="background:var(--amber)"></span>Blink LED</button>
-              <button class="tpl-btn" onclick="loadTemplate('servo')"><span class="tpl-dot" style="background:var(--blue)"></span>Servo Sweep</button>
-              <button class="tpl-btn" onclick="loadTemplate('sensor')"><span class="tpl-dot" style="background:var(--green)"></span>Read Sensor</button>
-              <button class="tpl-btn" onclick="loadTemplate('motor')"><span class="tpl-dot" style="background:var(--purple)"></span>DC Motor</button>
-            </div>
-          </div>
+          <iframe
+            id="wokwiIframe"
+            src="https://wokwi.com/projects/322062421191774803?embed=1&theme=dark"
+            allowfullscreen
+            allow="cross-origin-isolated"
+            onload="document.getElementById('wokwiLoading').style.opacity='0'"
+            style="opacity:0;transition:opacity .4s"
+          ></iframe>
         </div>
+        <div class="wokwi-credit">Powered by <a href="https://wokwi.com" target="_blank">Wokwi</a> — edit code, add components, and run simulations in real time</div>
       </div>
     </div>
 
     <!-- COMMUNITY -->
     <div class="page" id="page-community">
       <div class="compose">
-        <div class="compose-av">AL</div>
+        <div class="compose-av" id="composeAv">?</div>
         <textarea class="compose-input" id="composeInput" placeholder="Share something with the community…" rows="2"></textarea>
         <button class="compose-post" onclick="postMessage()">Post</button>
       </div>
@@ -772,7 +754,7 @@ void loop() {
 <script>
 /* ══ DATA ══ */
 const LESSONS=[
-  {icon:"⚡",title:"Electricity & Circuits",level:"Beginner",topic:"Theory",duration:"8 min",progress:80,body:`<h3>What is electricity?</h3><p>Electricity is the flow of electrons through a conductor. In robotics, we harness this flow to power motors, sensors, and microcontrollers.</p><div class="info-box">⚡ Key formula: <strong>V = I × R</strong> (Voltage = Current × Resistance). This is Ohm's Law — the foundation of all circuit design.</div><h3>The three essentials</h3><p><strong>Voltage (V)</strong> — the pressure that pushes electrons. Your Arduino runs on 5V. Most sensors operate at 3.3V–5V.</p><p><strong>Current (A)</strong> — the amount of charge flowing. LEDs need ~20mA. Motors can need 1–5A depending on size.</p><p><strong>Resistance (Ω)</strong> — how much the circuit opposes flow. Resistors protect your components from drawing too much current.</p><h3>Series vs. Parallel</h3><p>In a <strong>series</strong> circuit, components share one path. Total resistance adds up. In a <strong>parallel</strong> circuit, each component gets its own path — voltage stays the same, current divides.</p><div class="code-block">// Check your circuit in Arduino Serial Monitor
+  {icon:"⚡",title:"Electricity & Circuits",level:"Beginner",topic:"Theory",duration:"8 min",progress:0,body:`<h3>What is electricity?</h3><p>Electricity is the flow of electrons through a conductor. In robotics, we harness this flow to power motors, sensors, and microcontrollers.</p><div class="info-box">⚡ Key formula: <strong>V = I × R</strong> (Voltage = Current × Resistance). This is Ohm's Law — the foundation of all circuit design.</div><h3>The three essentials</h3><p><strong>Voltage (V)</strong> — the pressure that pushes electrons. Your Arduino runs on 5V. Most sensors operate at 3.3V–5V.</p><p><strong>Current (A)</strong> — the amount of charge flowing. LEDs need ~20mA. Motors can need 1–5A depending on size.</p><p><strong>Resistance (Ω)</strong> — how much the circuit opposes flow. Resistors protect your components from drawing too much current.</p><h3>Series vs. Parallel</h3><p>In a <strong>series</strong> circuit, components share one path. Total resistance adds up. In a <strong>parallel</strong> circuit, each component gets its own path — voltage stays the same, current divides.</p><div class="code-block">// Check your circuit in Arduino Serial Monitor
 void setup() {
   Serial.begin(9600);
   Serial.println("Circuit check ready");
@@ -790,7 +772,7 @@ void loop() {
   myServo.write(180); // go to 180°
   delay(1000);
 }</div><p>The <strong>Servo library</strong> handles all the PWM timing for you — just call <code>write(angle)</code>.</p>`},
-  {icon:"📡",title:"Sensors Explained",level:"Beginner",topic:"Theory",duration:"10 min",progress:40,body:`<h3>What are sensors?</h3><p>Sensors are the eyes and ears of a robot. They detect physical properties of the environment and convert them into electrical signals that a microcontroller can process.</p><h3>Types of sensors</h3><p><strong>Ultrasonic (HC-SR04)</strong> — measures distance using sound waves. Range: 2cm–400cm. Perfect for obstacle avoidance.</p><p><strong>IR Sensors</strong> — detect infrared light. Used for line following and proximity detection.</p><p><strong>Temperature (DHT11/22)</strong> — reads temperature and humidity. Used in climate-controlled robots.</p><p><strong>Accelerometer (MPU-6050)</strong> — measures tilt, acceleration, and rotation. Essential for balance bots.</p><div class="info-box">💡 Most sensors output either analog voltage (0–5V) or digital HIGH/LOW. Always check your sensor's datasheet.</div><div class="code-block">// HC-SR04 Ultrasonic example
+  {icon:"📡",title:"Sensors Explained",level:"Beginner",topic:"Theory",duration:"10 min",progress:0,body:`<h3>What are sensors?</h3><p>Sensors are the eyes and ears of a robot. They detect physical properties of the environment and convert them into electrical signals that a microcontroller can process.</p><h3>Types of sensors</h3><p><strong>Ultrasonic (HC-SR04)</strong> — measures distance using sound waves. Range: 2cm–400cm. Perfect for obstacle avoidance.</p><p><strong>IR Sensors</strong> — detect infrared light. Used for line following and proximity detection.</p><p><strong>Temperature (DHT11/22)</strong> — reads temperature and humidity. Used in climate-controlled robots.</p><p><strong>Accelerometer (MPU-6050)</strong> — measures tilt, acceleration, and rotation. Essential for balance bots.</p><div class="info-box">💡 Most sensors output either analog voltage (0–5V) or digital HIGH/LOW. Always check your sensor's datasheet.</div><div class="code-block">// HC-SR04 Ultrasonic example
 #define TRIG 9
 #define ECHO 10
 
@@ -858,90 +840,165 @@ const PROJECTS=[
   {icon:"📡",title:"Bluetooth RC Car",diff:"Intermediate",time:"5 hrs",tags:["HC-05","Motor","App Control"],bg:"#f5f5f5"},
 ];
 
-const POSTS_DATA=[
-  {user:"Adaeze O.",av:"#222",time:"2h ago",text:"Just finished my first line-following robot using IR sensors! The PID tuning took forever but it finally works smoothly. Kp=2.3 was the sweet spot for me 🙌",likes:24,liked:false},
-  {user:"Ibrahim M.",av:"#444",time:"5h ago",text:"Question for the community — is it better to start with ESP32 or Arduino Uno as a beginner? I want to get into IoT robotics eventually.",likes:11,liked:false},
-  {user:"Timi A.",av:"#666",time:"1d ago",text:"Pro tip: always add a 100µF capacitor across your motor driver power rails. It smooths out voltage spikes and prevents your Arduino from resetting when motors start.",likes:47,liked:true},
-  {user:"Chisom E.",av:"#888",time:"2d ago",text:"Sharing my self-balancing robot code on GitHub. It uses MPU-6050 + PID. Took 3 weeks but I learned so much about control theory. Link in bio!",likes:63,liked:false},
+
+/* ══ COMMUNITY (Firebase RTDB) ══ */
+const DEFAULT_POSTS = [
+  {user:"Adaeze O.",av:"#222",text:"Just finished my first line-following robot using IR sensors! The PID tuning took forever but it finally works smoothly. Kp=2.3 was the sweet spot for me 🙌",likes:24,timestamp:Date.now()-7200000},
+  {user:"Ibrahim M.",av:"#444",text:"Question for the community — is it better to start with ESP32 or Arduino Uno as a beginner? I want to get into IoT robotics eventually.",likes:11,timestamp:Date.now()-18000000},
+  {user:"Timi A.",av:"#666",text:"Pro tip: always add a 100µF capacitor across your motor driver power rails. It smooths out voltage spikes and prevents your Arduino from resetting when motors start.",likes:47,timestamp:Date.now()-86400000},
+  {user:"Chisom E.",av:"#888",text:"Sharing my self-balancing robot code on GitHub. It uses MPU-6050 + PID. Took 3 weeks but I learned so much about control theory. Link in bio!",likes:63,timestamp:Date.now()-172800000},
 ];
 
-/* ══ STATE ══ */
-let postsData=[...POSTS_DATA];
-let qIdx=0,qScore=0,qAnswered=false,currentFilter='All';
-const PAGE_TITLES={home:'Home',lessons:'Lessons',reader:'Lesson',projects:'Projects',quiz:'Quiz',simulator:'Simulator',community:'Community'};
+let db, postsListener = null;
 
-/* ══ NAV ══ */
-function nav(pageId, triggerId){
-  // Pages
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+pageId).classList.add('active');
-  // PC sidebar
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const pcId='ni-'+pageId;
-  if(document.getElementById(pcId)) document.getElementById(pcId).classList.add('active');
-  // Mobile tabs
-  document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));
-  const mobId='mt-'+pageId;
-  if(document.getElementById(mobId)) document.getElementById(mobId).classList.add('active');
-  // Title
-  document.getElementById('pageTitle').textContent=PAGE_TITLES[pageId]||pageId;
-  // Scroll content to top
-  document.querySelector('.content').scrollTop=0;
-  // Init pages
-  if(pageId==='lessons') renderLessons();
-  if(pageId==='quiz') initQuiz();
-  if(pageId==='projects') renderProjects();
-  if(pageId==='community') renderPosts();
+function initCommunity() {
+  // Seed default posts once if community is empty
+  db.ref('community/posts').once('value').then(snap => {
+    if (!snap.exists()) {
+      DEFAULT_POSTS.forEach(p => {
+        db.ref('community/posts').push({
+          user: p.user, av: p.av, text: p.text,
+          likes: p.likes, timestamp: p.timestamp, likedBy: {}
+        });
+      });
+    }
+  });
 }
 
-/* ══ LESSONS ══ */
-function openLesson(i){
-  const l=LESSONS[i];
-  document.getElementById('rIcon').textContent=l.icon;
-  document.getElementById('rTitle').textContent=l.title;
-  document.getElementById('rLevel').textContent=l.level;
-  document.getElementById('rDur').textContent=l.duration;
-  document.getElementById('rTopic').textContent=l.topic;
-  document.getElementById('rBody').innerHTML=l.body;
-  nav('reader',null);
+function listenToPosts() {
+  if (postsListener) db.ref('community/posts').off('value', postsListener);
+  postsListener = db.ref('community/posts').orderByChild('timestamp').on('value', snap => {
+    const posts = [];
+    snap.forEach(child => posts.unshift({ id: child.key, ...child.val() }));
+    renderPosts(posts);
+  });
 }
 
-function renderLessons(){
-  const color={Beginner:'var(--blue)',Intermediate:'var(--amber)',Advanced:'var(--purple)'};
-  const bg={Beginner:'var(--blue-dim)',Intermediate:'var(--amber-dim)',Advanced:'var(--purple-dim)'};
-  document.getElementById('lessonList').innerHTML=LESSONS
-    .filter(l=>currentFilter==='All'||l.level===currentFilter||l.topic===currentFilter)
-    .map((l,i)=>`
-      <div class="lesson-row" onclick="openLesson(${LESSONS.indexOf(l)})">
-        <div class="lr-icon" style="background:${bg[l.level]}">${l.icon}</div>
-        <div class="lr-body">
-          <div class="lr-title">${l.title}</div>
-          <div class="lr-meta">${l.topic} · ${l.duration}</div>
-        </div>
-        ${l.progress>0?`<div class="lr-progress">${l.progress}%</div>`:''}
-        <span class="lr-badge" style="background:${bg[l.level]};color:${color[l.level]}">${l.level}</span>
-      </div>`).join('');
-}
-
-function filterL(val,el){
-  currentFilter=val;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderLessons();
-}
-
-/* ══ PROJECTS ══ */
-function renderProjects(){
-  const dc={Beginner:'var(--green)',Intermediate:'var(--amber)',Advanced:'var(--red)'};
-  document.getElementById('projGrid').innerHTML=PROJECTS.map(p=>`
-    <div class="proj-card">
-      <div class="proj-thumb" style="background:${p.bg}">${p.icon}</div>
-      <div class="proj-body">
-        <div class="proj-title">${p.title}</div>
-        <div class="proj-meta"><span class="diff-pip" style="background:${dc[p.diff]}"></span>${p.diff} · ${p.time}</div>
-        <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
+function renderPosts(posts) {
+  const uid = auth.currentUser?.uid;
+  if (!posts.length) {
+    document.getElementById('postList').innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">No posts yet. Be the first!</div>';
+    return;
+  }
+  document.getElementById('postList').innerHTML = posts.map(p => {
+    const liked = uid && p.likedBy && p.likedBy[uid];
+    const likeCount = p.likedBy ? Object.keys(p.likedBy).length : (p.likes || 0);
+    const timeStr = formatPostTime(p.timestamp);
+    return `<div class="post-card">
+      <div class="post-head">
+        <div class="post-av" style="background:${p.av}">${escHtml(p.user.charAt(0))}</div>
+        <div><div class="post-user">${escHtml(p.user)}</div><div class="post-time">${timeStr}</div></div>
       </div>
-    </div>`).join('');
+      <div class="post-text">${escHtml(p.text)}</div>
+      <div class="post-actions">
+        <button class="post-action ${liked ? 'liked' : ''}" onclick="likePost('${p.id}',${!!liked})">${liked ? '♥' : '♡'} ${likeCount}</button>
+        <button class="post-action">💬 Reply</button>
+        <button class="post-action">↗ Share</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function likePost(postId, currentlyLiked) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  const ref = db.ref(`community/posts/${postId}/likedBy/${uid}`);
+  if (currentlyLiked) ref.remove(); else ref.set(true);
+}
+
+function postMessage() {
+  const input = document.getElementById('composeInput');
+  const txt = input.value.trim();
+  if (!txt) return;
+  const user = auth.currentUser;
+  const name = user.displayName || user.email.split('@')[0] || 'Student';
+  db.ref('community/posts').push({
+    user: name, av: '#111', text: txt,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    likedBy: {}
+  });
+  input.value = '';
+}
+
+function formatPostTime(ts) {
+  if (!ts) return 'Just now';
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  return Math.floor(diff / 86400000) + 'd ago';
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══ LESSON PROGRESS (per-user Firebase) ══ */
+let userProgress = {}; // { lessonIndex: pct }
+
+function loadUserProgress(uid) {
+  db.ref(`users/${uid}/progress`).on('value', snap => {
+    userProgress = snap.val() || {};
+    renderLessons();
+    updateHomeDashboard(uid);
+  });
+}
+
+function markLessonOpened(lessonIdx) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  // Only update if not already further along
+  const current = userProgress[lessonIdx] || 0;
+  if (current < 10) {
+    db.ref(`users/${uid}/progress/${lessonIdx}`).set(10);
+  }
+}
+
+function markLessonComplete(lessonIdx) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  db.ref(`users/${uid}/progress/${lessonIdx}`).set(100);
+}
+
+function updateHomeDashboard(uid) {
+  const done = Object.values(userProgress).filter(v => v >= 100).length;
+  const total = Object.keys(userProgress).length;
+  document.querySelector('.stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-indicator" style="background:var(--dark)"></div><div class="stat-num">${done}</div><div class="stat-label">Lessons done</div></div>
+    <div class="stat-card"><div class="stat-indicator" style="background:var(--green)"></div><div class="stat-num">${Math.max(0,Math.floor(done/3))}</div><div class="stat-label">Projects built</div></div>
+    <div class="stat-card"><div class="stat-indicator" style="background:var(--amber)"></div><div class="stat-num">${total>0?Math.round(Object.values(userProgress).reduce((a,b)=>a+b,0)/total)+'%':'—'}</div><div class="stat-label">Avg. progress</div></div>`;
+  // Update home lesson cards progress bars
+  const homeCards = document.querySelectorAll('.card-grid .lesson-card');
+  homeCards.forEach((card, i) => {
+    const fill = card.querySelector('.lc-fill');
+    if (fill) fill.style.width = (userProgress[i] || 0) + '%';
+  });
+}
+
+/* ══ SIMULATOR (Wokwi) ══ */
+const wokwiProjects = {
+  blink:  { id: '322062421191774803', url: 'https://wokwi.com/projects/322062421191774803' },
+  servo:  { id: '323706614604628562', url: 'https://wokwi.com/projects/323706614604628562' },
+  sensor: { id: '305967267362447936', url: 'https://wokwi.com/projects/305967267362447936' },
+  motor:  { id: '340696408651964498', url: 'https://wokwi.com/projects/340696408651964498' },
+};
+
+function loadWokwi(tpl, el) {
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const proj = wokwiProjects[tpl];
+  const iframe = document.getElementById('wokwiIframe');
+  const loading = document.getElementById('wokwiLoading');
+  const openBtn = document.getElementById('wokwiOpenBtn');
+  // Reset loading state
+  loading.style.opacity = '1';
+  iframe.style.opacity = '0';
+  openBtn.href = proj.url;
+  iframe.src = `https://wokwi.com/projects/${proj.id}?embed=1&theme=dark`;
+  iframe.onload = () => {
+    loading.style.opacity = '0';
+    iframe.style.opacity = '1';
+  };
 }
 
 /* ══ QUIZ ══ */
@@ -985,75 +1042,81 @@ function answer(i){
 }
 function nextQ(){qIdx++;qAnswered=false;renderQuestion()}
 
-/* ══ COMMUNITY ══ */
-function renderPosts(){
-  document.getElementById('postList').innerHTML=postsData.map((p,i)=>`
-    <div class="post-card">
-      <div class="post-head">
-        <div class="post-av" style="background:${p.av}">${p.user.charAt(0)}</div>
-        <div><div class="post-user">${p.user}</div><div class="post-time">${p.time}</div></div>
-      </div>
-      <div class="post-text">${p.text}</div>
-      <div class="post-actions">
-        <button class="post-action ${p.liked?'liked':''}" onclick="likePost(${i})">${p.liked?'♥':'♡'} ${p.likes}</button>
-        <button class="post-action">💬 Reply</button>
-        <button class="post-action">↗ Share</button>
+/* ══ PROJECTS ══ */
+function renderProjects(){
+  const dc={Beginner:'var(--green)',Intermediate:'var(--amber)',Advanced:'var(--red)'};
+  document.getElementById('projGrid').innerHTML=PROJECTS.map(p=>`
+    <div class="proj-card">
+      <div class="proj-thumb" style="background:${p.bg}">${p.icon}</div>
+      <div class="proj-body">
+        <div class="proj-title">${p.title}</div>
+        <div class="proj-meta"><span class="diff-pip" style="background:${dc[p.diff]}"></span>${p.diff} · ${p.time}</div>
+        <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
       </div>
     </div>`).join('');
 }
-function likePost(i){postsData[i].liked=!postsData[i].liked;postsData[i].likes+=postsData[i].liked?1:-1;renderPosts()}
-function postMessage(){
-  const input=document.getElementById('composeInput');
-  const txt=input.value.trim();if(!txt)return;
-  postsData.unshift({user:"You",av:"#111",time:"Just now",text:txt,likes:0,liked:false});
-  input.value='';renderPosts();
+
+/* ══ LESSONS ══ */
+function openLesson(i){
+  const l=LESSONS[i];
+  document.getElementById('rIcon').textContent=l.icon;
+  document.getElementById('rTitle').textContent=l.title;
+  document.getElementById('rLevel').textContent=l.level;
+  document.getElementById('rDur').textContent=l.duration;
+  document.getElementById('rTopic').textContent=l.topic;
+  document.getElementById('rBody').innerHTML=l.body;
+  markLessonOpened(i);
+  nav('reader',null);
 }
 
-/* ══ SIMULATOR ══ */
-const templates={
-  blink:`void setup() {\n  Serial.begin(9600);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  Serial.println("LED: ON");\n  delay(1000);\n  digitalWrite(13, LOW);\n  Serial.println("LED: OFF");\n  delay(1000);\n}`,
-  servo:`#include <Servo.h>\nServo myServo;\n\nvoid setup() {\n  myServo.attach(9);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for(int i=0;i<=180;i+=10){\n    myServo.write(i);\n    Serial.println("Angle: "+String(i));\n    delay(80);\n  }\n}`,
-  sensor:`#define TRIG 9\n#define ECHO 10\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n}\n\nvoid loop() {\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  long d = pulseIn(ECHO, HIGH);\n  float cm = d / 58.0;\n  Serial.print("Distance: ");\n  Serial.print(cm);\n  Serial.println(" cm");\n  delay(300);\n}`,
-  motor:`int motorPin = 6;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(motorPin, OUTPUT);\n}\n\nvoid loop() {\n  for(int s=0;s<=255;s+=5){\n    analogWrite(motorPin, s);\n    Serial.println("Speed: "+String(s));\n    delay(50);\n  }\n  analogWrite(motorPin, 0);\n  Serial.println("Motor OFF");\n  delay(1000);\n}`
-};
-function loadTemplate(t){document.getElementById('codeArea').value=templates[t]}
-function resetCode(){document.getElementById('codeArea').value=templates.blink;document.getElementById('serialBox').textContent='Ready. Press Run to start...';clearLeds()}
-let simInterval=null;
-function runCode(){
-  if(simInterval)clearInterval(simInterval);
-  const code=document.getElementById('codeArea').value;
-  const serial=document.getElementById('serialBox');
-  serial.textContent='';let tick=0;
-  simInterval=setInterval(()=>{
-    tick++;
-    if(code.includes('LED: ON')||code.includes('digitalWrite(13')){
-      const on=tick%2===1;
-      setLeds(on?[true,true,true,true]:[false,false,false,false]);
-      serial.textContent+=on?'LED: ON\n':'LED: OFF\n';
-    }else if(code.includes('Angle:')){
-      const angle=((tick*20)%180);
-      serial.textContent+=`Angle: ${angle}\n`;
-      setLeds([angle>45,angle>90,angle>135,angle>170]);
-    }else if(code.includes('Distance:')){
-      const d=(20+Math.random()*80).toFixed(1);
-      serial.textContent+=`Distance: ${d} cm\n`;
-      setLeds([d<80,d<60,d<40,d<20]);
-    }else if(code.includes('Speed:')){
-      const s=Math.min(255,(tick*25)%280);
-      serial.textContent+=`Speed: ${s}\n`;
-      setLeds([s>63,s>127,s>191,s>240]);
-    }else{
-      serial.textContent+=`Running... tick ${tick}\n`;
-    }
-    serial.scrollTop=serial.scrollHeight;
-    if(tick>12){clearInterval(simInterval);serial.textContent+='— Program complete —\n';}
-  },700);
+function renderLessons(){
+  const color={Beginner:'var(--blue)',Intermediate:'var(--amber)',Advanced:'var(--purple)'};
+  const bg={Beginner:'var(--blue-dim)',Intermediate:'var(--amber-dim)',Advanced:'var(--purple-dim)'};
+  document.getElementById('lessonList').innerHTML=LESSONS
+    .filter(l=>currentFilter==='All'||l.level===currentFilter||l.topic===currentFilter)
+    .map((l,i)=>{
+      const pct = userProgress[LESSONS.indexOf(l)] || 0;
+      return `<div class="lesson-row" onclick="openLesson(${LESSONS.indexOf(l)})">
+        <div class="lr-icon" style="background:${bg[l.level]}">${l.icon}</div>
+        <div class="lr-body">
+          <div class="lr-title">${l.title}</div>
+          <div class="lr-meta">${l.topic} · ${l.duration}</div>
+        </div>
+        ${pct>0?`<div class="lr-progress">${pct}%</div>`:''}
+        <span class="lr-badge" style="background:${bg[l.level]};color:${color[l.level]}">${l.level}</span>
+      </div>`;
+    }).join('');
 }
-function setLeds(states){states.forEach((on,i)=>{const el=document.getElementById('led'+i);if(el)el.classList.toggle('on',on)})}
-function clearLeds(){[0,1,2,3].forEach(i=>{const e=document.getElementById('led'+i);if(e)e.classList.remove('on')})}
+
+function filterL(val,el){
+  currentFilter=val;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderLessons();
+}
+
+/* ══ NAV ══ */
+function nav(pageId, triggerId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pcId='ni-'+pageId;
+  if(document.getElementById(pcId)) document.getElementById(pcId).classList.add('active');
+  document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));
+  const mobId='mt-'+pageId;
+  if(document.getElementById(mobId)) document.getElementById(mobId).classList.add('active');
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[pageId]||pageId;
+  document.querySelector('.content').scrollTop=0;
+  if(pageId==='lessons') renderLessons();
+  if(pageId==='quiz') initQuiz();
+  if(pageId==='projects') renderProjects();
+  if(pageId==='community') listenToPosts();
+}
 
 /* ══ INIT ══ */
-renderLessons();renderProjects();renderPosts();
+let qIdx=0,qScore=0,qAnswered=false,currentFilter='All';
+const PAGE_TITLES={home:'Home',lessons:'Lessons',reader:'Lesson',projects:'Projects',quiz:'Quiz',simulator:'Simulator',community:'Community'};
+renderLessons(); renderProjects();
 
 /* ══ FIREBASE INIT ══ */
 const firebaseConfig = {
@@ -1068,9 +1131,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+db = firebase.database();
 firebase.analytics();
 
-/* Persist session across page reloads */
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 /* ── Auth state listener ── */
@@ -1078,22 +1141,27 @@ auth.onAuthStateChanged(user => {
   if (user) {
     enterApp(user);
   } else {
-    // Show auth screen if not signed in
     const screen = document.getElementById('authScreen');
     screen.style.display = 'flex';
     screen.classList.remove('hidden');
   }
 });
 
-/* ── Enter app with Firebase user ── */
+/* ── Enter app ── */
 function enterApp(user) {
   const name = user.displayName || user.email || 'User';
   const initials = name.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'ME';
+  // Update avatars
   document.querySelector('.avatar-pill').textContent = initials;
+  const composeAv = document.getElementById('composeAv');
+  if (composeAv) composeAv.textContent = initials;
   // Hide auth screen
   const screen = document.getElementById('authScreen');
   screen.classList.add('hidden');
   setTimeout(() => screen.style.display = 'none', 400);
+  // Bootstrap Firebase features
+  initCommunity();           // seed default posts if empty
+  loadUserProgress(user.uid); // load per-user lesson progress
 }
 
 /* ── Panel switch ── */
