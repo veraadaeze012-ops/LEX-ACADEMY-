@@ -2124,25 +2124,30 @@ function switchPanel(to) {
 }
 
 async function handleLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pw    = document.getElementById('loginPw').value;
-  const err   = document.getElementById('loginError');
+  const emailEl = document.getElementById('loginEmail');
+  const pwEl    = document.getElementById('loginPw');
+  const err     = document.getElementById('loginError');
+  const email   = emailEl.value.trim();
+  const pw      = pwEl.value;
   err.classList.remove('show');
   if (!email || !pw) {
     err.textContent = 'Please enter your email and password.';
     err.classList.add('show');
-    if (!email) document.getElementById('loginEmail').classList.add('invalid');
-    if (!pw)    document.getElementById('loginPw').classList.add('invalid');
-    setTimeout(()=>document.querySelectorAll('.auth-input').forEach(i=>i.classList.remove('invalid')), 1800);
+    if (!email) emailEl.classList.add('invalid');
+    if (!pw)    pwEl.classList.add('invalid');
+    setTimeout(() => document.querySelectorAll('.auth-input').forEach(i => i.classList.remove('invalid')), 1800);
     return;
   }
   const btn = document.querySelector('#panelLogin .auth-btn');
-  btn.textContent='Signing in…'; btn.disabled=true;
+  if (!btn) return;
+  btn.textContent = 'Signing in…'; btn.disabled = true;
   try {
     await auth.signInWithEmailAndPassword(email, pw);
+    // onAuthStateChanged handles the rest
   } catch(e) {
-    btn.textContent='Sign in →'; btn.disabled=false;
-    err.textContent=firebaseErrMsg(e.code); err.classList.add('show');
+    btn.textContent = 'Sign in →'; btn.disabled = false;
+    err.textContent = firebaseErrMsg(e.code);
+    err.classList.add('show');
   }
 }
 
@@ -2231,8 +2236,10 @@ function firebaseErrMsg(code) {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key!=='Enter') return;
-  if (document.getElementById('authScreen').style.display==='none') return;
+  if (e.key !== 'Enter') return;
+  const screen = document.getElementById('authScreen');
+  // Only trigger if auth screen is actually visible
+  if (!screen || screen.classList.contains('hidden') || screen.style.display === 'none') return;
   if (document.getElementById('panelLogin').classList.contains('active')) handleLogin();
   else handleSignup();
 });
