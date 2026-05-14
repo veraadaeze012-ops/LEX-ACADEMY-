@@ -1,1746 +1,1258 @@
 <!DOCTYPE html>
 <html lang="en">
-<head></head>
+<head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lex Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- ══ FIREBASE SDK (compat) ══ -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-  firebase.initializeApp({
-    apiKey:            "AIzaSyBm2y7fNCHshVvS0HDJXNVlLxKtZ7384DI",
-    authDomain:        "lex-academy-3dbba.firebaseapp.com",
-    projectId:         "lex-academy-3dbba",
-    storageBucket:     "lex-academy-3dbba.firebasestorage.app",
-    messagingSenderId: "143935846024",
-    appId:             "1:143935846024:web:8ddbf2cb34aa9c7233513d",
-    measurementId:     "G-TRH7XW5XT4"
-  });
-  window._auth = firebase.auth();
-  window._db   = firebase.firestore();
-  window.dispatchEvent(new Event("fbReady"));
-</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f2f2f2;--surface:#fff;--surface-dim:#f8f8f8;--surface-hover:#f0f0f0;
-  --border:rgba(0,0,0,.07);--border-med:rgba(0,0,0,.11);--border-strong:rgba(0,0,0,.18);
-  --text:#0a0a0a;--text2:#4a4a4a;--text3:#9a9a9a;--text4:#c8c8c8;
-  --dark:#111;--dark2:#1a1a1a;--dark3:#232323;
-  --blue:#0071e3;--blue-dim:rgba(0,113,227,.08);--blue-mid:rgba(0,113,227,.15);
-  --green:#28cd41;--green-dim:rgba(40,205,65,.09);
-  --amber:#f59e0b;--amber-dim:rgba(245,158,11,.1);
-  --red:#ef4444;--red-dim:rgba(239,68,68,.08);
-  --purple:#8b5cf6;--purple-dim:rgba(139,92,246,.09);
-  --r:14px;--r-sm:10px;--r-xs:7px;--r-lg:20px;--r-full:999px;
-  --font:"DM Sans",system-ui,sans-serif;--mono:"DM Mono",monospace;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
-  --shadow-lg:0 12px 40px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.06);
-  --sidebar:236px;--topbar:60px;
+  --bg:#f2f2f2;--surface:#fff;--surface-dim:#f8f8f8;
+  --border:rgba(0,0,0,0.07);--border-med:rgba(0,0,0,0.1);
+  --text:#0a0a0a;--text2:#5a5a5a;--text3:#ababab;
+  --blue:#0071e3;--blue-dim:rgba(0,113,227,0.08);
+  --green:#28cd41;--green-dim:rgba(40,205,65,0.1);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.1);
+  --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.1);
+  --red:#ef4444;--dark:#111;
+  --r:16px;--r-sm:12px;--r-xs:8px;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --sidebar:240px;
 }
-html{height:100%;-webkit-text-size-adjust:100%}
-body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
-button{font-family:var(--font);cursor:pointer}
-input,textarea{font-family:var(--font)}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:var(--border-med);border-radius:2px}
+html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
+body{overflow:hidden}
 
-/* AUTH */
-#authLayer{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.auth-card{width:100%;max-width:420px;background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden}
-.auth-hero{background:var(--dark);padding:32px 32px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden}
-.auth-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,113,227,.22),transparent 70%)}
-.auth-logo-wrap{width:52px;height:52px;background:var(--dark3);border:1px solid rgba(255,255,255,.1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;z-index:1}
-.auth-logo-wrap svg{width:26px;height:26px}
-.auth-brand{font-size:20px;font-weight:600;color:#fff;letter-spacing:-.4px;position:relative;z-index:1}
-.auth-tagline{font-size:12.5px;color:rgba(255,255,255,.4);margin-top:4px;position:relative;z-index:1}
-.auth-body{padding:28px 32px 32px}
-.auth-tabs{display:flex;background:var(--bg);border-radius:var(--r-sm);padding:3px;gap:3px;margin-bottom:24px}
-.auth-tab{flex:1;padding:8px;border-radius:var(--r-xs);border:none;background:none;font-size:13.5px;font-weight:500;color:var(--text3);cursor:pointer;transition:all .15s}
-.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
-.form-group{margin-bottom:14px}
-.form-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;display:block}
-.form-input-wrap{position:relative}
-.form-input{width:100%;padding:11px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border-med);background:var(--bg);font-size:14px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
-.form-input:focus{border-color:var(--dark);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
-.form-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text3);padding:4px;background:none;border:none;font-size:14px}
-.form-error{font-size:11.5px;color:var(--red);margin-top:4px;display:none}
-.form-error.show{display:block}
-.auth-btn{width:100%;padding:12px;border-radius:var(--r-sm);background:var(--dark);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px}
-.auth-btn:hover{opacity:.88}
-.auth-btn:active{transform:scale(.98)}
-.auth-btn:disabled{opacity:.4;cursor:default}
-.auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text4);font-size:12px}
-.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--border)}
-.oauth-btn{width:100%;padding:10px 14px;border-radius:var(--r-sm);background:var(--surface);border:1.5px solid var(--border-med);font-size:13.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:9px}
-.oauth-btn:hover{border-color:var(--text3);color:var(--text)}
-.auth-switch{text-align:center;font-size:12.5px;color:var(--text3);margin-top:16px}
-.auth-switch span{color:var(--blue);cursor:pointer;font-weight:500}
-.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* ══════════════════════════════════════
+   PC LAYOUT (sidebar + main)
+══════════════════════════════════════ */
+.shell{display:flex;height:100vh;overflow:hidden}
 
-/* ONBOARDING */
-#onboardLayer{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
-#onboardLayer.show{display:flex}
-.onboard-card{width:100%;max-width:440px;background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:36px;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-.onboard-step{display:none}.onboard-step.active{display:block}
-.onboard-progress{display:flex;gap:5px;margin-bottom:28px}
-.onboard-pip{height:3px;flex:1;border-radius:2px;background:var(--border-med);transition:background .3s}
-.onboard-pip.done{background:var(--dark)}
-.ob-emoji{font-size:40px;margin-bottom:16px}
-.ob-title{font-size:22px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px}
-.ob-sub{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:24px}
-.ob-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-.ob-opt{padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border-med);background:none;font-size:13.5px;color:var(--text2);cursor:pointer;text-align:left;transition:all .12s;display:flex;align-items:center;gap:10px;font-family:var(--font)}
-.ob-opt:hover{border-color:var(--text3);color:var(--text)}
-.ob-opt.sel{border-color:var(--dark);background:rgba(0,0,0,.03);color:var(--text)}
-.ob-actions{display:flex;gap:10px}
-.ob-skip{flex:1;padding:11px;border-radius:var(--r-sm);border:1.5px solid var(--border-med);background:none;font-size:14px;color:var(--text2);cursor:pointer;font-family:var(--font)}
-.ob-next{flex:2;padding:11px;border-radius:var(--r-sm);background:var(--dark);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font)}
-
-/* SHELL */
-#appShell{display:none;height:100vh;overflow:hidden}
-#appShell.show{display:flex}
-.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.sidebar-top{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  height:100vh;
+}
+.sidebar-top{padding:24px 18px 18px;border-bottom:1px solid var(--border)}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:32px;height:32px;background:var(--dark);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-mark svg{width:17px;height:17px}
-.logo-name{font-size:14.5px;font-weight:600;letter-spacing:-.3px}
-.logo-tag{font-size:10px;color:var(--text3);margin-top:.5px}
-.sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
-.nav-sec{font-size:10px;font-weight:600;color:var(--text4);letter-spacing:.1em;text-transform:uppercase;padding:8px 8px 3px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;font-size:13.5px;color:var(--text2);border:none;background:none;width:100%;text-align:left;transition:all .12s}
-.nav-item:hover{background:var(--surface-hover);color:var(--text)}
-.nav-item.active{background:var(--dark);color:#fff}
-.nav-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(0,0,0,.04)}
-.nav-item.active .nav-icon{background:rgba(255,255,255,.12)}
-.nav-icon svg{width:13px;height:13px;stroke:var(--text2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo-mark{width:34px;height:34px;background:var(--dark);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:18px;height:18px}
+.logo-name{font-size:15px;font-weight:600;letter-spacing:-0.4px}
+.logo-tag{font-size:10px;color:var(--text3);margin-top:1px}
+.sidebar-nav{flex:1;padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.sidebar-nav::-webkit-scrollbar{display:none}
+.nav-group-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:10px 8px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;
+  border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:400;
+  color:var(--text2);transition:background .1s,color .1s;
+  border:none;background:none;width:100%;text-align:left;font-family:var(--font);
+}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--bg);color:var(--text);font-weight:500}
+.nav-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);transition:background .1s}
+.nav-item.active .nav-icon{background:var(--dark)}
+.nav-icon svg{width:14px;height:14px;stroke:var(--text2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .nav-item.active .nav-icon svg{stroke:#fff}
 .nav-item:hover:not(.active) .nav-icon svg{stroke:var(--text)}
-.sidebar-foot{padding:12px 16px;border-top:1px solid var(--border)}
-.sf-user{display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer;border-radius:9px;padding:6px 4px;transition:background .12s}
-.sf-user:hover{background:var(--surface-hover)}
-.sf-av{width:30px;height:30px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
-.sf-name{font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sf-lvl{font-size:11px;color:var(--text3)}
-.sf-out{background:none;border:none;color:var(--text4);cursor:pointer;padding:4px;border-radius:6px;transition:color .12s;flex-shrink:0}
-.sf-out:hover{color:var(--red)}
-.sf-out svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.xp-track{height:3px;background:var(--bg);border-radius:2px;overflow:hidden}
-.xp-fill{height:100%;border-radius:2px;background:var(--green);transition:width .6s ease}
-.xp-labels{display:flex;justify-content:space-between;margin-top:5px}
-.xp-labels span{font-size:11px;color:var(--text3)}
+.sidebar-foot{padding:14px 18px;border-top:1px solid var(--border)}
+.progress-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.progress-label span{font-size:11.5px;color:var(--text2)}
+.progress-label strong{font-size:12.5px;font-weight:600}
+.xp-track{height:3px;background:var(--bg);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;width:62%;background:var(--green);border-radius:3px}
+.xp-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.signout-btn{
+  display:flex;align-items:center;gap:7px;margin-top:12px;width:100%;
+  padding:8px 10px;border-radius:10px;border:1px solid var(--border);
+  background:none;font-family:var(--font);font-size:12.5px;color:var(--text2);
+  cursor:pointer;transition:background .12s,color .12s;
+}
+.signout-btn:hover{background:var(--bg);color:var(--red)}
+.signout-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{height:var(--topbar);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--surface)}
-.page-title{font-size:16px;font-weight:600;letter-spacing:-.3px}
-.topbar-right{display:flex;align-items:center;gap:10px;position:relative}
-.srch{position:relative}
-.srch input{padding:7px 13px 7px 34px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--bg);font-size:13px;color:var(--text);outline:none;width:180px;transition:width .25s,border-color .15s}
-.srch input:focus{border-color:var(--border-strong);width:220px}
-.srch input::placeholder{color:var(--text3)}
-.srch-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none}
-.srch-ic svg{width:13px;height:13px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round}
-.tb-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;position:relative}
-.tb-btn:hover{border-color:var(--border-strong)}
-.tb-btn svg{width:14px;height:14px;stroke:var(--text2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.nb-dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--surface)}
-.tb-av{width:30px;height:30px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;cursor:pointer;flex-shrink:0}
-.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px 28px;scroll-behavior:smooth}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;flex-shrink:0}
+.page-title{font-size:20px;font-weight:600;letter-spacing:-.5px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.search-pill{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 14px}
+.search-pill input{border:none;outline:none;background:none;font-family:var(--font);font-size:13px;color:var(--text);width:140px}
+.search-pill input::placeholder{color:var(--text3)}
+.search-pill svg{width:13px;height:13px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.avatar-pill{width:30px;height:30px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:20px 28px 28px;scroll-behavior:smooth}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--border-med);border-radius:2px}
+
+/* PAGES */
 .page{display:none}
-.page.active{display:block;animation:fadeIn .18s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.mob-nav{display:none;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
-.mob-tabs{display:flex}
-.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 7px;border:none;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.mob-ti{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:7px;transition:background .15s}
-.mob-ti svg{width:18px;height:18px;stroke:var(--text4);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
-.mob-tl{font-size:9.5px;color:var(--text4);font-weight:500;transition:color .15s}
-.mob-tab.active .mob-ti{background:var(--dark)}
-.mob-tab.active .mob-ti svg{stroke:#fff}
-.mob-tab.active .mob-tl{color:var(--text);font-weight:600}
+.page.active{display:block}
 
-/* NOTIF PANEL */
-.notif-panel{position:absolute;top:48px;right:0;width:300px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-lg);z-index:200;overflow:hidden;display:none}
-.notif-panel.open{display:block;animation:fadeIn .15s ease}
-.np-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border)}
-.np-title{font-size:13.5px;font-weight:600}
-.np-clear{font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font)}
-.notif-item{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
-.notif-item:hover{background:var(--bg)}
-.notif-item:last-child{border-bottom:none}
-.notif-item.unread{background:var(--blue-dim)}
-.ni-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--bg)}
-.ni-text{font-size:12.5px;color:var(--text2);line-height:1.5;flex:1}
-.ni-time{font-size:11px;color:var(--text3);margin-top:3px}
+/* ══════════════════════════════════════
+   MOBILE BOTTOM TAB BAR
+══════════════════════════════════════ */
+.mobile-bar{display:none}
 
-/* TOAST */
-.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
-.toast{background:var(--dark);color:#fff;padding:10px 18px;border-radius:var(--r-full);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn .25s ease;white-space:nowrap}
-@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.toast.ok{background:var(--green)}
-.toast.err{background:var(--red)}
-
-/* HOME */
-.hero-card{background:var(--dark);border-radius:var(--r);padding:26px 28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px}
-.hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 55% 80% at 85% 50%,rgba(0,113,227,.2),transparent 70%);pointer-events:none}
-.hero-glyph{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:68px;opacity:.06;line-height:1;user-select:none}
-.hero-ey{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:10px;position:relative;z-index:1}
-.hero-title{font-size:22px;font-weight:600;letter-spacing:-.5px;line-height:1.25;margin-bottom:6px;position:relative;z-index:1}
-.hero-sub{font-size:13px;color:rgba(255,255,255,.48);line-height:1.65;margin-bottom:18px;max-width:280px;position:relative;z-index:1}
-.hero-cta{display:inline-flex;align-items:center;gap:5px;background:#fff;color:var(--dark);font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:var(--r-full);border:none;cursor:pointer;transition:opacity .15s;position:relative;z-index:1;font-family:var(--font)}
-.hero-cta:hover{opacity:.88}
-.hero-streak{display:flex;align-items:center;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);position:relative;z-index:1}
-.hs-item{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.55)}
-.hs-val{font-size:13px;font-weight:600;color:#fff}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px}
-.stat-ind{width:6px;height:6px;border-radius:50%;margin-bottom:12px}
-.stat-num{font-size:26px;font-weight:600;letter-spacing:-1px;line-height:1}
-.stat-lbl{font-size:11.5px;color:var(--text2);margin-top:3px}
-.sec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
-.sec-title{font-size:14.5px;font-weight:600;letter-spacing:-.2px}
-.see-all{font-size:12.5px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:500}
-.lesson-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:20px}
-.lcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:17px;cursor:pointer;transition:transform .15s,box-shadow .15s}
-.lcard:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.lc-icon{font-size:24px;margin-bottom:13px;display:block}
-.lc-lvl{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
-.lc-title{font-size:13.5px;font-weight:500;letter-spacing:-.2px;line-height:1.3;margin-bottom:3px}
-.lc-meta{font-size:11px;color:var(--text3)}
-.lc-bar{height:2px;background:var(--bg);border-radius:2px;margin-top:13px;overflow:hidden}
-.lc-fill{height:100%;border-radius:2px;background:var(--dark)}
-.act-list{display:flex;flex-direction:column;gap:7px}
-.act-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);font-size:13px}
-.act-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.act-txt{flex:1;color:var(--text2)}
-.act-time{font-size:11px;color:var(--text3);white-space:nowrap}
-
-/* LESSONS */
-.filter-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.fbtn{padding:5px 12px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);font-size:12px;color:var(--text2);cursor:pointer;transition:all .12s;font-family:var(--font)}
-.fbtn:hover{border-color:var(--border-strong);color:var(--text)}
-.fbtn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
-.lesson-list{display:flex;flex-direction:column;gap:7px}
-.lrow{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:box-shadow .15s}
-.lrow:hover{box-shadow:var(--shadow-sm)}
-.lrow-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.lrow-body{flex:1;min-width:0}
-.lrow-title{font-size:13.5px;font-weight:500;letter-spacing:-.2px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lrow-meta{font-size:11.5px;color:var(--text3)}
-.lrow-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.diff-badge{font-size:10.5px;font-weight:500;padding:3px 9px;border-radius:var(--r-full)}
-.done-check{width:18px;height:18px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center}
-.done-check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-
-/* READER */
-.reader-wrap{max-width:600px;margin:0 auto}
-.r-back{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--blue);cursor:pointer;background:none;border:none;margin-bottom:22px;padding:0}
-.r-back svg{width:14px;height:14px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.r-icon{font-size:44px;margin-bottom:10px}
-.r-title{font-size:24px;font-weight:600;letter-spacing:-.6px;margin-bottom:8px;line-height:1.2}
-.r-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-.r-tag{font-size:11px;padding:3px 9px;border-radius:var(--r-full);background:var(--bg);border:1px solid var(--border);color:var(--text2)}
-.r-body{font-size:14.5px;line-height:1.85;color:var(--text2)}
-.r-body h3{font-size:15.5px;font-weight:600;color:var(--text);margin:22px 0 9px;letter-spacing:-.3px}
-.r-body p{margin-bottom:13px}
-.info-box{background:var(--blue-dim);border:1px solid var(--blue-mid);border-radius:var(--r-xs);padding:12px 14px;font-size:13px;line-height:1.65;margin:12px 0;color:var(--text)}
-.code-block{background:#111;border-radius:var(--r-xs);padding:16px;font-family:var(--mono);font-size:12px;color:#d4d4d4;margin:12px 0;line-height:1.75;overflow-x:auto;white-space:pre}
-.r-actions{display:flex;gap:9px;margin-top:28px;padding-top:18px;border-top:1px solid var(--border);flex-wrap:wrap}
-.r-btn{padding:10px 20px;border-radius:var(--r-sm);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .12s;border:1.5px solid var(--border);background:none;color:var(--text2);font-family:var(--font)}
-.r-btn:hover{border-color:var(--border-strong);color:var(--text)}
-.r-btn.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
-.r-btn.ok{background:var(--green);color:#fff;border-color:var(--green)}
-
-/* PROJECTS */
-.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative}
-.pcard:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.pcard-thumb{height:96px;display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--bg)}
-.pcard-body{padding:13px}
-.pcard-title{font-size:14px;font-weight:500;letter-spacing:-.2px;margin-bottom:4px}
-.pcard-meta{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3);margin-bottom:9px}
-.pdot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-.ptag{font-size:10px;padding:2px 7px;border-radius:var(--r-full);background:var(--bg);color:var(--text3);border:1px solid var(--border)}
-.pcard-done{position:absolute;top:10px;right:10px;background:var(--green);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--r-full)}
-
-/* QUIZ */
-.quiz-wrap{max-width:520px;margin:0 auto}
-.q-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.q-cnt{font-size:12px;color:var(--text3);white-space:nowrap}
-.q-pbar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
-.q-pbar-fill{height:100%;border-radius:2px;background:var(--dark);transition:width .4s cubic-bezier(.4,0,.2,1)}
-.q-xp{font-size:12px;color:var(--green);font-weight:500;white-space:nowrap}
-.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow-sm)}
-.q-topic{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:9px}
-.q-q{font-size:16px;font-weight:500;letter-spacing:-.4px;line-height:1.45;margin-bottom:18px}
-.q-opts{display:flex;flex-direction:column;gap:7px}
-.q-opt{padding:11px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:none;font-size:13.5px;cursor:pointer;text-align:left;transition:all .12s;color:var(--text);font-family:var(--font);display:flex;align-items:center;gap:10px}
-.q-opt:hover:not(:disabled){border-color:var(--border-strong);background:rgba(0,0,0,.02)}
-.q-opt.correct{border-color:var(--green);background:var(--green-dim);color:#166534}
-.q-opt.wrong{border-color:var(--red);background:var(--red-dim);color:#991b1b}
-.q-letter{width:22px;height:22px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
-.q-opt.correct .q-letter{background:var(--green);color:#fff}
-.q-opt.wrong .q-letter{background:var(--red);color:#fff}
-.q-exp{margin-top:13px;padding:11px 14px;background:rgba(0,0,0,.03);border-radius:var(--r-xs);font-size:13px;color:var(--text2);line-height:1.6;border-left:3px solid var(--border-strong)}
-.q-next{margin-top:14px;width:100%;padding:11px;background:var(--dark);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;font-family:var(--font)}
-.q-next:disabled{opacity:.25;cursor:default}
-.q-result{text-align:center;padding:36px 24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm)}
-.qr-circle{width:88px;height:88px;border-radius:50%;border:3px solid var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
-.qr-pct{font-size:26px;font-weight:700;letter-spacing:-1px}
-.qr-of{font-size:11px;color:var(--text3)}
-.qr-title{font-size:19px;font-weight:600;letter-spacing:-.4px;margin-bottom:6px}
-.qr-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.55}
-.qr-actions{display:flex;gap:9px;justify-content:center}
-.qr-btn{padding:10px 22px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:none;color:var(--text);font-family:var(--font)}
-.qr-btn.p{background:var(--dark);color:#fff;border-color:var(--dark)}
-
-/* SIMULATOR */
-.sim-intro{background:var(--dark);border-radius:var(--r);padding:22px 24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
-.sim-intro::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 90% 50%,rgba(0,113,227,.25),transparent 70%);pointer-events:none}
-.sim-intro-body{position:relative;z-index:1}
-.sim-intro-title{font-size:18px;font-weight:600;letter-spacing:-.4px;margin-bottom:6px}
-.sim-intro-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:18px;max-width:380px}
-.sim-open{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--dark);font-size:13px;font-weight:600;padding:9px 18px;border-radius:var(--r-full);border:none;cursor:pointer;font-family:var(--font)}
-.sim-glyph{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.07;line-height:1;user-select:none}
-.sim-tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
-.stpl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--font)}
-.stpl:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
-.stpl-icon{font-size:22px;margin-bottom:9px;display:block}
-.stpl-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
-.stpl-desc{font-size:11.5px;color:var(--text3);line-height:1.4}
-.stpl-badge{display:inline-flex;align-items:center;gap:4px;margin-top:9px;font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-dim);padding:3px 9px;border-radius:var(--r-full)}
-.sim-feats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.sfeat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px}
-.sfeat-icon{font-size:20px;margin-bottom:8px}
-.sfeat-title{font-size:13px;font-weight:500;margin-bottom:3px}
-.sfeat-desc{font-size:11.5px;color:var(--text3);line-height:1.45}
-
-/* COMMUNITY */
-.comm-tabs{display:flex;background:var(--bg);border-radius:var(--r-sm);padding:3px;gap:2px;border:1px solid var(--border);margin-bottom:14px;width:fit-content}
-.comm-tab{padding:6px 14px;border-radius:var(--r-xs);border:none;background:none;font-size:12.5px;font-weight:500;color:var(--text3);cursor:pointer;transition:all .12s;font-family:var(--font)}
-.comm-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
-.compose-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
-.compose-av{width:28px;height:28px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px}
-.compose-input{flex:1;border:none;outline:none;font-size:13.5px;color:var(--text);resize:none;line-height:1.55;background:none;font-family:var(--font);min-height:40px}
-.compose-input::placeholder{color:var(--text3)}
-.compose-post{padding:7px 14px;border-radius:var(--r-full);background:var(--dark);color:#fff;border:none;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font);align-self:flex-end}
-.post-list{display:flex;flex-direction:column;gap:8px}
-.post-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 15px}
-.post-head{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px}
-.post-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
-.post-ui{flex:1;min-width:0}
-.post-user{font-size:13px;font-weight:600}
-.post-role{font-size:11px;color:var(--text3)}
-.post-time{font-size:11px;color:var(--text3);flex-shrink:0;margin-top:1px}
-.post-text{font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:11px}
-.post-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-.post-tag{font-size:10.5px;padding:2px 8px;border-radius:var(--r-full);background:var(--blue-dim);color:var(--blue)}
-.post-foot{display:flex;gap:14px}
-.p-action{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font);transition:color .12s}
-.p-action:hover{color:var(--text2)}
-.p-action.liked{color:var(--red)}
-.p-action svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.p-action.liked svg{fill:var(--red);stroke:var(--red)}
-
-/* LEADERBOARD */
-.lb-podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:9px;margin-bottom:16px;align-items:flex-end}
-.lb-pod{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 10px;text-align:center;position:relative}
-.lb-pod.first{background:var(--dark);border-color:var(--dark);color:#fff}
-.lb-crown{font-size:18px;margin-bottom:5px}
-.lb-rank{position:absolute;top:10px;left:10px;font-size:11px;font-weight:600;color:var(--text3)}
-.lb-pod.first .lb-rank{color:rgba(255,255,255,.4)}
-.lb-av{width:38px;height:38px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
-.lb-pname{font-size:12.5px;font-weight:500;margin-bottom:2px}
-.lb-pod.first .lb-pname{color:rgba(255,255,255,.85)}
-.lb-pxp{font-size:11px;color:var(--text3)}
-.lb-pod.first .lb-pxp{color:rgba(255,255,255,.45)}
-.lb-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden}
-.lb-row{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--border)}
-.lb-row:last-child{border-bottom:none}
-.lb-row.me{background:var(--blue-dim)}
-.lb-rrank{font-size:12px;font-weight:600;color:var(--text3);width:20px;text-align:center;flex-shrink:0}
-.lb-rav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
-.lb-rname{flex:1;font-size:13.5px;font-weight:500}
-.lb-rlvl{font-size:11px;color:var(--text3)}
-.lb-rxp{font-size:13px;font-weight:600}
-
-/* PROFILE */
-.prof-hero{background:var(--dark);border-radius:var(--r);padding:24px;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}
-.prof-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 100% 50%,rgba(0,113,227,.15),transparent 70%)}
-.prof-av{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0;border:2px solid rgba(255,255,255,.15);position:relative;z-index:1}
-.prof-body{position:relative;z-index:1}
-.prof-name{font-size:20px;font-weight:600;letter-spacing:-.4px;margin-bottom:3px}
-.prof-lvl{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:10px}
-.prof-xpbar{height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;width:200px;max-width:100%}
-.prof-xpfill{height:100%;border-radius:2px;background:var(--green)}
-.prof-xplbl{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px}
-.prof-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
-.pstat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px;text-align:center}
-.pstat-num{font-size:22px;font-weight:600;letter-spacing:-.8px}
-.pstat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
-.badge-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:14px}
-.badge-item{display:flex;flex-direction:column;align-items:center;gap:4px}
-.badge-ic{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;border:1.5px solid var(--border)}
-.badge-ic.earned{background:var(--bg)}
-.badge-ic.locked{background:var(--bg);filter:grayscale(1);opacity:.35}
-.badge-nm{font-size:9.5px;color:var(--text3);text-align:center;line-height:1.3;max-width:54px}
-.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:14px}
-.sr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
-.sr:hover{background:var(--bg)}
-.sr:last-child{border-bottom:none}
-.sr-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.sr-title{font-size:13.5px;font-weight:500}
-.sr-sub{font-size:11.5px;color:var(--text3);margin-top:1px}
-.toggle{width:40px;height:23px;border-radius:12px;background:var(--green);position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
-.toggle::after{content:"";position:absolute;top:2px;right:2px;width:19px;height:19px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:right .2s}
-.toggle.off{background:var(--border-med)}
-.toggle.off::after{right:19px}
-.goal-row{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
-.goal-btn{padding:5px 12px;border-radius:var(--r-full);border:1.5px solid var(--border);background:none;font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .12s}
-.goal-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
-
-/* RESPONSIVE */
-@media(max-width:900px){
+@media(max-width:768px){
   body{overflow:auto}
-  #appShell{flex-direction:column;height:100dvh}
+  .shell{flex-direction:column;height:100dvh}
   .sidebar{display:none}
-  .main{flex:1;overflow:hidden;min-height:0}
-  .topbar{padding:0 16px;height:52px}
-  .content{padding:14px 14px 18px}
-  .mob-nav{display:block}
-  .srch input{width:130px}
-  .stats-grid{grid-template-columns:1fr 1fr 1fr}
-}
-@media(max-width:540px){
-  .content{padding:12px 12px 16px}
-  .lesson-grid{grid-template-columns:1fr 1fr}
+  .main{flex:1;min-height:0;overflow:hidden}
+  .topbar{padding:14px 18px 0}
+  .page-title{font-size:18px}
+  .search-pill{display:none}
+  .content{padding:14px 16px 16px}
+  .mobile-bar{
+    display:flex;background:var(--surface);
+    border-top:1px solid var(--border);
+    padding:8px 0 max(8px,env(safe-area-inset-bottom));
+    flex-shrink:0;
+  }
+  .mob-tab{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    cursor:pointer;padding:4px 2px;border:none;background:none;
+    font-family:var(--font);
+  }
+  .mob-tab-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s}
+  .mob-tab-icon svg{width:18px;height:18px;stroke:var(--text3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+  .mob-tab-label{font-size:9.5px;color:var(--text3);font-weight:500;transition:color .15s}
+  .mob-tab.active .mob-tab-icon{background:var(--dark)}
+  .mob-tab.active .mob-tab-icon svg{stroke:#fff}
+  .mob-tab.active .mob-tab-label{color:var(--text);font-weight:600}
+
+  /* Mobile layout tweaks */
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .card-grid{grid-template-columns:1fr 1fr}
+  .sim-layout{grid-template-columns:1fr;height:auto}
   .proj-grid{grid-template-columns:1fr 1fr}
-  .prof-stats{grid-template-columns:repeat(2,1fr)}
-  .sim-tpl-grid{grid-template-columns:repeat(2,1fr)}
-  .sim-feats{grid-template-columns:1fr}
-  .srch{display:none}
+  .quiz-wrap{max-width:100%}
+  .reader-wrap{max-width:100%}
+  .hero{padding:22px}
+  .hero-title{font-size:20px}
+  .stat-num{font-size:22px}
 }
-@media(max-width:380px){
-  .lesson-grid{grid-template-columns:1fr}
+
+@media(max-width:400px){
+  .card-grid{grid-template-columns:1fr}
   .proj-grid{grid-template-columns:1fr}
-  .sim-tpl-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
 }
+
+/* ══════════════════════════════════════
+   HOME
+══════════════════════════════════════ */
+.hero{
+  background:var(--dark);border-radius:var(--r);padding:28px 32px;
+  color:#fff;position:relative;overflow:hidden;cursor:pointer;margin-bottom:16px;
+}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(0,113,227,.18) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px}
+.hero-title{font-size:24px;font-weight:600;letter-spacing:-.6px;line-height:1.2;margin-bottom:8px}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:300px;margin-bottom:20px}
+.hero-cta{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--dark);font-size:13px;font-weight:500;padding:8px 18px;border-radius:20px;border:none;cursor:pointer;font-family:var(--font);transition:opacity .15s}
+.hero-cta:hover{opacity:.9}
+.hero-glyph{position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:72px;opacity:.07;line-height:1;user-select:none}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px 18px}
+.stat-indicator{width:6px;height:6px;border-radius:50%;margin-bottom:12px}
+.stat-num{font-size:26px;font-weight:600;letter-spacing:-1px;line-height:1}
+.stat-label{font-size:12px;color:var(--text2);margin-top:3px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-header h2{font-size:15px;font-weight:600;letter-spacing:-.3px}
+.btn-text{font-size:13px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font);font-weight:500}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.lesson-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.lesson-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.lc-icon{font-size:24px;margin-bottom:14px;display:block}
+.lc-level{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.lc-title{font-size:14px;font-weight:500;letter-spacing:-.2px;margin-bottom:4px;line-height:1.3}
+.lc-meta{font-size:11px;color:var(--text3)}
+.lc-bar{height:2px;background:var(--bg);border-radius:2px;margin-top:14px;overflow:hidden}
+.lc-fill{height:100%;border-radius:2px;background:var(--blue)}
+
+/* ══════════════════════════════════════
+   LESSONS
+══════════════════════════════════════ */
+.filter-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .12s}
+.filter-btn:hover{border-color:var(--text3);color:var(--text)}
+.filter-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.lesson-list{display:flex;flex-direction:column;gap:8px}
+.lesson-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:box-shadow .15s}
+.lesson-row:hover{box-shadow:0 2px 14px rgba(0,0,0,.06)}
+.lr-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.lr-body{flex:1;min-width:0}
+.lr-title{font-size:14px;font-weight:500;letter-spacing:-.2px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-meta{font-size:12px;color:var(--text3)}
+.lr-badge{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;flex-shrink:0}
+.lr-progress{font-size:12px;font-weight:500;color:var(--blue);min-width:32px;text-align:right;flex-shrink:0}
+
+/* ══════════════════════════════════════
+   READER
+══════════════════════════════════════ */
+.reader-wrap{max-width:580px;margin:0 auto}
+.reader-back{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--blue);cursor:pointer;background:none;border:none;font-family:var(--font);margin-bottom:24px;padding:0}
+.reader-icon{font-size:42px;margin-bottom:12px}
+.reader-title{font-size:24px;font-weight:600;letter-spacing:-.6px;margin-bottom:8px;line-height:1.2}
+.reader-meta{display:flex;gap:8px;font-size:12px;color:var(--text3);margin-bottom:28px;flex-wrap:wrap}
+.reader-body{font-size:14.5px;line-height:1.85;color:var(--text2)}
+.reader-body h3{font-size:15px;font-weight:600;color:var(--text);margin:24px 0 10px;letter-spacing:-.3px}
+.reader-body p{margin-bottom:14px}
+.info-box{background:rgba(0,113,227,.05);border:1px solid rgba(0,113,227,.12);border-radius:var(--r-xs);padding:13px 15px;font-size:13px;color:var(--text);margin:14px 0;line-height:1.65}
+.code-block{background:#111;border-radius:var(--r-xs);padding:16px;font-family:var(--mono);font-size:12px;color:#d4d4d4;margin:14px 0;line-height:1.7;overflow-x:auto;white-space:pre}
+.reader-nav{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border)}
+.r-nav-btn{padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:none;font-family:var(--font);font-size:13px;cursor:pointer;color:var(--text)}
+.r-nav-btn.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+/* ══════════════════════════════════════
+   PROJECTS
+══════════════════════════════════════ */
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.proj-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.proj-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:44px}
+.proj-body{padding:14px}
+.proj-title{font-size:14px;font-weight:500;letter-spacing:-.2px;margin-bottom:4px}
+.proj-meta{font-size:12px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.diff-pip{width:5px;height:5px;border-radius:50%;display:inline-block;flex-shrink:0}
+.proj-tags{display:flex;gap:5px;flex-wrap:wrap}
+.proj-tag{font-size:10px;padding:3px 7px;border-radius:20px;background:var(--bg);color:var(--text2);border:1px solid var(--border)}
+
+/* ══════════════════════════════════════
+   QUIZ
+══════════════════════════════════════ */
+.quiz-wrap{max-width:540px;margin:0 auto}
+.quiz-header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.quiz-count{font-size:12px;color:var(--text3);white-space:nowrap}
+.quiz-bar{flex:1;height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+.quiz-bar-fill{height:100%;border-radius:3px;background:var(--dark);transition:width .4s}
+.quiz-xp{font-size:12px;color:var(--green);font-weight:500;white-space:nowrap}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px}
+.q-topic{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+.q-text{font-size:16px;font-weight:500;letter-spacing:-.4px;line-height:1.45;margin-bottom:20px}
+.q-options{display:flex;flex-direction:column;gap:8px}
+.q-opt{padding:12px 15px;border-radius:10px;border:1.5px solid var(--border);background:none;font-family:var(--font);font-size:13.5px;cursor:pointer;text-align:left;transition:all .12s;color:var(--text)}
+.q-opt:hover:not(:disabled){border-color:var(--dark);background:rgba(0,0,0,.03)}
+.q-opt.correct{border-color:var(--green);background:var(--green-dim);color:#166534}
+.q-opt.wrong{border-color:var(--red);background:rgba(239,68,68,.07);color:#991b1b}
+.q-next{margin-top:16px;width:100%;padding:12px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.q-next:disabled{opacity:.25;cursor:default}
+.quiz-result{text-align:center;padding:40px 24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.result-emoji{font-size:48px;margin-bottom:14px}
+.result-score{font-size:46px;font-weight:600;letter-spacing:-2px;margin-bottom:6px}
+.result-sub{font-size:14px;color:var(--text2);margin-bottom:24px;line-height:1.5}
+.result-btn{padding:11px 26px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer}
+
+/* ══════════════════════════════════════
+   SIMULATOR
+══════════════════════════════════════ */
+.sim-layout{display:grid;grid-template-columns:1fr 250px;gap:14px;height:calc(100vh - 148px)}
+.sim-editor{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;display:flex;flex-direction:column}
+.sim-toolbar{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--border);background:var(--surface-dim)}
+.sim-filename{font-size:12px;font-weight:500;color:var(--text2);flex:1;font-family:var(--mono)}
+.btn-run{background:var(--green);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;transition:opacity .15s}
+.btn-run:hover{opacity:.9}
+.btn-reset{background:none;border:1px solid var(--border);border-radius:20px;padding:6px 11px;font-size:12px;cursor:pointer;font-family:var(--font);color:var(--text2);transition:border-color .12s}
+.btn-reset:hover{border-color:var(--text3)}
+.code-area{flex:1;padding:16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;background:#111;color:#f0f0f0;border:none;outline:none;resize:none;overflow-y:auto;tab-size:2;min-height:200px}
+.sim-panel{display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.sim-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px}
+.sim-card-title{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.robot-canvas{background:var(--bg);border-radius:var(--r-xs);height:110px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px}
+.robot-emoji{font-size:38px}
+.leds{display:flex;gap:5px}
+.led{width:9px;height:9px;border-radius:50%;background:var(--bg);border:1px solid var(--border);transition:all .25s}
+.led.on{background:var(--green);border-color:var(--green);box-shadow:0 0 6px var(--green)}
+.serial-box{background:#111;border-radius:var(--r-xs);padding:10px;font-family:var(--mono);font-size:11px;color:#28cd41;height:80px;overflow-y:auto;white-space:pre-wrap;line-height:1.6;margin-top:10px}
+.tpl-list{display:flex;flex-direction:column;gap:1px}
+.tpl-btn{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 9px;border-radius:var(--r-xs);border:none;background:none;font-family:var(--font);font-size:13px;color:var(--text2);cursor:pointer;transition:background .1s}
+.tpl-btn:hover{background:var(--bg);color:var(--text)}
+.tpl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* Mobile simulator stacks */
+@media(max-width:768px){
+  .sim-layout{grid-template-columns:1fr;height:auto;gap:12px}
+  .code-area{min-height:240px;max-height:300px}
+  .sim-panel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+}
+@media(max-width:480px){
+  .sim-panel{grid-template-columns:1fr}
+}
+
+/* ══════════════════════════════════════
+   COMMUNITY
+══════════════════════════════════════ */
+.compose{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 15px;display:flex;gap:11px;margin-bottom:13px;align-items:flex-start}
+.compose-av{width:30px;height:30px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.compose-input{flex:1;border:none;outline:none;font-family:var(--font);font-size:13.5px;color:var(--text);resize:none;line-height:1.5;background:none}
+.compose-input::placeholder{color:var(--text3)}
+.compose-post{background:var(--dark);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);flex-shrink:0;align-self:flex-end;transition:opacity .15s}
+.compose-post:hover{opacity:.85}
+.post-list{display:flex;flex-direction:column;gap:8px}
+.post-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.post-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.post-user{font-size:13px;font-weight:500}
+.post-time{font-size:11.5px;color:var(--text3)}
+.post-text{font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:12px}
+.post-actions{display:flex;gap:14px}
+.post-action{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;transition:color .12s}
+.post-action:hover{color:var(--text2)}
+.post-action.liked{color:var(--red)}
+
+/* ══════════════════════════════════════
+   AUTH SCREEN
+══════════════════════════════════════ */
+.auth-screen{
+  position:fixed;inset:0;z-index:1000;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  transition:opacity .4s, visibility .4s;
+}
+.auth-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+
+.auth-wrap{
+  width:100%;max-width:400px;
+  animation:authIn .5s cubic-bezier(.22,.68,0,1.2) both;
+}
+@keyframes authIn{
+  from{opacity:0;transform:translateY(24px) scale(.97)}
+  to{opacity:1;transform:none}
+}
+
+.auth-logo{display:flex;align-items:center;gap:11px;margin-bottom:36px}
+.auth-logo-mark{width:40px;height:40px;background:var(--dark);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.auth-logo-mark svg{width:20px;height:20px}
+.auth-logo-text .auth-logo-name{font-size:17px;font-weight:600;letter-spacing:-.5px}
+.auth-logo-text .auth-logo-tag{font-size:11px;color:var(--text3);margin-top:1px}
+
+.auth-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:30px 28px;
+  box-shadow:0 2px 40px rgba(0,0,0,.07);
+}
+
+.auth-panel{display:none}
+.auth-panel.active{display:block}
+
+.auth-heading{font-size:22px;font-weight:600;letter-spacing:-.6px;margin-bottom:4px}
+.auth-sub{font-size:13.5px;color:var(--text2);margin-bottom:26px;line-height:1.5}
+.auth-sub a,.auth-toggle-link{color:var(--blue);cursor:pointer;font-weight:500;text-decoration:none;background:none;border:none;font-family:var(--font);font-size:inherit;padding:0}
+.auth-sub a:hover,.auth-toggle-link:hover{text-decoration:underline}
+
+.auth-field{margin-bottom:14px}
+.auth-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;letter-spacing:.01em}
+.auth-input{
+  width:100%;padding:11px 14px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--bg);font-family:var(--font);font-size:14px;
+  color:var(--text);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  -webkit-appearance:none;
+}
+.auth-input:focus{border-color:var(--dark);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+.auth-input::placeholder{color:var(--text3)}
+
+.auth-name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.auth-btn{
+  width:100%;padding:13px;margin-top:6px;
+  background:var(--dark);color:#fff;
+  border:none;border-radius:12px;
+  font-family:var(--font);font-size:14.5px;font-weight:500;
+  cursor:pointer;transition:opacity .15s,transform .1s;
+  letter-spacing:-.2px;
+}
+.auth-btn:hover{opacity:.88}
+.auth-btn:active{transform:scale(.99)}
+
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-divider span{font-size:11.5px;color:var(--text3);white-space:nowrap}
+
+.auth-google{
+  width:100%;padding:11px;
+  background:var(--surface);color:var(--text);
+  border:1.5px solid var(--border);border-radius:12px;
+  font-family:var(--font);font-size:13.5px;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.auth-google:hover{border-color:var(--text3);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.auth-google svg{width:17px;height:17px;flex-shrink:0}
+
+.auth-terms{font-size:11.5px;color:var(--text3);text-align:center;margin-top:18px;line-height:1.6}
+.auth-terms a{color:var(--text3);text-decoration:underline;cursor:pointer}
+
+.auth-error{
+  background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);
+  border-radius:8px;padding:10px 13px;font-size:12.5px;color:#b91c1c;
+  margin-bottom:14px;display:none;
+}
+.auth-error.show{display:block}
+
+/* Input validation states */
+.auth-input.invalid{border-color:var(--red)!important}
+.auth-input.valid{border-color:var(--green)!important}
+
+/* Password strength */
+.pw-strength{margin-top:7px;display:none}
+.pw-strength.show{display:block}
+.pw-bars{display:flex;gap:4px;margin-bottom:4px}
+.pw-bar{flex:1;height:3px;border-radius:3px;background:var(--border);transition:background .3s}
+.pw-bar.weak{background:var(--red)}
+.pw-bar.fair{background:var(--amber)}
+.pw-bar.strong{background:var(--green)}
+.pw-label{font-size:11px;color:var(--text3)}
 </style>
 </head>
 <body>
 
-<!-- AUTH LAYER -->
-<div id="authLayer">
-  <div class="auth-card">
-    <div class="auth-hero">
-      <div class="auth-logo-wrap">
-        <svg viewBox="0 0 26 26" fill="none">
-          <rect x="11" y="1" width="4" height="14" rx="2" fill="rgba(255,255,255,.9)"/>
-          <rect x="2" y="6" width="4" height="10" rx="2" fill="rgba(255,255,255,.5)"/>
-          <rect x="20" y="8" width="4" height="8" rx="2" fill="rgba(255,255,255,.5)"/>
-          <rect x="9" y="17" width="8" height="3" rx="1.5" fill="rgba(255,255,255,.3)"/>
-          <rect x="7.5" y="20" width="3" height="3" rx="1.5" fill="rgba(255,255,255,.25)"/>
-          <rect x="15.5" y="20" width="3" height="3" rx="1.5" fill="rgba(255,255,255,.25)"/>
+<!-- ══ AUTH SCREEN ══ -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-wrap">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-mark">
+        <svg viewBox="0 0 18 18" fill="none">
+          <rect x="7.5" y="1.5" width="3" height="9" rx="1.5" fill="rgba(255,255,255,.9)"/>
+          <rect x="2" y="5" width="3" height="7" rx="1.5" fill="rgba(255,255,255,.5)"/>
+          <rect x="13" y="6" width="3" height="6" rx="1.5" fill="rgba(255,255,255,.5)"/>
+          <rect x="6" y="12" width="6" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
+          <rect x="5.5" y="14" width="2" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
+          <rect x="10.5" y="14" width="2" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
         </svg>
       </div>
-      <div class="auth-brand">Lex Academy</div>
-      <div class="auth-tagline">Learn Robotics. Build Anything.</div>
-    </div>
-    <div class="auth-body">
-      <div class="auth-tabs">
-        <button class="auth-tab" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-        <button class="auth-tab active" id="tabReg" onclick="switchTab('register')">Create Account</button>
+      <div class="auth-logo-text">
+        <div class="auth-logo-name">Lex Academy</div>
+        <div class="auth-logo-tag">Learn Robotics. Build Anything.</div>
       </div>
-      <div id="loginForm" style="display:none">
-        <div class="form-group"><label class="form-label">Email address</label>
-          <input class="form-input" id="liEmail" type="email" placeholder="you@example.com" autocomplete="email">
-          <div class="form-error" id="liEmailErr"></div></div>
-        <div class="form-group"><label class="form-label">Password</label>
-          <div class="form-input-wrap">
-            <input class="form-input" id="liPass" type="password" placeholder="Your password" autocomplete="current-password">
-            <button class="form-eye" onclick="toggleEye('liPass',this)">&#128065;</button>
-          </div>
-          <div class="form-error" id="liPassErr"></div></div>
-        <div class="form-error" id="liErr" style="margin-bottom:10px;font-size:13px"></div>
-        <button class="auth-btn" id="liBtn" onclick="doLogin()"><span id="liBtnTxt">Sign In</span></button>
-        <div class="auth-divider">or</div>
-        <button class="oauth-btn" onclick="googleSignIn()" style="margin-bottom:8px">
-          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    </div>
+
+    <div class="auth-card">
+
+      <!-- ── LOGIN PANEL ── -->
+      <div class="auth-panel active" id="panelLogin">
+        <div class="auth-heading">Welcome back</div>
+        <div class="auth-sub">Don't have an account? <button class="auth-toggle-link" onclick="switchPanel('signup')">Sign up free</button></div>
+
+        <div class="auth-error" id="loginError">Incorrect email or password. Please try again.</div>
+
+        <div class="auth-field">
+          <label class="auth-label">Email address</label>
+          <input class="auth-input" id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input class="auth-input" id="loginPw" type="password" placeholder="Your password" autocomplete="current-password">
+        </div>
+
+        <button class="auth-btn" onclick="handleLogin()">Sign in →</button>
+
+        <div class="auth-divider"><span>or continue with</span></div>
+
+        <button class="auth-google" onclick="handleGoogleAuth()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
           Continue with Google
         </button>
-        <button class="oauth-btn" onclick="guestMode()">&#128640; Continue as Guest</button>
-        <div class="auth-switch">No account? <span onclick="switchTab('register')">Create one free</span></div>
+
+        <div class="auth-terms">
+          <a onclick="void(0)">Forgot password?</a>
+        </div>
       </div>
-      <div id="regForm">
-        <!-- Step indicators -->
-        <div id="regStepDots" style="display:flex;gap:6px;justify-content:center;margin-bottom:18px">
-          <div class="reg-dot active" id="rdot0"></div>
-          <div class="reg-dot" id="rdot1"></div>
-          <div class="reg-dot" id="rdot2"></div>
-        </div>
 
-        <!-- Step 1: Personal Info -->
-        <div id="regStep0">
-          <div style="text-align:center;margin-bottom:16px">
-            <div style="font-size:28px">👤</div>
-            <div style="font-weight:600;font-size:15px;margin-top:4px">Personal Info</div>
-            <div style="font-size:12px;color:var(--text3)">Step 1 of 3</div>
-          </div>
-          <div class="form-group"><label class="form-label">Full name</label>
-            <input class="form-input" id="rgName" type="text" placeholder="e.g. Alex Johnson" autocomplete="name">
-            <div class="form-error" id="rgNameErr"></div></div>
-          <div class="form-group"><label class="form-label">Phone number</label>
-            <input class="form-input" id="rgPhone" type="tel" placeholder="e.g. +234 801 234 5678" autocomplete="tel">
-            <div class="form-error" id="rgPhoneErr"></div></div>
-          <div class="form-group"><label class="form-label">Date of birth</label>
-            <input class="form-input" id="rgDob" type="date" autocomplete="bday">
-            <div class="form-error" id="rgDobErr"></div></div>
-          <button class="auth-btn" onclick="regNext0()">Continue &rarr;</button>
-        </div>
+      <!-- ── SIGN UP PANEL ── -->
+      <div class="auth-panel" id="panelSignup">
+        <div class="auth-heading">Create your account</div>
+        <div class="auth-sub">Already have an account? <button class="auth-toggle-link" onclick="switchPanel('login')">Sign in</button></div>
 
-        <!-- Step 2: Account Info -->
-        <div id="regStep1" style="display:none">
-          <div style="text-align:center;margin-bottom:16px">
-            <div style="font-size:28px">✉️</div>
-            <div style="font-weight:600;font-size:15px;margin-top:4px">Account Details</div>
-            <div style="font-size:12px;color:var(--text3)">Step 2 of 3</div>
+        <div class="auth-error" id="signupError">Please fill in all fields correctly.</div>
+
+        <div class="auth-name-row">
+          <div class="auth-field">
+            <label class="auth-label">First name</label>
+            <input class="auth-input" id="signupFirst" type="text" placeholder="Alex" autocomplete="given-name">
           </div>
-          <div class="form-group"><label class="form-label">Email address</label>
-            <input class="form-input" id="rgEmail" type="email" placeholder="you@example.com" autocomplete="email">
-            <div class="form-error" id="rgEmailErr"></div></div>
-          <div class="form-group"><label class="form-label">Username</label>
-            <input class="form-input" id="rgUsername" type="text" placeholder="e.g. alexbuilder" autocomplete="username">
-            <div class="form-error" id="rgUsernameErr"></div></div>
-          <div class="form-group"><label class="form-label">Country</label>
-            <select class="form-input" id="rgCountry">
-              <option value="">Select your country…</option>
-              <option value="NG">Nigeria 🇳🇬</option>
-              <option value="GH">Ghana 🇬🇭</option>
-              <option value="KE">Kenya 🇰🇪</option>
-              <option value="ZA">South Africa 🇿🇦</option>
-              <option value="US">United States 🇺🇸</option>
-              <option value="GB">United Kingdom 🇬🇧</option>
-              <option value="CA">Canada 🇨🇦</option>
-              <option value="IN">India 🇮🇳</option>
-              <option value="OTHER">Other</option>
-            </select>
-            <div class="form-error" id="rgCountryErr"></div></div>
-          <div style="display:flex;gap:8px">
-            <button class="auth-btn" style="background:var(--bg);color:var(--text);border:1px solid var(--border-med);flex:0 0 80px" onclick="regBack0()">&larr; Back</button>
-            <button class="auth-btn" style="flex:1" onclick="regNext1()">Continue &rarr;</button>
+          <div class="auth-field">
+            <label class="auth-label">Last name</label>
+            <input class="auth-input" id="signupLast" type="text" placeholder="Chen" autocomplete="family-name">
           </div>
         </div>
-
-        <!-- Step 3: Password -->
-        <div id="regStep2" style="display:none">
-          <div style="text-align:center;margin-bottom:16px">
-            <div style="font-size:28px">🔒</div>
-            <div style="font-weight:600;font-size:15px;margin-top:4px">Secure Your Account</div>
-            <div style="font-size:12px;color:var(--text3)">Step 3 of 3</div>
-          </div>
-          <div class="form-group"><label class="form-label">Password</label>
-            <div class="form-input-wrap">
-              <input class="form-input" id="rgPass" type="password" placeholder="Min. 8 characters" autocomplete="new-password">
-              <button class="form-eye" onclick="toggleEye('rgPass',this)">&#128065;</button>
+        <div class="auth-field">
+          <label class="auth-label">Email address</label>
+          <input class="auth-input" id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input class="auth-input" id="signupPw" type="password" placeholder="At least 8 characters" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+          <div class="pw-strength" id="pwStrength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="bar0"></div>
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
             </div>
-            <div class="form-error" id="rgPassErr"></div></div>
-          <div class="form-group"><label class="form-label">Confirm password</label>
-            <div class="form-input-wrap">
-              <input class="form-input" id="rgPass2" type="password" placeholder="Repeat password" autocomplete="new-password">
-              <button class="form-eye" onclick="toggleEye('rgPass2',this)">&#128065;</button>
-            </div>
-            <div class="form-error" id="rgPass2Err"></div></div>
-          <div class="form-error" id="rgErr" style="margin-bottom:10px;font-size:13px;font-weight:500"></div>
-          <div style="display:flex;gap:8px">
-            <button class="auth-btn" style="background:var(--bg);color:var(--text);border:1px solid var(--border-med);flex:0 0 80px" onclick="regBack1()">&larr; Back</button>
-            <button class="auth-btn" style="flex:1" id="rgBtn" onclick="doRegister()"><span id="rgBtnTxt">Create Account 🚀</span></button>
+            <div class="pw-label" id="pwLabel">Weak</div>
           </div>
         </div>
 
-        <div class="auth-switch" style="margin-top:14px">Have an account? <span onclick="switchTab('login')">Sign in</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+        <button class="auth-btn" onclick="handleSignup()">Create account →</button>
 
-<!-- ONBOARDING -->
-<div id="onboardLayer">
-  <div class="onboard-card">
-    <div class="onboard-progress" id="obProg"></div>
-    <div class="onboard-step active" id="ob-0">
-      <div class="ob-emoji">&#128075;</div>
-      <div class="ob-title">Welcome to Lex Academy!</div>
-      <div class="ob-sub">We will personalise your learning in just 3 quick steps.</div>
-      <div class="ob-actions"><button class="ob-next" style="flex:1" onclick="nextOb()">Let's go &#8594;</button></div>
-    </div>
-    <div class="onboard-step" id="ob-1">
-      <div class="ob-emoji">&#127919;</div>
-      <div class="ob-title">What is your goal?</div>
-      <div class="ob-sub">Choose what you want to achieve.</div>
-      <div class="ob-opts" id="ob1opts">
-        <button class="ob-opt" onclick="selOb(this,'ob1opts')"><span>&#129302;</span>Build my first robot</button>
-        <button class="ob-opt" onclick="selOb(this,'ob1opts')"><span>&#128188;</span>Start a career in robotics</button>
-        <button class="ob-opt" onclick="selOb(this,'ob1opts')"><span>&#128218;</span>Learn for school/university</button>
-        <button class="ob-opt" onclick="selOb(this,'ob1opts')"><span>&#127918;</span>Just for fun</button>
-      </div>
-      <div class="ob-actions">
-        <button class="ob-skip" onclick="nextOb()">Skip</button>
-        <button class="ob-next" onclick="nextOb()">Continue &#8594;</button>
-      </div>
-    </div>
-    <div class="onboard-step" id="ob-2">
-      <div class="ob-emoji">&#128202;</div>
-      <div class="ob-title">Your experience level?</div>
-      <div class="ob-sub">We will match lessons to your knowledge.</div>
-      <div class="ob-opts" id="ob2opts">
-        <button class="ob-opt" onclick="selOb(this,'ob2opts')"><span>&#127807;</span>Complete beginner</button>
-        <button class="ob-opt" onclick="selOb(this,'ob2opts')"><span>&#9889;</span>Some coding / electronics</button>
-        <button class="ob-opt" onclick="selOb(this,'ob2opts')"><span>&#128295;</span>I have built robots before</button>
-      </div>
-      <div class="ob-actions">
-        <button class="ob-skip" onclick="nextOb()">Skip</button>
-        <button class="ob-next" onclick="nextOb()">Continue &#8594;</button>
-      </div>
-    </div>
-    <div class="onboard-step" id="ob-3">
-      <div class="ob-emoji">&#9201;</div>
-      <div class="ob-title">Weekly learning goal</div>
-      <div class="ob-sub">How many lessons per week?</div>
-      <div class="ob-opts" id="ob3opts">
-        <button class="ob-opt" onclick="selOb(this,'ob3opts')"><span>&#128528;</span>3 lessons/week &mdash; Casual</button>
-        <button class="ob-opt" onclick="selOb(this,'ob3opts')"><span>&#128640;</span>5 lessons/week &mdash; Regular</button>
-        <button class="ob-opt" onclick="selOb(this,'ob3opts')"><span>&#128170;</span>7 lessons/week &mdash; Intensive</button>
-      </div>
-      <div class="ob-actions">
-        <button class="ob-skip" onclick="finishOb()">Skip</button>
-        <button class="ob-next" onclick="finishOb()">Start Learning &#128640;</button>
-      </div>
-    </div>
-  </div>
-</div>
+        <div class="auth-divider"><span>or continue with</span></div>
 
-<!-- APP SHELL -->
-<div id="appShell">
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="logo">
-        <div class="logo-mark">
-          <svg viewBox="0 0 26 26" fill="none">
-            <rect x="11" y="1" width="4" height="14" rx="2" fill="rgba(255,255,255,.9)"/>
-            <rect x="2" y="6" width="4" height="10" rx="2" fill="rgba(255,255,255,.5)"/>
-            <rect x="20" y="8" width="4" height="8" rx="2" fill="rgba(255,255,255,.5)"/>
-            <rect x="9" y="17" width="8" height="3" rx="1.5" fill="rgba(255,255,255,.3)"/>
-            <rect x="7.5" y="20" width="3" height="3" rx="1.5" fill="rgba(255,255,255,.25)"/>
-            <rect x="15.5" y="20" width="3" height="3" rx="1.5" fill="rgba(255,255,255,.25)"/>
+        <button class="auth-google" onclick="handleGoogleAuth()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
           </svg>
-        </div>
-        <div><div class="logo-name">Lex Academy</div><div class="logo-tag">Learn Robotics</div></div>
-      </div>
-    </div>
-    <div class="sidebar-nav">
-      <div class="nav-sec">Learn</div>
-      <button class="nav-item active" id="ni-home" onclick="nav('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>Home</button>
-      <button class="nav-item" id="ni-lessons" onclick="nav('lessons')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Lessons</button>
-      <button class="nav-item" id="ni-projects" onclick="nav('projects')"><div class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>Projects</button>
-      <button class="nav-item" id="ni-quiz" onclick="nav('quiz')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg></div>Quiz</button>
-      <div class="nav-sec" style="margin-top:4px">Practice</div>
-      <button class="nav-item" id="ni-simulator" onclick="nav('simulator')"><div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>Simulator</button>
-      <button class="nav-item" id="ni-community" onclick="nav('community')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>Community</button>
-      <div class="nav-sec" style="margin-top:4px">Account</div>
-      <button class="nav-item" id="ni-leaderboard" onclick="nav('leaderboard')"><div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>Leaderboard</button>
-      <button class="nav-item" id="ni-profile" onclick="nav('profile')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Profile</button>
-    </div>
-    <div class="sidebar-foot">
-      <div class="sf-user" onclick="nav('profile')">
-        <div class="sf-av" id="sf-av">AL</div>
-        <div><div class="sf-name" id="sf-name">Loading...</div><div class="sf-lvl" id="sf-lvl">Level 1</div></div>
-        <button class="sf-out" onclick="event.stopPropagation();doLogout()" title="Sign out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
-      </div>
-      <div class="xp-track"><div class="xp-fill" id="sfXpBar" style="width:0%"></div></div>
-      <div class="xp-labels"><span id="sfXpCur">0 XP</span><span id="sfXpNext">500 XP to next</span></div>
-    </div>
-  </aside>
-
-  <div class="main">
-    <div class="topbar">
-      <div class="page-title" id="pageTitle">Home</div>
-      <div class="topbar-right">
-        <div class="srch">
-          <div class="srch-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-          <input placeholder="Search lessons..." oninput="doSearch(this.value)">
-        </div>
-        <button class="tb-btn" id="notifBtn" onclick="toggleNotif()">
-          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <div class="nb-dot" id="nbDot"></div>
+          Sign up with Google
         </button>
-        <div class="tb-av" id="tbAv" onclick="nav('profile')">AL</div>
-        <div class="notif-panel" id="notifPanel">
-          <div class="np-head"><span class="np-title">Notifications</span><button class="np-clear" onclick="clearNotifs()">Mark all read</button></div>
-          <div id="notifList"></div>
+
+        <div class="auth-terms">
+          By signing up you agree to our <a onclick="void(0)">Terms of Service</a> and <a onclick="void(0)">Privacy Policy</a>.
+        </div>
+      </div>
+
+    </div><!-- /auth-card -->
+  </div><!-- /auth-wrap -->
+</div><!-- /auth-screen -->
+
+<div class="shell">
+
+<!-- ══ SIDEBAR (PC only) ══ -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 18 18" fill="none">
+          <rect x="7.5" y="1.5" width="3" height="9" rx="1.5" fill="rgba(255,255,255,.9)"/>
+          <rect x="2" y="5" width="3" height="7" rx="1.5" fill="rgba(255,255,255,.5)"/>
+          <rect x="13" y="6" width="3" height="6" rx="1.5" fill="rgba(255,255,255,.5)"/>
+          <rect x="6" y="12" width="6" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
+          <rect x="5.5" y="14" width="2" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
+          <rect x="10.5" y="14" width="2" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">Lex Academy</div>
+        <div class="logo-tag">Learn Robotics. Build Anything.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Learn</div>
+    <button class="nav-item active" id="ni-home" onclick="nav('home','ni-home')">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" id="ni-lessons" onclick="nav('lessons','ni-lessons')">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      <span>Lessons</span>
+    </button>
+    <button class="nav-item" id="ni-projects" onclick="nav('projects','ni-projects')">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <span>Projects</span>
+    </button>
+    <button class="nav-item" id="ni-quiz" onclick="nav('quiz','ni-quiz')">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg></div>
+      <span>Quiz</span>
+    </button>
+    <div class="nav-group-label" style="margin-top:6px">Practice</div>
+    <button class="nav-item" id="ni-simulator" onclick="nav('simulator','ni-simulator')">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <span>Simulator</span>
+    </button>
+    <button class="nav-item" id="ni-community" onclick="nav('community','ni-community')">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <span>Community</span>
+    </button>
+  </div>
+  <div class="sidebar-foot">
+    <div class="progress-label"><span>Level 3 · Technician</span><strong>620 XP</strong></div>
+    <div class="xp-track"><div class="xp-fill"></div></div>
+    <div class="xp-sub">380 XP to Level 4</div>
+    <button class="signout-btn" onclick="handleSignOut()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">Home</div>
+    <div class="topbar-right">
+      <div class="search-pill">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Search lessons…">
+      </div>
+      <div class="avatar-pill">AL</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="hero" onclick="nav('lessons','ni-lessons')">
+        <div class="hero-eyebrow">Continue Learning</div>
+        <div class="hero-title">Motors &amp; Movement</div>
+        <div class="hero-sub">Learn how DC motors, servos, and stepper motors power your robots — no hardware needed.</div>
+        <button class="hero-cta">Resume Lesson →</button>
+        <div class="hero-glyph">⚙</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-indicator" style="background:var(--dark)"></div><div class="stat-num">12</div><div class="stat-label">Lessons done</div></div>
+        <div class="stat-card"><div class="stat-indicator" style="background:var(--green)"></div><div class="stat-num">4</div><div class="stat-label">Projects built</div></div>
+        <div class="stat-card"><div class="stat-indicator" style="background:var(--amber)"></div><div class="stat-num">87%</div><div class="stat-label">Quiz accuracy</div></div>
+      </div>
+      <div class="section-header">
+        <h2>Recommended for you</h2>
+        <button class="btn-text" onclick="nav('lessons','ni-lessons')">See all →</button>
+      </div>
+      <div class="card-grid">
+        <div class="lesson-card" onclick="openLesson(0)"><span class="lc-icon">⚡</span><div class="lc-level" style="color:var(--blue)">Beginner</div><div class="lc-title">Electricity &amp; Circuits</div><div class="lc-meta">8 min · Theory</div><div class="lc-bar"><div class="lc-fill" style="width:80%"></div></div></div>
+        <div class="lesson-card" onclick="openLesson(1)"><span class="lc-icon">🦾</span><div class="lc-level" style="color:var(--amber)">Intermediate</div><div class="lc-title">Servo Motors &amp; Control</div><div class="lc-meta">12 min · Electronics</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>
+        <div class="lesson-card" onclick="openLesson(2)"><span class="lc-icon">📡</span><div class="lc-level" style="color:var(--blue)">Beginner</div><div class="lc-title">Sensors Explained</div><div class="lc-meta">10 min · Theory</div><div class="lc-bar"><div class="lc-fill" style="width:40%"></div></div></div>
+        <div class="lesson-card" onclick="openLesson(3)"><span class="lc-icon">💻</span><div class="lc-level" style="color:var(--purple)">Advanced</div><div class="lc-title">Arduino C++ Basics</div><div class="lc-meta">15 min · Programming</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>
+      </div>
+    </div>
+
+    <!-- LESSONS -->
+    <div class="page" id="page-lessons">
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterL('All',this)">All</button>
+        <button class="filter-btn" onclick="filterL('Beginner',this)">Beginner</button>
+        <button class="filter-btn" onclick="filterL('Intermediate',this)">Intermediate</button>
+        <button class="filter-btn" onclick="filterL('Advanced',this)">Advanced</button>
+        <button class="filter-btn" onclick="filterL('Theory',this)">Theory</button>
+        <button class="filter-btn" onclick="filterL('Programming',this)">Programming</button>
+      </div>
+      <div class="lesson-list" id="lessonList"></div>
+    </div>
+
+    <!-- READER -->
+    <div class="page" id="page-reader">
+      <div class="reader-wrap">
+        <button class="reader-back" onclick="nav('lessons','ni-lessons')">← Back to Lessons</button>
+        <div class="reader-icon" id="rIcon"></div>
+        <div class="reader-title" id="rTitle"></div>
+        <div class="reader-meta">
+          <span id="rLevel"></span><span>·</span><span id="rDur"></span><span>·</span><span id="rTopic"></span>
+        </div>
+        <div class="reader-body" id="rBody"></div>
+        <div class="reader-nav">
+          <button class="r-nav-btn" onclick="nav('lessons','ni-lessons')">← All Lessons</button>
+          <button class="r-nav-btn primary" onclick="nav('quiz','ni-quiz')">Take Quiz →</button>
         </div>
       </div>
     </div>
 
-    <div class="content" id="mainContent">
-
-      <!-- HOME -->
-      <div class="page active" id="page-home">
-        <div class="hero-card">
-          <div class="hero-glyph">&#9881;</div>
-          <div class="hero-ey">Continue Learning</div>
-          <div class="hero-title" id="heroTitle">Welcome back! &#128075;</div>
-          <div class="hero-sub" id="heroSub">Pick up where you left off.</div>
-          <button class="hero-cta" onclick="nav('lessons')">Resume Lesson &#8594;</button>
-          <div class="hero-streak">
-            <div class="hs-item">&#128293; <span class="hs-val" id="strkVal">0</span>&nbsp;day streak</div>
-            <div class="hs-item">&#11088; <span class="hs-val" id="xpVal">0</span>&nbsp;XP</div>
-            <div class="hs-item">&#128218; <span class="hs-val" id="lsnVal">0</span>&nbsp;lessons</div>
-          </div>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-ind" style="background:var(--dark)"></div><div class="stat-num" id="stL">0</div><div class="stat-lbl">Lessons done</div></div>
-          <div class="stat-card"><div class="stat-ind" style="background:var(--green)"></div><div class="stat-num" id="stP">0</div><div class="stat-lbl">Projects built</div></div>
-          <div class="stat-card"><div class="stat-ind" style="background:var(--amber)"></div><div class="stat-num" id="stA">&#8212;</div><div class="stat-lbl">Quiz accuracy</div></div>
-        </div>
-        <div class="sec-row"><span class="sec-title">Recommended</span><button class="see-all" onclick="nav('lessons')">See all &#8594;</button></div>
-        <div class="lesson-grid" id="homeGrid"></div>
-        <div class="sec-row"><span class="sec-title">Recent activity</span></div>
-        <div class="act-list" id="actList"></div>
-      </div>
-
-      <!-- LESSONS -->
-      <div class="page" id="page-lessons">
-        <div class="filter-row">
-          <button class="fbtn active" onclick="fLessons('All',this)">All</button>
-          <button class="fbtn" onclick="fLessons('Beginner',this)">Beginner</button>
-          <button class="fbtn" onclick="fLessons('Intermediate',this)">Intermediate</button>
-          <button class="fbtn" onclick="fLessons('Advanced',this)">Advanced</button>
-          <button class="fbtn" onclick="fLessons('Theory',this)">Theory</button>
-          <button class="fbtn" onclick="fLessons('Programming',this)">Programming</button>
-          <button class="fbtn" onclick="fLessons('Electronics',this)">Electronics</button>
-        </div>
-        <div class="lesson-list" id="lessonList"></div>
-      </div>
-
-      <!-- READER -->
-      <div class="page" id="page-reader">
-        <div class="reader-wrap">
-          <button class="r-back" onclick="nav('lessons')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back to Lessons</button>
-          <div class="r-icon" id="rIcon"></div>
-          <div class="r-title" id="rTitle"></div>
-          <div class="r-tags" id="rTags"></div>
-          <div class="r-body" id="rBody"></div>
-          <div class="r-actions">
-            <button class="r-btn" id="rComplete" onclick="markComplete()">&#10003; Mark Complete</button>
-            <button class="r-btn primary" onclick="nav('quiz')">Take Quiz &#8594;</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- PROJECTS -->
-      <div class="page" id="page-projects">
-        <div class="filter-row">
-          <button class="fbtn active" onclick="fProjs('All',this)">All</button>
-          <button class="fbtn" onclick="fProjs('Beginner',this)">Beginner</button>
-          <button class="fbtn" onclick="fProjs('Intermediate',this)">Intermediate</button>
-          <button class="fbtn" onclick="fProjs('Advanced',this)">Advanced</button>
-        </div>
-        <div class="proj-grid" id="projGrid"></div>
-      </div>
-
-      <!-- QUIZ -->
-      <div class="page" id="page-quiz"><div class="quiz-wrap" id="quizWrap"></div></div>
-
-      <!-- SIMULATOR -->
-      <div class="page" id="page-simulator">
-        <div class="sim-intro">
-          <div class="sim-glyph">&#9881;</div>
-          <div class="sim-intro-body">
-            <div class="sim-intro-title">Wokwi Simulator</div>
-            <div class="sim-intro-sub">Full virtual Arduino lab. No hardware. No Wokwi account needed &mdash; your Lex Academy login gives you direct access.</div>
-            <button class="sim-open" onclick="openWokwi(null)">&#9654; Open Simulator</button>
-          </div>
-        </div>
-        <div class="sec-row" style="margin-bottom:10px"><span class="sec-title">Starter Templates</span></div>
-        <div class="sim-tpl-grid" id="simTpls"></div>
-        <div class="sec-row" style="margin-bottom:10px"><span class="sec-title">What you can simulate</span></div>
-        <div class="sim-feats">
-          <div class="sfeat"><div class="sfeat-icon">&#128187;</div><div class="sfeat-title">Live Code Editor</div><div class="sfeat-desc">Write and run Arduino C++ in real time</div></div>
-          <div class="sfeat"><div class="sfeat-icon">&#129302;</div><div class="sfeat-title">Virtual Arduino</div><div class="sfeat-desc">Uno, Mega, Nano, ESP32 and more</div></div>
-          <div class="sfeat"><div class="sfeat-icon">&#129513;</div><div class="sfeat-title">Component Library</div><div class="sfeat-desc">200+ parts: LEDs, servos, sensors, motors</div></div>
-          <div class="sfeat"><div class="sfeat-icon">&#128223;</div><div class="sfeat-title">Serial Monitor</div><div class="sfeat-desc">Debug your sketches instantly</div></div>
-        </div>
-      </div>
-
-      <!-- COMMUNITY -->
-      <div class="page" id="page-community">
-        <div class="comm-tabs">
-          <button class="comm-tab active" onclick="setCommTab('latest',this)">Latest</button>
-          <button class="comm-tab" onclick="setCommTab('trending',this)">Trending</button>
-        </div>
-        <div class="compose-box">
-          <div class="compose-av" id="compAv">AL</div>
-          <textarea class="compose-input" id="compInput" placeholder="Share a build, ask a question, help someone out..." rows="2"></textarea>
-          <button class="compose-post" onclick="postMsg()">Post</button>
-        </div>
-        <div class="post-list" id="postList"></div>
-      </div>
-
-      <!-- LEADERBOARD -->
-      <div class="page" id="page-leaderboard">
-        <div class="lb-podium" id="lbPodium"></div>
-        <div class="lb-list" id="lbList"></div>
-      </div>
-
-      <!-- PROFILE -->
-      <div class="page" id="page-profile">
-        <div class="prof-hero">
-          <div class="prof-av" id="profAv">AL</div>
-          <div class="prof-body">
-            <div class="prof-name" id="profName">Loading...</div>
-            <div class="prof-lvl" id="profLvlLbl">Level 1 &middot; Builder</div>
-            <div class="prof-xpbar"><div class="prof-xpfill" id="profXpFill" style="width:0%"></div></div>
-            <div class="prof-xplbl" id="profXpLbl">0 / 500 XP</div>
-          </div>
-        </div>
-        <div class="prof-stats">
-          <div class="pstat"><div class="pstat-num" id="psL">0</div><div class="pstat-lbl">Lessons</div></div>
-          <div class="pstat"><div class="pstat-num" id="psP">0</div><div class="pstat-lbl">Projects</div></div>
-          <div class="pstat"><div class="pstat-num" id="psXP">0</div><div class="pstat-lbl">Total XP</div></div>
-          <div class="pstat"><div class="pstat-num" id="psSt">0&#128293;</div><div class="pstat-lbl">Streak</div></div>
-        </div>
-        <div class="sec-row"><span class="sec-title">Badges</span></div>
-        <div class="badge-grid" id="badgeGrid"></div>
-        <div class="sec-row"><span class="sec-title">Settings</span></div>
-        <div class="settings-card">
-          <div class="sr" style="cursor:default">
-            <div class="sr-ic" style="background:rgba(40,205,65,.1)">&#128276;</div>
-            <div style="flex:1"><div class="sr-title">Push Notifications</div><div class="sr-sub">Daily reminders and updates</div></div>
-            <button class="toggle" id="notifToggle" onclick="toggleSetting('notifs',this)"></button>
-          </div>
-          <div class="goal-row">
-            <span style="font-size:12.5px;color:var(--text2);margin-right:4px">Weekly goal:</span>
-            <button class="goal-btn" onclick="setGoal(3,this)">3/wk</button>
-            <button class="goal-btn active" onclick="setGoal(5,this)">5/wk</button>
-            <button class="goal-btn" onclick="setGoal(7,this)">7/wk</button>
-            <button class="goal-btn" onclick="setGoal(10,this)">10/wk</button>
-          </div>
-          <div class="sr" onclick="editProfile()">
-            <div class="sr-ic" style="background:var(--surface-dim)">&#128100;</div>
-            <div style="flex:1"><div class="sr-title">Edit Profile</div><div class="sr-sub" id="editSub">Update name</div></div>
-            <span style="color:var(--text3);font-size:16px">&#8250;</span>
-          </div>
-          <div class="sr" onclick="doLogout()">
-            <div class="sr-ic" style="background:var(--red-dim)">&#128682;</div>
-            <div style="flex:1"><div class="sr-title" style="color:var(--red)">Sign Out</div><div class="sr-sub">Sign out of your account</div></div>
-            <span style="color:var(--text3);font-size:16px">&#8250;</span>
-          </div>
-        </div>
-        <div style="text-align:center;padding:16px 0 4px;font-size:11.5px;color:var(--text4)">Lex Academy v2.0 &middot; Built for 100M+ learners</div>
-      </div>
-
-    </div><!-- /content -->
-  </div><!-- /main -->
-
-  <!-- MOBILE NAV -->
-  <nav class="mob-nav">
-    <div class="mob-tabs">
-      <button class="mob-tab active" id="mt-home" onclick="nav('home')"><div class="mob-ti"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="mob-tl">Home</span></button>
-      <button class="mob-tab" id="mt-lessons" onclick="nav('lessons')"><div class="mob-ti"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><span class="mob-tl">Lessons</span></button>
-      <button class="mob-tab" id="mt-projects" onclick="nav('projects')"><div class="mob-ti"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="mob-tl">Projects</span></button>
-      <button class="mob-tab" id="mt-quiz" onclick="nav('quiz')"><div class="mob-ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg></div><span class="mob-tl">Quiz</span></button>
-      <button class="mob-tab" id="mt-simulator" onclick="nav('simulator')"><div class="mob-ti"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><span class="mob-tl">Simulator</span></button>
-      <button class="mob-tab" id="mt-community" onclick="nav('community')"><div class="mob-ti"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="mob-tl">Community</span></button>
+    <!-- PROJECTS -->
+    <div class="page" id="page-projects">
+      <div class="proj-grid" id="projGrid"></div>
     </div>
-  </nav>
-</div>
 
-<div class="toast-wrap" id="toastWrap"></div>
-<script>
-/* ══ FIREBASE STATE ══ */
-let _curUser = null;
-let _curUid  = null;
+    <!-- QUIZ -->
+    <div class="page" id="page-quiz">
+      <div class="quiz-wrap" id="quizWrap"></div>
+    </div>
 
-/* ══ DATA ══ */
-const LEVELS=[{name:"Builder",min:0,max:500},{name:"Tinkerer",min:500,max:1200},{name:"Technician",min:1200,max:2500},{name:"Engineer",min:2500,max:5000},{name:"Inventor",min:5000,max:10000},{name:"Master",min:10000,max:Infinity}];
-const BADGES=[{id:"first",icon:"🎯",name:"First Step",desc:"Complete your first lesson"},{id:"quiz5",icon:"📝",name:"Quiz Whiz",desc:"Score 80%+ on 5 quizzes"},{id:"builder",icon:"🔨",name:"Builder",desc:"Complete first project"},{id:"streak3",icon:"🔥",name:"On A Roll",desc:"3-day streak"},{id:"streak7",icon:"🏅",name:"Week Warrior",desc:"7-day streak"},{id:"xp500",icon:"⭐",name:"500 Club",desc:"Earn 500 XP"},{id:"xp2500",icon:"🌟",name:"2500 Club",desc:"Earn 2500 XP"},{id:"lessons5",icon:"📖",name:"Bookworm",desc:"5 lessons done"},{id:"lessons10",icon:"🎓",name:"Graduate",desc:"10 lessons done"},{id:"perfect",icon:"💯",name:"Perfectionist",desc:"Score 100% on a quiz"}];
-const LD=[
-  {id:"electricity",icon:"⚡",title:"Electricity & Circuits",level:"Beginner",topic:"Theory",dur:"8 min",xp:80,body:`<h3>What is electricity?</h3><p>Electricity is the flow of electrons through a conductor. In robotics every motor, sensor, and microcontroller is driven by this invisible force.</p><div class="info-box">⚡ <strong>Ohm's Law: V = I × R</strong> (Voltage = Current × Resistance). Master this and you understand 80% of basic circuits.</div><h3>The three essentials</h3><p><strong>Voltage (V)</strong> — the pressure that pushes electrons. Arduino runs on 5V; most sensors use 3.3V.</p><p><strong>Current (A)</strong> — charge flow per second. LEDs need ~20mA; motors can need 1–5A.</p><p><strong>Resistance (Ω)</strong> — how much the circuit slows flow. Resistors protect components.</p><h3>Series vs Parallel</h3><p>In <strong>series</strong> all components share one path — resistance adds up. In <strong>parallel</strong> each branch gets same voltage but current splits.</p><div class="code-block">void setup() {
+    <!-- SIMULATOR -->
+    <div class="page" id="page-simulator">
+      <div class="sim-layout">
+        <div class="sim-editor">
+          <div class="sim-toolbar">
+            <span class="sim-filename">sketch.ino</span>
+            <button class="btn-reset" onclick="resetCode()">Reset</button>
+            <button class="btn-run" onclick="runCode()">▶ Run</button>
+          </div>
+          <textarea class="code-area" id="codeArea" spellcheck="false">void setup() {
   Serial.begin(9600);
-  float V = 5.0, R = 220.0;
-  float I = V / R; // Ohm's Law
-  Serial.print("Current: ");
-  Serial.print(I * 1000, 1);
-  Serial.println(" mA");
-}</div>`},
-  {id:"arduino-intro",icon:"🤖",title:"Intro to Arduino",level:"Beginner",topic:"Programming",dur:"12 min",xp:100,body:`<h3>What is Arduino?</h3><p>Arduino is an open-source electronics platform combining a microcontroller with a simplified C++ programming environment. It is the most popular way to learn embedded systems worldwide.</p><h3>Sketch anatomy</h3><div class="code-block">void setup() {
-  // Runs ONCE on power-on
-  Serial.begin(9600);
-  pinMode(13, OUTPUT); // built-in LED
+  pinMode(13, OUTPUT);
 }
 
 void loop() {
-  // Runs FOREVER
-  digitalWrite(13, HIGH); // LED on
-  delay(1000);             // wait 1 s
-  digitalWrite(13, LOW);  // LED off
+  digitalWrite(13, HIGH);
+  Serial.println("LED: ON");
   delay(1000);
-}</div><div class="info-box">💡 Every Arduino program needs exactly these two functions. Think of setup() as a constructor and loop() as while(true).</div><h3>Digital vs Analog</h3><p>Digital pins read/write only HIGH (5V) or LOW (0V). Analog pins (A0–A5) read 0–5V and return 0–1023 (10-bit ADC).</p>`},
-  {id:"sensors",icon:"📡",title:"Sensors Explained",level:"Beginner",topic:"Theory",dur:"10 min",xp:80,body:`<h3>What are sensors?</h3><p>Sensors convert physical properties into electrical signals a microcontroller can read. They are the eyes, ears, and skin of every robot.</p><h3>Common types</h3><p><strong>HC-SR04</strong> — ultrasonic distance sensor, 2–400 cm range. Perfect for obstacle avoidance.</p><p><strong>IR sensors</strong> — detect reflected infrared light. Used for line following and proximity.</p><p><strong>DHT11/22</strong> — temperature and humidity. Great for environment-sensing robots.</p><p><strong>MPU-6050</strong> — 3-axis accelerometer + gyroscope. Essential for balance bots and drones.</p><div class="code-block">const int TRIG=9, ECHO=10;
-void setup(){
+  digitalWrite(13, LOW);
+  Serial.println("LED: OFF");
+  delay(1000);
+}</textarea>
+        </div>
+        <div class="sim-panel">
+          <div class="sim-card">
+            <div class="sim-card-title">Hardware Preview</div>
+            <div class="robot-canvas">
+              <div class="robot-emoji">🤖</div>
+              <div class="leds">
+                <span class="led" id="led0"></span>
+                <span class="led" id="led1"></span>
+                <span class="led" id="led2"></span>
+                <span class="led" id="led3"></span>
+              </div>
+            </div>
+            <div class="sim-card-title" style="margin-top:12px">Serial Monitor</div>
+            <div class="serial-box" id="serialBox">Ready. Press Run to start...</div>
+          </div>
+          <div class="sim-card">
+            <div class="sim-card-title">Templates</div>
+            <div class="tpl-list">
+              <button class="tpl-btn" onclick="loadTemplate('blink')"><span class="tpl-dot" style="background:var(--amber)"></span>Blink LED</button>
+              <button class="tpl-btn" onclick="loadTemplate('servo')"><span class="tpl-dot" style="background:var(--blue)"></span>Servo Sweep</button>
+              <button class="tpl-btn" onclick="loadTemplate('sensor')"><span class="tpl-dot" style="background:var(--green)"></span>Read Sensor</button>
+              <button class="tpl-btn" onclick="loadTemplate('motor')"><span class="tpl-dot" style="background:var(--purple)"></span>DC Motor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMUNITY -->
+    <div class="page" id="page-community">
+      <div class="compose">
+        <div class="compose-av">AL</div>
+        <textarea class="compose-input" id="composeInput" placeholder="Share something with the community…" rows="2"></textarea>
+        <button class="compose-post" onclick="postMessage()">Post</button>
+      </div>
+      <div class="post-list" id="postList"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══ MOBILE BOTTOM TAB BAR ══ -->
+<nav class="mobile-bar">
+  <button class="mob-tab active" id="mt-home" onclick="nav('home','mt-home')">
+    <div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <span class="mob-tab-label">Home</span>
+  </button>
+  <button class="mob-tab" id="mt-lessons" onclick="nav('lessons','mt-lessons')">
+    <div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <span class="mob-tab-label">Lessons</span>
+  </button>
+  <button class="mob-tab" id="mt-projects" onclick="nav('projects','mt-projects')">
+    <div class="mob-tab-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    <span class="mob-tab-label">Projects</span>
+  </button>
+  <button class="mob-tab" id="mt-quiz" onclick="nav('quiz','mt-quiz')">
+    <div class="mob-tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg></div>
+    <span class="mob-tab-label">Quiz</span>
+  </button>
+  <button class="mob-tab" id="mt-simulator" onclick="nav('simulator','mt-simulator')">
+    <div class="mob-tab-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+    <span class="mob-tab-label">Simulator</span>
+  </button>
+  <button class="mob-tab" id="mt-community" onclick="nav('community','mt-community')">
+    <div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <span class="mob-tab-label">Community</span>
+  </button>
+</nav>
+
+</div><!-- /shell -->
+
+<script>
+/* ══ DATA ══ */
+const LESSONS=[
+  {icon:"⚡",title:"Electricity & Circuits",level:"Beginner",topic:"Theory",duration:"8 min",progress:80,body:`<h3>What is electricity?</h3><p>Electricity is the flow of electrons through a conductor. In robotics, we harness this flow to power motors, sensors, and microcontrollers.</p><div class="info-box">⚡ Key formula: <strong>V = I × R</strong> (Voltage = Current × Resistance). This is Ohm's Law — the foundation of all circuit design.</div><h3>The three essentials</h3><p><strong>Voltage (V)</strong> — the pressure that pushes electrons. Your Arduino runs on 5V. Most sensors operate at 3.3V–5V.</p><p><strong>Current (A)</strong> — the amount of charge flowing. LEDs need ~20mA. Motors can need 1–5A depending on size.</p><p><strong>Resistance (Ω)</strong> — how much the circuit opposes flow. Resistors protect your components from drawing too much current.</p><h3>Series vs. Parallel</h3><p>In a <strong>series</strong> circuit, components share one path. Total resistance adds up. In a <strong>parallel</strong> circuit, each component gets its own path — voltage stays the same, current divides.</p><div class="code-block">// Check your circuit in Arduino Serial Monitor
+void setup() {
   Serial.begin(9600);
-  pinMode(TRIG,OUTPUT);
-  pinMode(ECHO,INPUT);
+  Serial.println("Circuit check ready");
+}</div>`},
+  {icon:"🦾",title:"Servo Motors & Control",level:"Intermediate",topic:"Electronics",duration:"12 min",progress:0,body:`<h3>What is a servo?</h3><p>A servo motor is a rotary actuator that allows for precise control of angular position. Unlike regular DC motors that spin freely, servos rotate to a specific angle and hold it.</p><div class="info-box">📐 Standard servos rotate 0–180°. Continuous rotation servos spin like a regular motor but with speed/direction control.</div><h3>How it works</h3><p>Servos use PWM (Pulse Width Modulation) signals to determine their angle. A pulse width of 1ms = 0°, 1.5ms = 90°, and 2ms = 180° — repeated every 20ms.</p><h3>Arduino code</h3><div class="code-block">#include &lt;Servo.h&gt;
+Servo myServo;
+
+void setup() {
+  myServo.attach(9); // signal pin
 }
-void loop(){
-  digitalWrite(TRIG,HIGH);
+
+void loop() {
+  myServo.write(0);   // go to 0°
+  delay(1000);
+  myServo.write(180); // go to 180°
+  delay(1000);
+}</div><p>The <strong>Servo library</strong> handles all the PWM timing for you — just call <code>write(angle)</code>.</p>`},
+  {icon:"📡",title:"Sensors Explained",level:"Beginner",topic:"Theory",duration:"10 min",progress:40,body:`<h3>What are sensors?</h3><p>Sensors are the eyes and ears of a robot. They detect physical properties of the environment and convert them into electrical signals that a microcontroller can process.</p><h3>Types of sensors</h3><p><strong>Ultrasonic (HC-SR04)</strong> — measures distance using sound waves. Range: 2cm–400cm. Perfect for obstacle avoidance.</p><p><strong>IR Sensors</strong> — detect infrared light. Used for line following and proximity detection.</p><p><strong>Temperature (DHT11/22)</strong> — reads temperature and humidity. Used in climate-controlled robots.</p><p><strong>Accelerometer (MPU-6050)</strong> — measures tilt, acceleration, and rotation. Essential for balance bots.</p><div class="info-box">💡 Most sensors output either analog voltage (0–5V) or digital HIGH/LOW. Always check your sensor's datasheet.</div><div class="code-block">// HC-SR04 Ultrasonic example
+#define TRIG 9
+#define ECHO 10
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+}
+
+void loop() {
+  digitalWrite(TRIG, HIGH);
   delayMicroseconds(10);
-  digitalWrite(TRIG,LOW);
-  long us=pulseIn(ECHO,HIGH);
-  float cm=us/58.0;
-  Serial.print("Distance: ");
-  Serial.print(cm,1);
-  Serial.println(" cm");
+  digitalWrite(TRIG, LOW);
+  long dur = pulseIn(ECHO, HIGH);
+  float cm = dur / 58.0;
+  Serial.println(cm);
   delay(200);
 }</div>`},
-  {id:"servo",icon:"🦾",title:"Servo Motors & Control",level:"Intermediate",topic:"Electronics",dur:"14 min",xp:150,body:`<h3>How servo motors work</h3><p>A servo contains a DC motor, gearbox, position sensor, and control circuit in one package. It rotates to a specific angle and holds it — perfect for robotic arms, grippers, and steering.</p><div class="info-box">📐 PWM pulse width controls angle: 1 ms = 0°, 1.5 ms = 90°, 2 ms = 180°. Repeated every 20 ms.</div><h3>Using the Servo library</h3><div class="code-block">#include &lt;Servo.h&gt;
-Servo shoulder;
-
-void setup(){
-  shoulder.attach(9); // signal pin
+  {icon:"💻",title:"Arduino C++ Basics",level:"Advanced",topic:"Programming",duration:"15 min",progress:0,body:`<h3>Why C++ for Arduino?</h3><p>Arduino uses a simplified version of C++ — giving you speed, direct hardware control, and access to the vast library ecosystem.</p><h3>Program structure</h3><div class="code-block">void setup() {
+  // Runs ONCE when powered on
 }
 
-void loop(){
-  for(int a=0;a<=180;a+=5){
-    shoulder.write(a);
-    delay(30);
-  }
-  for(int a=180;a>=0;a-=5){
-    shoulder.write(a);
-    delay(30);
-  }
-}</div><p>The library abstracts all PWM timing — just call write(angle) and the servo moves there.</p>`},
-  {id:"cpp-basics",icon:"💻",title:"Arduino C++ Basics",level:"Intermediate",topic:"Programming",dur:"16 min",xp:150,body:`<h3>Variables & types</h3><div class="code-block">int speed = 200;       // 16-bit integer
-long distance = 50000; // 32-bit integer
-float temp = 36.6;     // decimal
-bool isOn = true;      // true/false
-String name = "Lex";   // text</div><div class="info-box">⚠️ On Arduino Uno int is 16-bit (max 32767). Use long for millis() return values.</div><h3>Control flow</h3><div class="code-block">if(distance < 10){
+void loop() {
+  // Runs FOREVER after setup()
+}</div><h3>Variables & types</h3><div class="code-block">int speed = 200;      // whole numbers
+float temp = 36.6;   // decimals
+bool isOn = true;    // true or false
+String name = "Bot"; // text</div><div class="info-box">⚠ On Arduino Uno, int is 16-bit (max 32,767). Use long for bigger numbers.</div><h3>Control flow</h3><div class="code-block">if (distance < 10) {
   stopMotors();
-}else if(distance < 30){
+} else if (distance < 30) {
   slowDown();
-}else{
+} else {
   fullSpeed();
-}
-
-for(int i=0;i<10;i++){
-  Serial.println(i);
-}</div><h3>Functions</h3><div class="code-block">int readBattery(){
-  int raw=analogRead(A0);
-  return map(raw,0,1023,0,100);
-}
-
-void setup(){
-  Serial.begin(9600);
-  Serial.print("Battery: ");
-  Serial.print(readBattery());
-  Serial.println("%");
 }</div>`},
-  {id:"pid",icon:"🎯",title:"PID Control Theory",level:"Advanced",topic:"Programming",dur:"20 min",xp:250,body:`<h3>What is PID?</h3><p>PID (Proportional–Integral–Derivative) is the most widely used feedback control algorithm in engineering — from thermostats to self-balancing robots to spacecraft attitude control.</p><div class="info-box">🧮 Output = Kp×e + Ki×∫e dt + Kd×de/dt — where e = error (setpoint − measured)</div><h3>The three terms</h3><p><strong>P</strong> — reacts to current error. Larger error → stronger correction. Alone it leaves steady-state offset.</p><p><strong>I</strong> — accumulates past error. Eliminates offset but can cause windup.</p><p><strong>D</strong> — anticipates future error from rate of change. Dampens oscillation.</p><div class="code-block">float Kp=2.0, Ki=0.5, Kd=1.0;
-float prevErr=0, integral=0;
+  {icon:"🔋",title:"Power Systems",level:"Intermediate",topic:"Electronics",duration:"9 min",progress:0,body:`<h3>Powering your robot</h3><p>The right power system determines whether your robot runs for 10 minutes or 3 hours. Understanding power budgets is essential for any real build.</p><h3>Common power sources</h3><p><strong>Li-Po</strong> — high energy density, lightweight. Used in drones and RC cars.</p><p><strong>NiMH</strong> — safer, more tolerant. AA/AAA packs common in beginner bots.</p><p><strong>18650 Li-Ion</strong> — 3.7V nominal, 3000mAh+. Great for prototypes.</p><div class="info-box">🔋 Runtime (h) = Capacity (mAh) ÷ Current draw (mA). 500mA draw + 2000mAh battery = ~4 hours.</div>`},
+  {icon:"🔄",title:"PID Control",level:"Advanced",topic:"Programming",duration:"18 min",progress:0,body:`<h3>What is PID?</h3><p>PID (Proportional–Integral–Derivative) control is the most widely used control algorithm in robotics. It continuously corrects a system's output to reach a desired target.</p><h3>The three terms</h3><p><strong>P</strong> — reacts to current error. Larger error = stronger correction.</p><p><strong>I</strong> — accounts for accumulated past error. Eliminates steady-state offset.</p><p><strong>D</strong> — anticipates future error. Dampens oscillation.</p><div class="code-block">float Kp=2.0, Ki=0.5, Kd=1.0;
+float prev_error=0, integral=0;
 
-float pid(float setpoint, float measured){
-  float err=setpoint-measured;
-  integral+=err;
-  float deriv=err-prevErr;
-  prevErr=err;
-  return Kp*err + Ki*integral + Kd*deriv;
-}
-
-void loop(){
-  float out=pid(90.0, readAngle());
-  applyMotor(out);
-  delay(10);
+float pid(float setpoint, float measured) {
+  float error = setpoint - measured;
+  integral += error;
+  float derivative = error - prev_error;
+  prev_error = error;
+  return Kp*error + Ki*integral + Kd*derivative;
 }</div>`},
-  {id:"power",icon:"🔋",title:"Power Systems",level:"Intermediate",topic:"Electronics",dur:"10 min",xp:120,body:`<h3>Why power matters</h3><p>Underpowered robots behave erratically — servos jitter, Arduinos reset, sensors glitch. Getting power right is as important as the code.</p><h3>Battery types compared</h3><p><strong>Li-Po</strong> — highest energy density, lightweight. Used in drones. Requires careful charging (never over-discharge).</p><p><strong>18650 Li-Ion</strong> — 3.7V, 2000–3500 mAh. Safe and widely available. Great for prototypes.</p><p><strong>NiMH AA</strong> — 1.2V each, beginner-friendly, tolerant of abuse. Heavier per watt.</p><div class="info-box">⏱ Runtime (h) = Capacity (mAh) ÷ Current draw (mA). 2000 mAh + 400 mA = ~5 hours.</div><h3>Voltage regulators</h3><p>Sensors need 5V or 3.3V but batteries output 7.4V+. LM7805 and AMS1117 step voltage down safely. Never connect a 12V battery directly to Arduino!</p>`},
-  {id:"motor-driver",icon:"⚙️",title:"Motor Drivers & H-Bridge",level:"Advanced",topic:"Electronics",dur:"18 min",xp:200,body:`<h3>Why you need a driver</h3><p>An Arduino pin outputs ~40mA max — not nearly enough for any motor. A motor driver amplifies this signal to handle 1–10A and enables direction reversal via an H-bridge.</p><h3>The H-Bridge explained</h3><p>Four switches in an H shape: close top-left + bottom-right → motor goes forward. Swap them → motor reverses. This is how every robot drives its wheels.</p><div class="code-block">// L298N dual motor driver
-const int ENA=5, IN1=6, IN2=7;
-
-void forward(int spd){
-  digitalWrite(IN1,HIGH);
-  digitalWrite(IN2,LOW);
-  analogWrite(ENA,spd); // 0-255
-}
-void reverse(int spd){
-  digitalWrite(IN1,LOW);
-  digitalWrite(IN2,HIGH);
-  analogWrite(ENA,spd);
-}
-void stopMotor(){
-  digitalWrite(IN1,LOW);
-  digitalWrite(IN2,LOW);
-  analogWrite(ENA,0);
-}</div><div class="info-box">🌡️ The L298N gets warm under load. Attach the heatsink and do not exceed 2A continuous rating.</div>`},
-];
-const PD=[
-  {id:"line-f",icon:"🚗",title:"Line Following Robot",diff:"Beginner",time:"2 hrs",xp:200,tags:["IR Sensor","DC Motor","Arduino"]},
-  {id:"robotic-arm",icon:"🦾",title:"3-DOF Robotic Arm",diff:"Intermediate",time:"4 hrs",xp:350,tags:["Servo","Joystick","C++"]},
-  {id:"obstacle",icon:"🤖",title:"Obstacle Avoider",diff:"Beginner",time:"3 hrs",xp:250,tags:["Ultrasonic","Servo","L298N"]},
-  {id:"balance",icon:"⚖️",title:"Self-Balancing Bot",diff:"Advanced",time:"8 hrs",xp:600,tags:["MPU-6050","PID","L298N"]},
-  {id:"weather",icon:"🌡️",title:"Climate Monitor",diff:"Beginner",time:"1.5 hrs",xp:150,tags:["DHT22","OLED","WiFi"]},
-  {id:"rc-car",icon:"🎮",title:"Bluetooth RC Car",diff:"Intermediate",time:"5 hrs",xp:400,tags:["HC-05","Motor","App"]},
-];
-const QD=[
-  {q:"What does PWM stand for?",opts:["Power Width Module","Pulse Width Modulation","Programmable Wire Mode","Pulse Wave Management"],ans:1,topic:"Electronics",exp:"PWM = Pulse Width Modulation — simulates analog output by rapidly switching a digital pin."},
-  {q:"Ohm's Law states:",opts:["P = IV","V = IR","F = ma","E = mc²"],ans:1,topic:"Theory",exp:"V = I × R. Voltage equals Current times Resistance. The foundation of all circuit analysis."},
-  {q:"Which Arduino Uno pin has the built-in LED?",opts:["Pin 1","Pin 7","Pin 12","Pin 13"],ans:3,topic:"Arduino",exp:"Pin 13 is hardwired to the onboard LED on the Arduino Uno board."},
-  {q:"analogRead() on Arduino Uno returns:",opts:["0 to 5","0 to 255","0 to 1023","0 to 4095"],ans:2,topic:"Programming",exp:"The Uno has a 10-bit ADC giving 0–1023. 0 = 0V, 1023 = 5V."},
-  {q:"What does setup() do in Arduino?",opts:["Loops forever","Runs once at startup","Compiles the code","Resets the board"],ans:1,topic:"Programming",exp:"setup() runs exactly once when the board powers on or resets — use it to configure pins and initialise libraries."},
-  {q:"Which sensor measures distance with sound?",opts:["IR sensor","Thermistor","HC-SR04","Hall effect"],ans:2,topic:"Sensors",exp:"The HC-SR04 emits a 40kHz ultrasonic burst and times the echo to calculate distance."},
-  {q:"In PID control the D term means:",opts:["Differential","Directional","Derivative","Digital"],ans:2,topic:"Control Theory",exp:"Derivative — it reacts to the rate of change of error, dampening oscillation before it builds up."},
-  {q:"Standard Arduino Uno logic voltage is:",opts:["3.3V","5V","9V","12V"],ans:1,topic:"Electronics",exp:"The ATmega328P runs at 5V logic. The barrel jack accepts 7–12V which is regulated internally."},
-  {q:"What is an H-bridge used for?",opts:["Voltage regulation","Wireless comms","Motor direction control","Sensor calibration"],ans:2,topic:"Electronics",exp:"An H-bridge lets you reverse motor direction by switching which terminals receive positive voltage."},
-  {q:"Which library simplifies servo control?",opts:["Wire","SPI","Servo","Stepper"],ans:2,topic:"Programming",exp:"#include <Servo.h> gives the Servo class. Just call myServo.write(angle) and it handles all PWM timing."},
-];
-const SIM_TPLS=[
-  {icon:"💡",title:"Blink LED",desc:"Hello World of hardware",sketch:"blink"},
-  {icon:"🚦",title:"Traffic Light",desc:"RGB LED sequencer",sketch:"traffic"},
-  {icon:"📡",title:"HC-SR04 Distance",desc:"Ultrasonic sensor",sketch:"ultrasonic"},
-  {icon:"🦾",title:"Servo Sweep",desc:"0–180° control",sketch:"servo"},
-  {icon:"🌱",title:"Plant Monitor",desc:"Soil moisture + pump",sketch:"plant"},
-  {icon:"🤖",title:"Obstacle Avoider",desc:"Autonomous navigation",sketch:"obstacle"},
-];
-const WOKWI_URLS={
-  blink:"https://wokwi.com/projects/305452630227419712",
-  traffic:"https://wokwi.com/projects/305890247122378305",
-  ultrasonic:"https://wokwi.com/projects/304919715507806786",
-  servo:"https://wokwi.com/projects/305408683220893249",
-  plant:"https://wokwi.com/projects/309614946810822209",
-  obstacle:"https://wokwi.com/projects/307738744667168320",
-};
-const CP=[
-  {id:"c1",user:"Adaeze O.",role:"Robotics Engineer",av:"#2d2d2d",time:"2h ago",text:"Finally got my PID line follower running! Kp=2.3 was the sweet spot. Tip: always tune Kd before Ki — saved me two days of frustration. 🔥",tags:["PID","Line Follower"],likes:47,replies:12},
-  {id:"c2",user:"Ibrahim M.",role:"Student",av:"#444",time:"4h ago",text:"ESP32 or Arduino Uno to start as a beginner wanting to get into IoT robotics eventually? The ESP32 seems more powerful but I am worried it is too complex…",tags:["Beginner","ESP32","Arduino"],likes:23,replies:18},
-  {id:"c3",user:"Timi A.",role:"Hardware Dev",av:"#1a1a1a",time:"1d ago",text:"Pro tip: put a 100µF capacitor across your motor driver power rails. It absorbs voltage spikes when motors start and stops random Arduino resets. Saved my project twice!",tags:["Hardware Tips","L298N"],likes:89,replies:31},
-  {id:"c4",user:"Chisom E.",role:"Maker",av:"#555",time:"2d ago",text:"Open-sourced my self-balancing robot — MPU-6050 + complementary filter + PID. 3 weeks of work. Happy to answer any questions in the comments! 🤖",tags:["Open Source","Balance Bot"],likes:134,replies:45},
-  {id:"c5",user:"Fatima K.",role:"Lecturer",av:"#333",time:"3d ago",text:"Teaching tip: teach millis() instead of delay() from day one. It builds the right mental model for multitasking and avoids 90% of 'why does my button not respond' bugs.",tags:["Teaching","millis()"],likes:201,replies:67},
-];
-const LB_DATA=[
-  {name:"Chisom E.",av:"#1a1a1a",xp:9840,level:"Inventor"},
-  {name:"Fatima K.",av:"#333",xp:8120,level:"Inventor"},
-  {name:"Timi A.",av:"#1a1a1a",xp:6540,level:"Engineer"},
-  {name:"Adaeze O.",av:"#2d2d2d",xp:4210,level:"Engineer"},
-  {name:"Ibrahim M.",av:"#444",xp:3080,level:"Technician"},
-  {name:"You",av:"#111",xp:0,level:"Builder",isMe:true},
-  {name:"Kelechi N.",av:"#555",xp:2100,level:"Tinkerer"},
-  {name:"David R.",av:"#666",xp:1540,level:"Tinkerer"},
-];
-const NOTIFS=[
-  {icon:"🔥",text:"You have a 1-day streak! Log in tomorrow to keep it alive.",time:"Just now",unread:true},
-  {icon:"⭐",text:"Earned 80 XP for completing Electricity & Circuits.",time:"2h ago",unread:true},
-  {icon:"🏅",text:"Complete 3 more lessons to unlock the Bookworm badge.",time:"1d ago",unread:false},
-  {icon:"👥",text:"5 people liked your community post.",time:"2d ago",unread:false},
 ];
 
-/* ══ FIREBASE STORAGE LAYER ══
-   All user data now lives in Firestore at: users/{uid}
-   _curUser  = in-memory cache of the current user document
-   _curUid   = Firebase Auth UID of the current user
-══════════════════════════════════════════════════════ */
-let _curUser = null;
-let _curUid  = null;
+const QUESTIONS=[
+  {q:"What does PWM stand for?",opts:["Power Width Module","Pulse Width Modulation","Programmable Wire Mode","Pulse Wave Management"],ans:1,topic:"Electronics"},
+  {q:"What is Ohm's Law?",opts:["P = IV","V = IR","F = ma","E = mc²"],ans:1,topic:"Theory"},
+  {q:"Which pin on Arduino Uno has the built-in LED?",opts:["Pin 1","Pin 7","Pin 12","Pin 13"],ans:3,topic:"Arduino"},
+  {q:"What voltage does a standard Arduino Uno operate at?",opts:["3.3V","5V","9V","12V"],ans:1,topic:"Electronics"},
+  {q:"What does setup() do in an Arduino sketch?",opts:["Loops forever","Runs once at startup","Compiles the code","Resets the board"],ans:1,topic:"Programming"},
+  {q:"What sensor measures distance using sound waves?",opts:["IR sensor","Thermistor","Ultrasonic sensor","Hall effect sensor"],ans:2,topic:"Sensors"},
+  {q:"What does void mean in void loop()?",opts:["The function is empty","The function returns nothing","The function loops","The function is private"],ans:1,topic:"Programming"},
+  {q:"What does LED stand for?",opts:["Light Energy Device","Low Emission Diode","Light Emitting Diode","Laser Emission Detector"],ans:2,topic:"Theory"},
+];
 
-function mkUser(name, email, extras={}) {
-  return {
-    name, email,
-    phone: extras.phone||"",
-    dob: extras.dob||"",
-    username: extras.username||"",
-    country: extras.country||"",
-    createdAt: Date.now(),
-    xp: 0, streak: 0,
-    lastLogin: Date.now(),
-    completedLessons: [],
-    completedProjects: [],
-    badges: [],
-    quizHistory: [],
-    likedPosts: [],
-    notifOn: true,
-    goal: 5,
-    activity: []
-  };
-}
+const PROJECTS=[
+  {icon:"🚗",title:"Line Following Robot",diff:"Beginner",time:"2 hrs",tags:["IR Sensor","DC Motor","Arduino"],bg:"#f5f5f5"},
+  {icon:"🦾",title:"Robotic Arm (Servo)",diff:"Intermediate",time:"4 hrs",tags:["Servo","3D Print","C++"],bg:"#f5f5f5"},
+  {icon:"🚁",title:"Mini Obstacle Avoider",diff:"Beginner",time:"3 hrs",tags:["Ultrasonic","Servo","Motor Driver"],bg:"#f5f5f5"},
+  {icon:"🤖",title:"Self-Balancing Bot",diff:"Advanced",time:"8 hrs",tags:["MPU-6050","PID","L298N"],bg:"#f5f5f5"},
+  {icon:"🌡️",title:"Climate Monitor Bot",diff:"Beginner",time:"1.5 hrs",tags:["DHT22","OLED","WiFi"],bg:"#f5f5f5"},
+  {icon:"📡",title:"Bluetooth RC Car",diff:"Intermediate",time:"5 hrs",tags:["HC-05","Motor","App Control"],bg:"#f5f5f5"},
+];
 
-// Read from in-memory cache (sync, always fast)
-function getCurUser() { return _curUser; }
+const POSTS_DATA=[
+  {user:"Adaeze O.",av:"#222",time:"2h ago",text:"Just finished my first line-following robot using IR sensors! The PID tuning took forever but it finally works smoothly. Kp=2.3 was the sweet spot for me 🙌",likes:24,liked:false},
+  {user:"Ibrahim M.",av:"#444",time:"5h ago",text:"Question for the community — is it better to start with ESP32 or Arduino Uno as a beginner? I want to get into IoT robotics eventually.",likes:11,liked:false},
+  {user:"Timi A.",av:"#666",time:"1d ago",text:"Pro tip: always add a 100µF capacitor across your motor driver power rails. It smooths out voltage spikes and prevents your Arduino from resetting when motors start.",likes:47,liked:true},
+  {user:"Chisom E.",av:"#888",time:"2d ago",text:"Sharing my self-balancing robot code on GitHub. It uses MPU-6050 + PID. Took 3 weeks but I learned so much about control theory. Link in bio!",likes:63,liked:false},
+];
 
-// Write to Firestore (async, non-blocking)
-async function saveCurUser(u) {
-  _curUser = u;
-  if (!_curUid) return;
-  try {
-    await window._db.collection("users").doc(_curUid).set(u);
-  } catch (e) { console.error("saveCurUser:", e); }
-}
+/* ══ STATE ══ */
+let postsData=[...POSTS_DATA];
+let qIdx=0,qScore=0,qAnswered=false,currentFilter='All';
+const PAGE_TITLES={home:'Home',lessons:'Lessons',reader:'Lesson',projects:'Projects',quiz:'Quiz',simulator:'Simulator',community:'Community'};
 
-// Load user document from Firestore into cache
-async function loadUserFromFirestore(uid) {
-  const snap = await window._db.collection("users").doc(uid).get();
-  if (snap.exists) {
-    _curUser = snap.data();
-  }
-  return _curUser;
-}
-
-/* ══ USER HELPERS ══ */
-function mkUser(name, email, extras={}) {
-  return {
-    name, email,
-    phone: extras.phone||"",
-    dob: extras.dob||"",
-    username: extras.username||"",
-    country: extras.country||"",
-    createdAt: Date.now(),
-    xp: 0, streak: 0,
-    lastLogin: Date.now(),
-    completedLessons: [],
-    completedProjects: [],
-    badges: [],
-    quizHistory: [],
-    likedPosts: [],
-    notifOn: true,
-    goal: 5,
-    activity: []
-  };
-}
-
-function getCurUser() { return _curUser; }
-
-async function saveCurUser(u) {
-  _curUser = u;
-  if (!_curUid) return;
-  try {
-    await window._db.collection("users").doc(_curUid).set(u);
-  } catch(e) { console.error("saveCurUser:", e); }
-}
-
-async function loadUserFromFirestore(uid) {
-  try {
-    const snap = await window._db.collection("users").doc(uid).get();
-    if (snap.exists) { _curUser = snap.data(); }
-  } catch(e) { console.error("loadUser:", e); }
-  return _curUser;
-}
-
-/* ══ AUTH ══ */
-function switchTab(t){
-  document.getElementById("tabLogin").classList.toggle("active",t==="login");
-  document.getElementById("tabReg").classList.toggle("active",t==="register");
-  document.getElementById("loginForm").style.display=t==="login"?"block":"none";
-  document.getElementById("regForm").style.display=t==="register"?"block":"none";
-}
-function toggleEye(id,btn){
-  const i=document.getElementById(id);
-  i.type=i.type==="password"?"text":"password";
-  btn.textContent=i.type==="text"?"🙈":"👁";
-}
-function showErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.add("show");}}
-function hideErr(id){const e=document.getElementById(id);if(e)e.classList.remove("show");}
-function setLoading(btnId,txtId,txt,on=true){
-  const b=document.getElementById(btnId);
-  const t=document.getElementById(txtId);
-  if(!b||!t)return;
-  b.disabled=on;
-  t.innerHTML=on?'<div class="spinner"></div>'+txt:txt;
-}
-
-async function doLogin(){
-  if(!window._auth){
-    showErr("liErr","Firebase not loaded yet — please wait 3 seconds and try again.");
-    return;
-  }
-  const email=document.getElementById("liEmail").value.trim().toLowerCase();
-  const pass=document.getElementById("liPass").value;
-  let ok=true;
-  hideErr("liErr");
-  if(!email||!email.includes("@")){showErr("liEmailErr","Enter a valid email");ok=false;}else hideErr("liEmailErr");
-  if(!pass){showErr("liPassErr","Password required");ok=false;}else hideErr("liPassErr");
-  if(!ok)return;
-  setLoading("liBtn","liBtnTxt","Signing in…",true);
-  try {
-    const cred = await window._auth.signInWithEmailAndPassword(email, pass);
-    _curUid = cred.user.uid;
-    await loadUserFromFirestore(_curUid);
-    const u = _curUser;
-    if(u){
-      const today=new Date().toDateString();
-      const last=new Date(u.lastLogin).toDateString();
-      const yest=new Date(Date.now()-86400000).toDateString();
-      if(last!==today){u.streak=last===yest?u.streak+1:1;u.lastLogin=Date.now();await saveCurUser(u);}
-    }
-    setLoading("liBtn","liBtnTxt","Sign In",false);
-    launchApp();
-  } catch(e){
-    console.error("LOGIN ERROR:", e.code, e.message);
-    let msg = e.message;
-    if(e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"||e.code==="auth/user-not-found")
-      msg="Incorrect email or password.";
-    else if(e.code==="auth/too-many-requests") msg="Too many attempts. Please wait and try again.";
-    else if(e.code==="auth/network-request-failed") msg="Network error — check your internet.";
-    else if(e.code==="auth/operation-not-allowed") msg="Sign-in not enabled in Firebase Console.";
-    else msg = e.code ? e.code+": "+e.message : e.message;
-    showErr("liErr",msg);
-    setLoading("liBtn","liBtnTxt","Sign In",false);
-  }
-}
-
-/* ══ REGISTER STEPS ══ */
-function regSetStep(n){
-  [0,1,2].forEach(i=>{
-    document.getElementById("regStep"+i).style.display=i===n?"block":"none";
-    const d=document.getElementById("rdot"+i);
-    if(d)d.classList.toggle("active",i===n);
-  });
-}
-function regNext0(){
-  const name=document.getElementById("rgName").value.trim();
-  const phone=document.getElementById("rgPhone").value.trim();
-  const dob=document.getElementById("rgDob").value;
-  let ok=true;
-  if(!name){showErr("rgNameErr","Full name required");ok=false;}else hideErr("rgNameErr");
-  if(!phone){showErr("rgPhoneErr","Phone number required");ok=false;}else hideErr("rgPhoneErr");
-  if(!dob){showErr("rgDobErr","Date of birth required");ok=false;}else hideErr("rgDobErr");
-  if(ok)regSetStep(1);
-}
-function regBack0(){regSetStep(0);}
-function regNext1(){
-  const email=document.getElementById("rgEmail").value.trim().toLowerCase();
-  const username=document.getElementById("rgUsername").value.trim();
-  const country=document.getElementById("rgCountry").value;
-  let ok=true;
-  if(!email||!email.includes("@")){showErr("rgEmailErr","Enter a valid email");ok=false;}else hideErr("rgEmailErr");
-  if(!username||username.length<3){showErr("rgUsernameErr","Username must be at least 3 characters");ok=false;}else hideErr("rgUsernameErr");
-  if(!country){showErr("rgCountryErr","Please select your country");ok=false;}else hideErr("rgCountryErr");
-  if(ok)regSetStep(2);
-}
-function regBack1(){regSetStep(1);}
-
-async function doRegister(){
-  if(!window._auth){
-    showErr("rgErr","Firebase not loaded yet — please wait and try again.");
-    return;
-  }
-  const name     = document.getElementById("rgName").value.trim();
-  const phone    = document.getElementById("rgPhone").value.trim();
-  const dob      = document.getElementById("rgDob").value;
-  const email    = document.getElementById("rgEmail").value.trim().toLowerCase();
-  const username = document.getElementById("rgUsername").value.trim();
-  const country  = document.getElementById("rgCountry").value;
-  const pass     = document.getElementById("rgPass").value;
-  const pass2    = document.getElementById("rgPass2").value;
-  let ok=true;
-  hideErr("rgErr");
-  if(pass.length<8){showErr("rgPassErr","Min. 8 characters");ok=false;}else hideErr("rgPassErr");
-  if(pass!==pass2){showErr("rgPass2Err","Passwords do not match");ok=false;}else hideErr("rgPass2Err");
-  if(!ok)return;
-  setLoading("rgBtn","rgBtnTxt","Creating account…",true);
-  try {
-    const cred = await window._auth.createUserWithEmailAndPassword(email, pass);
-    _curUid = cred.user.uid;
-    const newUser = mkUser(name, email, {phone, dob, username, country});
-    await window._db.collection("users").doc(_curUid).set(newUser);
-    _curUser = newUser;
-    setLoading("rgBtn","rgBtnTxt","Create Account 🚀",false);
-    showOnboard();
-  } catch(e){
-    console.error("REGISTER ERROR:", e.code, e.message);
-    let msg = e.message;
-    if(e.code==="auth/email-already-in-use") msg="Account already exists — try signing in.";
-    else if(e.code==="auth/invalid-email") msg="Invalid email address.";
-    else if(e.code==="auth/weak-password") msg="Password too weak — use 8+ characters.";
-    else if(e.code==="auth/network-request-failed") msg="Network error — check your internet.";
-    else if(e.code==="auth/operation-not-allowed") msg="Email sign-up not enabled in Firebase Console.";
-    else if(e.code==="auth/too-many-requests") msg="Too many attempts — wait a moment and retry.";
-    else msg = e.code ? e.code+": "+e.message : e.message;
-    showErr("rgErr",msg);
-    setLoading("rgBtn","rgBtnTxt","Create Account 🚀",false);
-  }
-}
-
-async function googleSignIn(){
-  try {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    const result = await window._auth.signInWithPopup(provider);
-    const user = result.user;
-    _curUid = user.uid;
-    const snap = await window._db.collection("users").doc(user.uid).get();
-    if(snap.exists){
-      _curUser = snap.data();
-      launchApp();
-    } else {
-      const newUser = mkUser(user.displayName||"Learner", user.email);
-      await window._db.collection("users").doc(user.uid).set(newUser);
-      _curUser = newUser;
-      showOnboard();
-    }
-  } catch(e){
-    toast("Google sign-in failed: "+e.message,"err");
-    console.error("Google sign-in error:", e);
-  }
-}
-
-async function guestMode(){
-  _curUid = null;
-  _curUser = mkUser("Guest Learner","guest@lexacademy.app");
-  showOnboard();
-}
-
-async function doLogout(){
-  try { await window._auth.signOut(); } catch(_){}
-  _curUser = null; _curUid = null;
-  location.reload();
-}
-
-/* ══ ONBOARDING ══ */
-let obStep=0; const OB_TOTAL=4;
-function showOnboard(){
-  document.getElementById("authLayer").style.display="none";
-  document.getElementById("onboardLayer").classList.add("show");
-  renderObProg();
-}
-function renderObProg(){
-  document.getElementById("obProg").innerHTML=
-    Array.from({length:OB_TOTAL},(_,i)=>'<div class="onboard-pip '+(i<=obStep?"done":"")+'"></div>').join("");
-}
-function nextOb(){
-  document.getElementById("ob-"+obStep).classList.remove("active");
-  obStep++;
-  if(obStep>=OB_TOTAL){finishOb();return;}
-  document.getElementById("ob-"+obStep).classList.add("active");
-  renderObProg();
-}
-function selOb(el,grp){
-  document.querySelectorAll("#"+grp+" .ob-opt").forEach(o=>o.classList.remove("sel"));
-  el.classList.add("sel");
-}
-function finishOb(){document.getElementById("onboardLayer").classList.remove("show");launchApp();}
-
-/* ══ LAUNCH ══ */
-function launchApp(){
-  document.getElementById("authLayer").style.display="none";
-  document.getElementById("onboardLayer").classList.remove("show");
-  document.getElementById("appShell").classList.add("show");
-  refreshUI();renderHomeGrid();renderLessons();renderProjects();
-  renderComm();renderLB();initQuiz();renderSim();renderNotifs();
-}
-
-/* ══ REFRESH UI ══ */
-function getLevel(xp){return LEVELS.slice().reverse().find(l=>xp>=l.min)||LEVELS[0];}
-function refreshUI(){
-  const u=getCurUser();if(!u)return;
-  const ini=u.name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
-  const lv=getLevel(u.xp);const li=LEVELS.indexOf(lv);const nx=LEVELS[li+1]||lv;
-  const pct=Math.min(100,nx.min>lv.min?((u.xp-lv.min)/(nx.min-lv.min))*100:100);
-  ["sf-av","tbAv","compAv","profAv"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini;});
-  document.getElementById("sf-name").textContent=u.name;
-  document.getElementById("sf-lvl").textContent="Level "+(li+1)+" · "+lv.name;
-  document.getElementById("sfXpBar").style.width=pct+"%";
-  document.getElementById("sfXpCur").textContent=u.xp+" XP";
-  document.getElementById("sfXpNext").textContent=(nx.min-u.xp)+" XP to next";
-  document.getElementById("heroTitle").textContent="Welcome back, "+u.name.split(" ")[0]+"! 👋";
-  document.getElementById("heroSub").textContent=u.completedLessons.length===0?"Start your first lesson below.":u.completedLessons.length+" lesson"+(u.completedLessons.length>1?"s":"")+" done. Keep going!";
-  document.getElementById("strkVal").textContent=u.streak;
-  document.getElementById("xpVal").textContent=u.xp;
-  document.getElementById("lsnVal").textContent=u.completedLessons.length;
-  document.getElementById("stL").textContent=u.completedLessons.length;
-  document.getElementById("stP").textContent=u.completedProjects.length;
-  const acc=u.quizHistory.length?Math.round(u.quizHistory.reduce((s,q)=>s+q.pct,0)/u.quizHistory.length)+"%":"—";
-  document.getElementById("stA").textContent=acc;
-  document.getElementById("profName").textContent=u.name;
-  document.getElementById("profLvlLbl").textContent="Level "+(li+1)+" · "+lv.name;
-  document.getElementById("profXpFill").style.width=pct+"%";
-  document.getElementById("profXpLbl").textContent=u.xp+" / "+nx.min+" XP";
-  document.getElementById("psL").textContent=u.completedLessons.length;
-  document.getElementById("psP").textContent=u.completedProjects.length;
-  document.getElementById("psXP").textContent=u.xp;
-  document.getElementById("psSt").textContent=u.streak+"🔥";
-  document.getElementById("editSub").textContent=u.email;
-  renderActivity(u);renderBadges(u);
-  const me=LB_DATA.find(r=>r.isMe);if(me){me.xp=u.xp;me.level=lv.name;}
-}
-
-function addXP(amt,reason){
-  const u=getCurUser();if(!u)return;
-  u.xp+=amt;
-  u.activity.unshift({icon:"⭐",text:"Earned "+amt+" XP — "+reason,time:"Just now"});
-  if(u.activity.length>20)u.activity.pop();
-  saveCurUser(u);refreshUI();toast("+"+amt+" XP!");checkBadges(u);
-}
-
-function checkBadges(u){
-  const e=u.badges||[];const ul=[];
-  if(u.completedLessons.length>=1&&!e.includes("first"))ul.push("first");
-  if(u.completedProjects.length>=1&&!e.includes("builder"))ul.push("builder");
-  if(u.streak>=3&&!e.includes("streak3"))ul.push("streak3");
-  if(u.streak>=7&&!e.includes("streak7"))ul.push("streak7");
-  if(u.xp>=500&&!e.includes("xp500"))ul.push("xp500");
-  if(u.xp>=2500&&!e.includes("xp2500"))ul.push("xp2500");
-  if(u.completedLessons.length>=5&&!e.includes("lessons5"))ul.push("lessons5");
-  if(u.completedLessons.length>=10&&!e.includes("lessons10"))ul.push("lessons10");
-  if(u.quizHistory.find(q=>q.pct===100)&&!e.includes("perfect"))ul.push("perfect");
-  if(u.quizHistory.filter(q=>q.pct>=80).length>=5&&!e.includes("quiz5"))ul.push("quiz5");
-  if(ul.length){
-    u.badges=[...e,...ul];saveCurUser(u);
-    ul.forEach(b=>{const bd=BADGES.find(x=>x.id===b);if(bd)toast("Badge: "+bd.icon+" "+bd.name);});
-  }
-}
-
-/* ══ NAVIGATION ══ */
-const PT={home:"Home",lessons:"Lessons",reader:"Lesson",projects:"Projects",quiz:"Quiz",simulator:"Simulator",community:"Community",leaderboard:"Leaderboard",profile:"Profile"};
-function nav(p){
-  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-  const pg=document.getElementById("page-"+p);if(pg)pg.classList.add("active");
-  document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active"));
-  const ni=document.getElementById("ni-"+p);if(ni)ni.classList.add("active");
-  document.querySelectorAll(".mob-tab").forEach(x=>x.classList.remove("active"));
-  const mt=document.getElementById("mt-"+p);if(mt)mt.classList.add("active");
-  const pt=document.getElementById("pageTitle");if(pt)pt.textContent=PT[p]||p;
-  const mc=document.getElementById("mainContent");if(mc)mc.scrollTop=0;
-  const np=document.getElementById("notifPanel");if(np)np.classList.remove("open");
-}
-
-/* ══ HOME ══ */
-function renderHomeGrid(){
-  const u=getCurUser();
-  const rec=LD.filter(l=>!u||!u.completedLessons.includes(l.id)).slice(0,4);
-  const cl={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};
-  const bg={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
-  const el=document.getElementById("homeGrid");if(!el)return;
-  el.innerHTML=rec.length
-    ?rec.map(l=>'<div class="lcard" onclick="openLesson(\'''+l.id+'''\')">'+
-      '<span class="lc-icon">'+l.icon+'</span>'+
-      '<div class="lc-lvl" style="color:'+cl[l.level]+'">'+l.level+'</div>'+
-      '<div class="lc-title">'+l.title+'</div>'+
-      '<div class="lc-meta">'+l.dur+' · '+l.xp+' XP</div>'+
-      '<div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>').join("")
-    :'<div style="grid-column:span 2;text-align:center;padding:32px;color:var(--text3)">🎉 All lessons complete!</div>';
-}
-
-function renderActivity(u){
-  const bg={'⭐':"var(--amber-dim)",'✅':"var(--green-dim)",'🔥':"rgba(239,68,68,.08)",'🔨':"rgba(139,92,246,.08)",'💻':"var(--blue-dim)"};
-  const el=document.getElementById("actList");if(!el)return;
-  el.innerHTML=u.activity.slice(0,6).length
-    ?u.activity.slice(0,6).map(a=>'<div class="act-item"><div class="act-ic" style="background:'+
-      (bg[a.icon]||"var(--bg)")+'">'+a.icon+'</div><div class="act-txt">'+a.text+
-      '</div><div class="act-time">'+a.time+'</div></div>').join("")
-    :'<div class="act-item"><div class="act-txt" style="color:var(--text3)">No activity yet — complete a lesson to get started!</div></div>';
+/* ══ NAV ══ */
+function nav(pageId, triggerId){
+  // Pages
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  // PC sidebar
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pcId='ni-'+pageId;
+  if(document.getElementById(pcId)) document.getElementById(pcId).classList.add('active');
+  // Mobile tabs
+  document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));
+  const mobId='mt-'+pageId;
+  if(document.getElementById(mobId)) document.getElementById(mobId).classList.add('active');
+  // Title
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[pageId]||pageId;
+  // Scroll content to top
+  document.querySelector('.content').scrollTop=0;
+  // Init pages
+  if(pageId==='lessons') renderLessons();
+  if(pageId==='quiz') initQuiz();
+  if(pageId==='projects') renderProjects();
+  if(pageId==='community') renderPosts();
 }
 
 /* ══ LESSONS ══ */
-let curFilter="All";
-function fLessons(f,el){curFilter=f;document.querySelectorAll("#page-lessons .fbtn").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderLessons();}
+function openLesson(i){
+  const l=LESSONS[i];
+  document.getElementById('rIcon').textContent=l.icon;
+  document.getElementById('rTitle').textContent=l.title;
+  document.getElementById('rLevel').textContent=l.level;
+  document.getElementById('rDur').textContent=l.duration;
+  document.getElementById('rTopic').textContent=l.topic;
+  document.getElementById('rBody').innerHTML=l.body;
+  nav('reader',null);
+}
+
 function renderLessons(){
-  const u=getCurUser();
-  const cl={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};
-  const bg={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
-  const filtered=LD.filter(l=>curFilter==="All"||l.level===curFilter||l.topic===curFilter);
-  const el=document.getElementById("lessonGrid");if(!el)return;
-  el.innerHTML=filtered.map(l=>{
-    const done=u&&u.completedLessons.includes(l.id);
-    return '<div class="lcard '+(done?"done":"")+'" onclick="openLesson(\'''+l.id+'''\')">'+
-      '<span class="lc-icon">'+l.icon+'</span>'+
-      (done?'<div class="lc-done">✓</div>':"")+
-      '<div class="lc-lvl" style="color:'+cl[l.level]+'">'+l.level+'</div>'+
-      '<div class="lc-title">'+l.title+'</div>'+
-      '<div class="lc-meta">'+l.dur+' · '+l.xp+' XP</div>'+
-      '<div class="lc-bar"><div class="lc-fill" style="width:'+(done?"100":"0")+'%"></div></div></div>';
-  }).join("");
+  const color={Beginner:'var(--blue)',Intermediate:'var(--amber)',Advanced:'var(--purple)'};
+  const bg={Beginner:'var(--blue-dim)',Intermediate:'var(--amber-dim)',Advanced:'var(--purple-dim)'};
+  document.getElementById('lessonList').innerHTML=LESSONS
+    .filter(l=>currentFilter==='All'||l.level===currentFilter||l.topic===currentFilter)
+    .map((l,i)=>`
+      <div class="lesson-row" onclick="openLesson(${LESSONS.indexOf(l)})">
+        <div class="lr-icon" style="background:${bg[l.level]}">${l.icon}</div>
+        <div class="lr-body">
+          <div class="lr-title">${l.title}</div>
+          <div class="lr-meta">${l.topic} · ${l.duration}</div>
+        </div>
+        ${l.progress>0?`<div class="lr-progress">${l.progress}%</div>`:''}
+        <span class="lr-badge" style="background:${bg[l.level]};color:${color[l.level]}">${l.level}</span>
+      </div>`).join('');
 }
 
-function openLesson(id){
-  const l=LD.find(x=>x.id===id);if(!l)return;
-  const u=getCurUser();
-  const done=u&&u.completedLessons.includes(l.id);
-  const el=document.getElementById("readerBody");if(el)el.innerHTML=l.body;
-  const btn=document.getElementById("lessonDoneBtn");
-  if(btn){btn.textContent=done?"✓ Completed":"Mark Complete & Earn "+l.xp+" XP";btn.disabled=done;}
-  const lt=document.getElementById("lessonTitle");if(lt)lt.textContent=l.title;
-  nav("reader");
-  window._currentLesson=l;
-}
-
-function completeLesson(){
-  const l=window._currentLesson;if(!l)return;
-  const u=getCurUser();if(!u)return;
-  if(u.completedLessons.includes(l.id)){toast("Already completed! ✓");return;}
-  u.completedLessons.push(l.id);
-  u.activity.unshift({icon:"✅",text:"Completed: "+l.title,time:"Just now"});
-  saveCurUser(u);addXP(l.xp,"lesson completed");
-  const btn=document.getElementById("lessonDoneBtn");
-  if(btn){btn.textContent="✓ Completed";btn.disabled=true;}
-  checkBadges(u);renderLessons();
+function filterL(val,el){
+  currentFilter=val;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderLessons();
 }
 
 /* ══ PROJECTS ══ */
 function renderProjects(){
-  const u=getCurUser();
-  const el=document.getElementById("projGrid");if(!el)return;
-  el.innerHTML=PD.map(p=>{
-    const done=u&&u.completedProjects.includes(p.id);
-    const dc={Beginner:"var(--blue-dim)",Intermediate:"var(--amber-dim)",Advanced:"var(--purple-dim)"};
-    const tc={Beginner:"var(--blue)",Intermediate:"var(--amber)",Advanced:"var(--purple)"};
-    return '<div class="proj-card '+(done?"done":"")+'">'+
-      '<div class="pc-head"><span class="pc-icon">'+p.icon+'</span>'+
-      (done?'<span class="pc-done">✓ Built</span>':'<span class="pc-diff" style="background:'+dc[p.diff]+';color:'+tc[p.diff]+'">'+p.diff+'</span>')+
-      '</div><div class="pc-title">'+p.title+'</div>'+
-      '<div class="pc-time">⏱ '+p.time+'</div>'+
-      '<div class="pc-tags">'+p.tags.map(t=>'<span class="pc-tag">'+t+'</span>').join("")+'</div>'+
-      '<button class="pc-btn'+(done?' done':"")+'" onclick="completeProj(\'''+p.id+''',\''''+p.title+''','+(p.xp||150)+')" '+(done?"disabled":"")+'>'+
-      (done?"✓ Completed":"Mark as Built · +'+(p.xp||150)+' XP")+'</button></div>';
-  }).join("");
-}
-
-function completeProj(id,title,xp){
-  const u=getCurUser();if(!u)return;
-  if(u.completedProjects.includes(id)){toast("Already built! 🔨");return;}
-  u.completedProjects.push(id);
-  u.activity.unshift({icon:"🔨",text:"Built: "+title,time:"Just now"});
-  saveCurUser(u);addXP(xp,"project built");renderProjects();checkBadges(u);
+  const dc={Beginner:'var(--green)',Intermediate:'var(--amber)',Advanced:'var(--red)'};
+  document.getElementById('projGrid').innerHTML=PROJECTS.map(p=>`
+    <div class="proj-card">
+      <div class="proj-thumb" style="background:${p.bg}">${p.icon}</div>
+      <div class="proj-body">
+        <div class="proj-title">${p.title}</div>
+        <div class="proj-meta"><span class="diff-pip" style="background:${dc[p.diff]}"></span>${p.diff} · ${p.time}</div>
+        <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
 }
 
 /* ══ QUIZ ══ */
-let qI=0,qSc=0,qAns=false;
-function initQuiz(){qI=0;qSc=0;qAns=false;renderQ();}
-function renderQ(){
-  const w=document.getElementById("quizWrap");if(!w)return;
-  if(qI>=QD.length){
-    const pct=Math.round(qSc/QD.length*100);
-    const u=getCurUser();
-    if(u){u.quizHistory.push({pct,date:Date.now()});saveCurUser(u);addXP(pct,"quiz completed");checkBadges(u);}
-    w.innerHTML='<div class="q-result">'+
-      '<div class="qr-circle" style="border-color:'+(pct>=80?"var(--green)":pct>=60?"var(--amber)":"var(--red)")+'">'+
-      '<div class="qr-pct">'+pct+'%</div><div class="qr-of">'+qSc+'/'+QD.length+'</div></div>'+
-      '<div class="qr-title">'+(pct>=80?"Excellent! 🏆":pct>=60?"Good work! 👍":"Keep studying! 💪")+'</div>'+
-      '<div class="qr-sub">'+(pct>=80?"Strong understanding!":pct>=60?"Review some lessons.":"Head back to lessons.")+'</div>'+
-      '<div class="qr-actions">'+
-      '<button class="qr-btn" onclick="nav('+"'lessons'"+')">Back to Lessons</button>'+
-      '<button class="qr-btn p" onclick="initQuiz()">Try Again</button></div></div>';
-    return;
+function initQuiz(){qIdx=0;qScore=0;qAnswered=false;renderQuestion()}
+function renderQuestion(){
+  const wrap=document.getElementById('quizWrap');
+  if(qIdx>=QUESTIONS.length){
+    const pct=Math.round(qScore/QUESTIONS.length*100);
+    wrap.innerHTML=`<div class="quiz-result">
+      <div class="result-emoji">${pct>=80?'🏆':pct>=50?'👍':'💪'}</div>
+      <div class="result-score">${pct}%</div>
+      <div class="result-sub">You got ${qScore} of ${QUESTIONS.length} correct${pct>=80?' — Excellent work!':pct>=50?' — Good effort!':' — Keep studying!'}</div>
+      <button class="result-btn" onclick="initQuiz()">Try Again</button>
+    </div>`;return;
   }
-  const q=QD[qI];const pb=Math.round((qI/QD.length)*100);const L=["A","B","C","D"];
-  w.innerHTML=
-    '<div class="q-meta"><span class="q-cnt">'+(qI+1)+' / '+QD.length+'</span>'+
-    '<div class="q-pbar"><div class="q-pbar-fill" style="width:'+pb+'%"></div></div>'+
-    '<span class="q-xp">+'+(qSc*10)+' XP</span></div>'+
-    '<div class="q-card"><div class="q-topic">'+q.topic+'</div>'+
-    '<div class="q-q">'+q.q+'</div>'+
-    '<div class="q-opts">'+ q.opts.map((o,i)=>
-      '<button class="q-opt" onclick="ansQ('+i+')"><span class="q-letter">'+L[i]+'</span>'+o+'</button>'
-    ).join("")+'</div>'+
-    '<button class="q-next" id="qNext" disabled onclick="nextQ()">Continue &#8594;</button></div>';
+  const q=QUESTIONS[qIdx];
+  const pct=Math.round((qIdx/QUESTIONS.length)*100);
+  wrap.innerHTML=`
+    <div class="quiz-header">
+      <span class="quiz-count">${qIdx+1} / ${QUESTIONS.length}</span>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${pct}%"></div></div>
+      <span class="quiz-xp">+${qScore*10} XP</span>
+    </div>
+    <div class="q-card">
+      <div class="q-topic">${q.topic}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">${q.opts.map((o,i)=>`<button class="q-opt" onclick="answer(${i})">${o}</button>`).join('')}</div>
+      <button class="q-next" id="nextBtn" disabled onclick="nextQ()">Continue →</button>
+    </div>`;
 }
-function ansQ(i){
-  if(qAns)return;qAns=true;
-  const q=QD[qI];
-  document.querySelectorAll(".q-opt").forEach((o,idx)=>{
+function answer(i){
+  if(qAnswered)return;qAnswered=true;
+  const q=QUESTIONS[qIdx];
+  document.querySelectorAll('.q-opt').forEach((o,idx)=>{
+    if(idx===q.ans)o.classList.add('correct');
+    else if(idx===i&&i!==q.ans)o.classList.add('wrong');
     o.disabled=true;
-    if(idx===q.ans)o.classList.add("correct");
-    else if(idx===i&&i!==q.ans)o.classList.add("wrong");
   });
-  if(i===q.ans)qSc++;
-  const card=document.querySelector(".q-card");
-  const exp=document.createElement("div");exp.className="q-exp";exp.textContent=q.exp;
-  const nxt=document.getElementById("qNext");
-  if(nxt){card.insertBefore(exp,nxt);nxt.disabled=false;}
+  if(i===q.ans)qScore++;
+  document.getElementById('nextBtn').disabled=false;
 }
-function nextQ(){qI++;qAns=false;renderQ();}
-
-/* ══ SIMULATOR ══ */
-function renderSim(){
-  const el=document.getElementById("simTpls");if(!el)return;
-  el.innerHTML=SIM_TPLS.map(t=>
-    '<div class="stpl" onclick="openWokwi(\''''+t.sketch+'''\')">'+
-    '<span class="stpl-icon">'+t.icon+'</span>'+
-    '<div class="stpl-title">'+t.title+'</div>'+
-    '<div class="stpl-desc">'+t.desc+'</div>'+
-    '<span class="stpl-badge">Open in Wokwi ↗</span></div>'
-  ).join("");
-}
-function openWokwi(sketch){
-  const url=sketch&&WOKWI_URLS[sketch]?WOKWI_URLS[sketch]:"https://wokwi.com/projects/new/arduino-uno";
-  window.open(url,"_blank","noopener");
-  const u=getCurUser();
-  if(u){u.activity.unshift({icon:"💻",text:"Opened Wokwi Simulator",time:"Just now"});saveCurUser(u);refreshUI();}
-  toast("Opening Wokwi — no account needed! 🚀");
-}
+function nextQ(){qIdx++;qAnswered=false;renderQuestion()}
 
 /* ══ COMMUNITY ══ */
-let commTab="latest";let commPosts=[...CP];
-function setCommTab(t,el){commTab=t;document.querySelectorAll(".comm-tab").forEach(x=>x.classList.remove("active"));el.classList.add("active");renderComm();}
-function renderComm(){
-  const u=getCurUser();let posts=[...commPosts];
-  if(commTab==="trending")posts.sort((a,b)=>b.likes-a.likes);
-  const el=document.getElementById("postList");if(!el)return;
-  el.innerHTML=posts.map(p=>{
-    const liked=u&&u.likedPosts&&u.likedPosts.includes(p.id);
-    return '<div class="post-card">'+
-      '<div class="post-head"><div class="post-av" style="background:'+p.av+'">'+p.user.charAt(0)+'</div>'+
-      '<div class="post-ui"><div class="post-user">'+p.user+'</div><div class="post-role">'+p.role+'</div></div>'+
-      '<div class="post-time">'+p.time+'</div></div>'+
-      '<div class="post-text">'+p.text+'</div>'+
-      '<div class="post-tags">'+ p.tags.map(t=>'<span class="post-tag">'+t+'</span>').join("")+'</div>'+
-      '<div class="post-foot">'+
-      '<button class="p-action '+(liked?"liked":"")+'" onclick="toggleLike(\''''+p.id+'''\'',this)">'+
-      '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'+p.likes+'</button>'+
-      '<button class="p-action" onclick="toast('+"'Reply coming soon!'"+ ')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+p.replies+'</button>'+
-      '<button class="p-action" onclick="toast('+"'Link copied!'"+ ')"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>'+
-      '</div></div>';
-  }).join("");
+function renderPosts(){
+  document.getElementById('postList').innerHTML=postsData.map((p,i)=>`
+    <div class="post-card">
+      <div class="post-head">
+        <div class="post-av" style="background:${p.av}">${p.user.charAt(0)}</div>
+        <div><div class="post-user">${p.user}</div><div class="post-time">${p.time}</div></div>
+      </div>
+      <div class="post-text">${p.text}</div>
+      <div class="post-actions">
+        <button class="post-action ${p.liked?'liked':''}" onclick="likePost(${i})">${p.liked?'♥':'♡'} ${p.likes}</button>
+        <button class="post-action">💬 Reply</button>
+        <button class="post-action">↗ Share</button>
+      </div>
+    </div>`).join('');
 }
-function toggleLike(id,el){
-  const u=getCurUser();if(!u)return;
-  const p=commPosts.find(x=>x.id===id);if(!p)return;
-  if(!u.likedPosts)u.likedPosts=[];
-  const i=u.likedPosts.indexOf(id);
-  if(i>-1){u.likedPosts.splice(i,1);p.likes--;}else{u.likedPosts.push(id);p.likes++;}
-  saveCurUser(u);renderComm();
-}
-function postMsg(){
-  const inp=document.getElementById("compInput");if(!inp)return;
-  const txt=inp.value.trim();if(!txt)return;
-  const u=getCurUser();
-  commPosts.unshift({id:"u"+Date.now(),user:u?u.name:"You",role:"Member",av:"#111",time:"Just now",text:txt,tags:[],likes:0,replies:0});
-  inp.value="";renderComm();toast("Posted! 🚀","ok");
+function likePost(i){postsData[i].liked=!postsData[i].liked;postsData[i].likes+=postsData[i].liked?1:-1;renderPosts()}
+function postMessage(){
+  const input=document.getElementById('composeInput');
+  const txt=input.value.trim();if(!txt)return;
+  postsData.unshift({user:"You",av:"#111",time:"Just now",text:txt,likes:0,liked:false});
+  input.value='';renderPosts();
 }
 
-/* ══ LEADERBOARD ══ */
-function renderLB(){
-  const u=getCurUser();const me=LB_DATA.find(r=>r.isMe);
-  if(u&&me){me.xp=u.xp;me.level=getLevel(u.xp).name;}
-  const sorted=[...LB_DATA].sort((a,b)=>b.xp-a.xp);
-  const top3=sorted.slice(0,3);
-  const avC=["#1a1a1a","#333","#555"];
-  const podOrd=[1,0,2];
-  const lbp=document.getElementById("lbPodium");
-  if(lbp)lbp.innerHTML=podOrd.map(i=>{
-    const p=top3[i];if(!p)return"";const isF=i===0;
-    return '<div class="lb-pod '+(isF?"first":"")+'">'+
-      '<div class="lb-rank">#'+(i+1)+'</div>'+(isF?'<div class="lb-crown">👑</div>':"")+
-      '<div class="lb-av" style="background:'+(avC[i]||"#333")+'">'+p.name.charAt(0)+'</div>'+
-      '<div class="lb-pname">'+p.name+(p.isMe?" (You)":"")+'</div>'+
-      '<div class="lb-pxp">'+p.xp.toLocaleString()+' XP</div></div>';
-  }).join("");
-  const lbl=document.getElementById("lbList");
-  if(lbl)lbl.innerHTML=sorted.slice(3).map((p,i)=>
-    '<div class="lb-row '+(p.isMe?"me":"")+'">'+
-    '<span class="lb-rrank">'+(i+4)+'</span>'+
-    '<div class="lb-rav" style="background:'+(p.av||"#333")+'">'+p.name.charAt(0)+'</div>'+
-    '<div><div class="lb-rname">'+p.name+(p.isMe?" (You)":"")+'</div><div class="lb-rlvl">'+p.level+'</div></div>'+
-    '<span class="lb-rxp">'+p.xp.toLocaleString()+' XP</span></div>'
-  ).join("");
+/* ══ SIMULATOR ══ */
+const templates={
+  blink:`void setup() {\n  Serial.begin(9600);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  Serial.println("LED: ON");\n  delay(1000);\n  digitalWrite(13, LOW);\n  Serial.println("LED: OFF");\n  delay(1000);\n}`,
+  servo:`#include <Servo.h>\nServo myServo;\n\nvoid setup() {\n  myServo.attach(9);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for(int i=0;i<=180;i+=10){\n    myServo.write(i);\n    Serial.println("Angle: "+String(i));\n    delay(80);\n  }\n}`,
+  sensor:`#define TRIG 9\n#define ECHO 10\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n}\n\nvoid loop() {\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  long d = pulseIn(ECHO, HIGH);\n  float cm = d / 58.0;\n  Serial.print("Distance: ");\n  Serial.print(cm);\n  Serial.println(" cm");\n  delay(300);\n}`,
+  motor:`int motorPin = 6;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(motorPin, OUTPUT);\n}\n\nvoid loop() {\n  for(int s=0;s<=255;s+=5){\n    analogWrite(motorPin, s);\n    Serial.println("Speed: "+String(s));\n    delay(50);\n  }\n  analogWrite(motorPin, 0);\n  Serial.println("Motor OFF");\n  delay(1000);\n}`
+};
+function loadTemplate(t){document.getElementById('codeArea').value=templates[t]}
+function resetCode(){document.getElementById('codeArea').value=templates.blink;document.getElementById('serialBox').textContent='Ready. Press Run to start...';clearLeds()}
+let simInterval=null;
+function runCode(){
+  if(simInterval)clearInterval(simInterval);
+  const code=document.getElementById('codeArea').value;
+  const serial=document.getElementById('serialBox');
+  serial.textContent='';let tick=0;
+  simInterval=setInterval(()=>{
+    tick++;
+    if(code.includes('LED: ON')||code.includes('digitalWrite(13')){
+      const on=tick%2===1;
+      setLeds(on?[true,true,true,true]:[false,false,false,false]);
+      serial.textContent+=on?'LED: ON\n':'LED: OFF\n';
+    }else if(code.includes('Angle:')){
+      const angle=((tick*20)%180);
+      serial.textContent+=`Angle: ${angle}\n`;
+      setLeds([angle>45,angle>90,angle>135,angle>170]);
+    }else if(code.includes('Distance:')){
+      const d=(20+Math.random()*80).toFixed(1);
+      serial.textContent+=`Distance: ${d} cm\n`;
+      setLeds([d<80,d<60,d<40,d<20]);
+    }else if(code.includes('Speed:')){
+      const s=Math.min(255,(tick*25)%280);
+      serial.textContent+=`Speed: ${s}\n`;
+      setLeds([s>63,s>127,s>191,s>240]);
+    }else{
+      serial.textContent+=`Running... tick ${tick}\n`;
+    }
+    serial.scrollTop=serial.scrollHeight;
+    if(tick>12){clearInterval(simInterval);serial.textContent+='— Program complete —\n';}
+  },700);
 }
+function setLeds(states){states.forEach((on,i)=>{const el=document.getElementById('led'+i);if(el)el.classList.toggle('on',on)})}
+function clearLeds(){[0,1,2,3].forEach(i=>{const e=document.getElementById('led'+i);if(e)e.classList.remove('on')})}
 
-/* ══ BADGES ══ */
-function renderBadges(u){
-  const e=u.badges||[];
-  const el=document.getElementById("badgeGrid");if(!el)return;
-  el.innerHTML=BADGES.map(b=>{
-    const earned=e.includes(b.id);
-    return '<div class="badge-item" title="'+b.desc+'">'+
-      '<div class="badge-ic '+(earned?"earned":"locked")+'">'+b.icon+'</div>'+
-      '<div class="badge-nm">'+b.name+'</div></div>';
-  }).join("");
-}
+/* ══ INIT ══ */
+renderLessons();renderProjects();renderPosts();
 
-/* ══ PROFILE ══ */
-function editProfile(){
-  const u=getCurUser();if(!u)return;
-  const n=prompt("Your name:",u.name);
-  if(n&&n.trim()){u.name=n.trim();saveCurUser(u);refreshUI();toast("Profile updated ✓","ok");}
-}
-function toggleSetting(key,el){
-  const u=getCurUser();if(!u)return;
-  el.classList.toggle("off");
-  if(key==="notifs")u.notifOn=!el.classList.contains("off");
-  saveCurUser(u);
-}
-function setGoal(v,el){
-  document.querySelectorAll(".goal-btn").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
-  const u=getCurUser();if(!u)return;
-  u.goal=v;saveCurUser(u);toast("Goal: "+v+" lessons/week");
-}
+/* ══ FIREBASE INIT ══ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBm2y7fNCHshVvS0HDJXNVlLxKtZ7384DI",
+  authDomain: "lex-academy-3dbba.firebaseapp.com",
+  databaseURL: "https://lex-academy-3dbba-default-rtdb.firebaseio.com",
+  projectId: "lex-academy-3dbba",
+  storageBucket: "lex-academy-3dbba.firebasestorage.app",
+  messagingSenderId: "143935846024",
+  appId: "1:143935846024:web:8ddbf2cb34aa9c7233513d",
+  measurementId: "G-TRH7XW5XT4"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+firebase.analytics();
 
-/* ══ NOTIFICATIONS ══ */
-function renderNotifs(){
-  const n=NOTIFS.filter(x=>x.unread).length;
-  const dot=document.getElementById("nbDot");if(dot)dot.style.display=n?"block":"none";
-  const nl=document.getElementById("notifList");if(!nl)return;
-  nl.innerHTML=NOTIFS.map(n=>
-    '<div class="notif-item '+(n.unread?"unread":"")+'" onclick="this.classList.remove('+"'unread'"+ ')"><div class="ni-icon">'+n.icon+'</div>'+
-    '<div><div class="ni-text">'+n.text+'</div><div class="ni-time">'+n.time+'</div></div></div>'
-  ).join("");
-}
-function toggleNotif(){const p=document.getElementById("notifPanel");if(p)p.classList.toggle("open");}
-function clearNotifs(){
-  NOTIFS.forEach(n=>n.unread=false);
-  const dot=document.getElementById("nbDot");if(dot)dot.style.display="none";
-  const p=document.getElementById("notifPanel");if(p)p.classList.remove("open");
-  renderNotifs();
-}
-document.addEventListener("click",e=>{
-  const p=document.getElementById("notifPanel");
-  const b=document.getElementById("notifBtn");
-  if(p&&b&&!p.contains(e.target)&&!b.contains(e.target))p.classList.remove("open");
+/* Persist session across page reloads */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+/* ── Auth state listener ── */
+auth.onAuthStateChanged(user => {
+  if (user) {
+    enterApp(user);
+  } else {
+    // Show auth screen if not signed in
+    const screen = document.getElementById('authScreen');
+    screen.style.display = 'flex';
+    screen.classList.remove('hidden');
+  }
 });
 
-/* ══ SEARCH ══ */
-function doSearch(v){
-  if(!v.trim())return;
-  const q=v.toLowerCase();
-  const m=LD.find(l=>l.title.toLowerCase().includes(q)||l.topic.toLowerCase().includes(q));
-  if(m)openLesson(m.id);else toast("No results found");
+/* ── Enter app with Firebase user ── */
+function enterApp(user) {
+  const name = user.displayName || user.email || 'User';
+  const initials = name.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'ME';
+  document.querySelector('.avatar-pill').textContent = initials;
+  // Hide auth screen
+  const screen = document.getElementById('authScreen');
+  screen.classList.add('hidden');
+  setTimeout(() => screen.style.display = 'none', 400);
 }
 
-/* ══ TOAST ══ */
-function toast(msg,type=""){
-  const w=document.getElementById("toastWrap");if(!w)return;
-  const t=document.createElement("div");t.className="toast "+(type||"");t.textContent=msg;
-  w.appendChild(t);
-  setTimeout(()=>{t.style.opacity="0";t.style.transition="opacity .25s";setTimeout(()=>t.remove(),260);},2800);
+/* ── Panel switch ── */
+function switchPanel(to) {
+  document.getElementById('panelLogin').classList.toggle('active', to === 'login');
+  document.getElementById('panelSignup').classList.toggle('active', to === 'signup');
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('signupError').classList.remove('show');
+  const card = document.querySelector('.auth-card');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = 'authIn .35s cubic-bezier(.22,.68,0,1.2) both'; });
 }
 
-/* ══ BOOT ══ */
-(function boot(){
-  function startApp(){
-    window._auth.onAuthStateChanged(async (firebaseUser)=>{
-      if(firebaseUser){
-        _curUid = firebaseUser.uid;
-        await loadUserFromFirestore(_curUid);
-        if(_curUser){
-          document.getElementById("authLayer").style.display="none";
-          launchApp();
-        } else {
-          document.getElementById("authLayer").style.display="flex";
-        }
-      } else {
-        document.getElementById("authLayer").style.display="flex";
-        const lp=document.getElementById("liPass");
-        if(lp)lp.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
-        const rp=document.getElementById("rgPass2");
-        if(rp)rp.addEventListener("keydown",e=>{if(e.key==="Enter")doRegister();});
-      }
-    });
+/* ── Email / Password Login ── */
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+  const err   = document.getElementById('loginError');
+  err.classList.remove('show');
+
+  if (!email || !pw) {
+    err.textContent = 'Please enter your email and password.';
+    err.classList.add('show');
+    if (!email) document.getElementById('loginEmail').classList.add('invalid');
+    if (!pw)    document.getElementById('loginPw').classList.add('invalid');
+    setTimeout(() => document.querySelectorAll('.auth-input').forEach(i => i.classList.remove('invalid')), 1800);
+    return;
   }
-  if(window._auth){ startApp(); }
-  else { window.addEventListener("fbReady",startApp,{once:true}); }
-})();
+
+  const btn = document.querySelector('#panelLogin .auth-btn');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, pw);
+    // onAuthStateChanged handles the rest
+  } catch (e) {
+    btn.textContent = 'Sign in →'; btn.disabled = false;
+    err.textContent = firebaseErrMsg(e.code);
+    err.classList.add('show');
+  }
+}
+
+/* ── Email / Password Sign Up ── */
+async function handleSignup() {
+  const first = document.getElementById('signupFirst').value.trim();
+  const last  = document.getElementById('signupLast').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pw    = document.getElementById('signupPw').value;
+  const err   = document.getElementById('signupError');
+  err.classList.remove('show');
+
+  const fields = [
+    { id: 'signupFirst', ok: !!first },
+    { id: 'signupLast',  ok: !!last },
+    { id: 'signupEmail', ok: !!email && email.includes('@') },
+    { id: 'signupPw',    ok: pw.length >= 8 }
+  ];
+  const invalid = fields.filter(f => !f.ok);
+  if (invalid.length) {
+    const msgs = [];
+    if (!first || !last)              msgs.push('Enter your full name.');
+    if (!email || !email.includes('@')) msgs.push('Enter a valid email.');
+    if (pw.length < 8)                msgs.push('Password must be at least 8 characters.');
+    err.textContent = msgs.join(' ');
+    err.classList.add('show');
+    invalid.forEach(f => {
+      const el = document.getElementById(f.id);
+      el.classList.add('invalid');
+      setTimeout(() => el.classList.remove('invalid'), 1800);
+    });
+    return;
+  }
+
+  const btn = document.querySelector('#panelSignup .auth-btn');
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pw);
+    await cred.user.updateProfile({ displayName: first + ' ' + last });
+    // onAuthStateChanged handles the rest
+  } catch (e) {
+    btn.textContent = 'Create account →'; btn.disabled = false;
+    err.textContent = firebaseErrMsg(e.code);
+    err.classList.add('show');
+  }
+}
+
+/* ── Google Sign-In ── */
+async function handleGoogleAuth() {
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span style="font-size:13px;color:var(--text3)">Opening Google…</span>';
+  btn.disabled = true;
+
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+    // onAuthStateChanged handles the rest
+  } catch (e) {
+    btn.innerHTML = orig; btn.disabled = false;
+    if (e.code !== 'auth/popup-closed-by-user') {
+      const err = document.querySelector('.auth-panel.active .auth-error');
+      if (err) { err.textContent = firebaseErrMsg(e.code); err.classList.add('show'); }
+    }
+  }
+}
+
+/* ── Sign Out ── */
+async function handleSignOut() {
+  try {
+    await auth.signOut();
+    // onAuthStateChanged will show auth screen automatically
+  } catch (e) {
+    console.error('Sign out error:', e);
+  }
+}
+
+/* ── Password strength meter ── */
+function checkPwStrength(val) {
+  const wrap  = document.getElementById('pwStrength');
+  const label = document.getElementById('pwLabel');
+  if (!val) { wrap.classList.remove('show'); return; }
+  wrap.classList.add('show');
+  let score = 0;
+  if (val.length >= 8)          score++;
+  if (/[A-Z]/.test(val))        score++;
+  if (/[0-9]/.test(val))        score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [['weak','Weak'],['fair','Fair'],['fair','Good'],['strong','Strong']];
+  const [cls, txt] = levels[Math.max(0, score - 1)];
+  label.textContent = txt;
+  [0,1,2,3].forEach(i => {
+    const bar = document.getElementById('bar' + i);
+    bar.className = 'pw-bar' + (i < score ? ' ' + cls : '');
+  });
+}
+
+/* ── Human-readable Firebase error messages ── */
+function firebaseErrMsg(code) {
+  const map = {
+    'auth/user-not-found':       'No account found with that email.',
+    'auth/wrong-password':       'Incorrect password. Please try again.',
+    'auth/invalid-credential':   'Incorrect email or password. Please try again.',
+    'auth/email-already-in-use': 'An account with this email already exists.',
+    'auth/weak-password':        'Password is too weak. Use at least 8 characters.',
+    'auth/invalid-email':        'Please enter a valid email address.',
+    'auth/too-many-requests':    'Too many attempts. Please try again later.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
+    'auth/popup-blocked':        'Popup was blocked. Please allow popups for this site.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+/* ── Enter key submits active form ── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('panelLogin').classList.contains('active')) handleLogin();
+  else handleSignup();
+});
 </script>
 </body>
 </html>
