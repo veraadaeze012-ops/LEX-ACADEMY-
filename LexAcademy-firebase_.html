@@ -25,6 +25,125 @@
   --mono:'DM Mono',monospace;
   --sidebar:240px;
 }
+/* DARK MODE */
+body.dark{
+  --bg:#111;--surface:#1a1a1a;--surface-dim:#222;
+  --border:rgba(255,255,255,0.08);--border-med:rgba(255,255,255,0.12);
+  --text:#f0f0f0;--text2:#aaa;--text3:#555;
+  --dark:#fff;
+}
+body.dark .logo-mark{background:#fff}
+body.dark .logo-mark svg rect[fill="rgba(255,255,255,.9)"]{fill:rgba(0,0,0,.9)}
+body.dark .logo-mark svg rect[fill="rgba(255,255,255,.5)"]{fill:rgba(0,0,0,.5)}
+body.dark .logo-mark svg rect[fill="rgba(255,255,255,.3)"]{fill:rgba(0,0,0,.3)}
+body.dark .nav-item.active .nav-icon{background:#fff}
+body.dark .nav-item.active .nav-icon svg{stroke:#111}
+body.dark .hero{background:#1a1a1a;border:1px solid rgba(255,255,255,.08)}
+body.dark .hero-cta{background:#111;color:#f0f0f0}
+body.dark .code-block{background:#0a0a0a}
+body.dark .auth-card{background:#1a1a1a}
+body.dark .auth-screen{background:#111}
+body.dark .auth-input{background:#222}
+body.dark .q-opt{border-color:rgba(255,255,255,.1)}
+body.dark .q-opt:hover:not(:disabled){background:rgba(255,255,255,.05)}
+body.dark .step-num{background:#fff;color:#111}
+body.dark .result-btn{background:#fff;color:#111}
+body.dark .profile-save-btn{background:#fff;color:#111}
+body.dark .compose-post{background:#fff;color:#111}
+body.dark .hero-glyph{opacity:.04}
+body.dark .mob-tab.active .mob-tab-icon{background:#fff}
+body.dark .mob-tab.active .mob-tab-icon svg{stroke:#111}
+body.dark .wokwi-open-btn{background:#fff;color:#111}
+body.dark .wokwi-open-btn svg{stroke:#111}
+body.dark .proj-sim-btn{background:#fff;color:#111}
+body.dark .proj-sim-btn svg{stroke:#111}
+body.dark .filter-btn.active{background:#fff;color:#111;border-color:#fff}
+body.dark .tpl-btn.active{background:#fff;color:#111;border-color:#fff}
+body.dark .r-nav-btn.primary{background:#fff;color:#111;border-color:#fff}
+body.dark .auth-google{background:#222;color:#f0f0f0}
+body.dark .signout-btn:hover{background:#222}
+/* Dark mode toggle button */
+.darkmode-btn{
+  display:flex;align-items:center;gap:7px;margin-top:6px;width:100%;padding:8px 10px;
+  border-radius:10px;border:1px solid var(--border);background:none;
+  font-family:var(--font);font-size:12.5px;color:var(--text2);cursor:pointer;
+  transition:background .12s,color .12s;
+}
+.darkmode-btn:hover{background:var(--bg);color:var(--text)}
+.darkmode-btn svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* Mobile search overlay */
+.mobile-search-bar{
+  display:none;padding:10px 18px 0;
+}
+.mobile-search-bar.open{display:flex;gap:8px;align-items:center}
+.mobile-search-input{flex:1;padding:9px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:13px;color:var(--text);outline:none}
+.mobile-search-close{background:none;border:none;padding:6px;cursor:pointer;color:var(--text3)}
+.search-icon-btn{
+  display:none;width:34px;height:34px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  transition:background .12s;
+}
+.search-icon-btn svg{width:15px;height:15px;stroke:var(--text2);fill:none;stroke-width:2;stroke-linecap:round}
+@media(max-width:768px){.search-icon-btn{display:flex}}
+/* Bookmark icon on lesson rows */
+.lr-bookmark{width:26px;height:26px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .12s;padding:0;flex-shrink:0}
+.lr-bookmark:hover{background:var(--bg)}
+.lr-bookmark svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lr-bookmark.saved svg{stroke:var(--amber);fill:var(--amber)}
+/* Bookmarks filter */
+.bookmarks-section{margin-bottom:20px;display:none}
+.bookmarks-section.has-bookmarks{display:block}
+/* Project completion badge */
+.proj-built-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11.5px;font-weight:600;border:1px solid rgba(40,205,65,.2)}
+.proj-mark-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:13.5px;font-weight:500;cursor:pointer;transition:opacity .15s;margin-top:14px}
+.proj-mark-btn:hover{opacity:.85}
+.proj-mark-btn.done{background:var(--green);cursor:default;opacity:.8}
+/* Achievements section */
+.achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:12px}
+.achievement-badge{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;opacity:.35;transition:opacity .2s}
+.achievement-badge.unlocked{opacity:1;border-color:var(--amber);background:var(--amber-dim)}
+.achievement-emoji{font-size:26px;margin-bottom:6px}
+.achievement-name{font-size:11.5px;font-weight:600;letter-spacing:-.2px;margin-bottom:2px}
+.achievement-desc{font-size:10.5px;color:var(--text3);line-height:1.4}
+/* Leaderboard in community */
+.leaderboard-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:16px}
+.leaderboard-head{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--border)}
+.leaderboard-title{font-size:13px;font-weight:600}
+.leaderboard-toggle{font-size:11.5px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font)}
+.leaderboard-list{padding:4px 0}
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 15px;transition:background .1s}
+.lb-row:hover{background:var(--bg)}
+.lb-rank{width:20px;font-size:12px;font-weight:600;color:var(--text3);text-align:center;flex-shrink:0}
+.lb-rank.top3{color:var(--amber)}
+.lb-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0}
+.lb-name{flex:1;font-size:13px;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-xp{font-size:12px;font-weight:600;color:var(--green);flex-shrink:0}
+.lb-you{font-size:10px;color:var(--text3);font-weight:400;margin-left:3px}
+/* Character counter */
+.compose-counter{font-size:11px;color:var(--text3);min-width:40px;text-align:right}
+.compose-counter.warning{color:var(--amber)}
+.compose-counter.danger{color:var(--red)}
+/* Streak in sidebar */
+.streak-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--amber);font-weight:600;margin-left:4px}
+/* Forgot password link */
+.forgot-pw-link{font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;display:block;margin-top:-4px;margin-bottom:10px;text-align:right}
+.forgot-pw-link:hover{text-decoration:underline}
+/* Password reset modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .2s}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal-box{background:var(--surface);border-radius:var(--r);padding:28px;max-width:360px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,.18);animation:authIn .3s cubic-bezier(.22,.68,0,1.2) both}
+.modal-title{font-size:16px;font-weight:600;letter-spacing:-.4px;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.5}
+.modal-input{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-family:var(--font);font-size:14px;color:var(--text);outline:none;margin-bottom:12px;transition:border-color .15s}
+.modal-input:focus{border-color:var(--dark)}
+.modal-btns{display:flex;gap:8px}
+.modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--font);font-size:13.5px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:none;color:var(--text);transition:background .12s}
+.modal-btn.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
+.modal-btn:hover:not(.primary){background:var(--bg)}
+.modal-msg{font-size:12.5px;padding:8px 12px;border-radius:8px;margin-bottom:10px;display:none}
+.modal-msg.success{display:block;background:var(--green-dim);color:#166534;border:1px solid rgba(40,205,65,.2)}
+.modal-msg.error{display:block;background:rgba(239,68,68,.07);color:#b91c1c;border:1px solid rgba(239,68,68,.2)}
 html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
 body{overflow:hidden}
 .shell{display:flex;height:100vh;overflow:hidden}
@@ -479,7 +598,7 @@ body{overflow:hidden}
           <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
           Continue with Google
         </button>
-        <div class="auth-terms"><a onclick="void(0)">Forgot password?</a></div>
+        <button class="forgot-pw-link" onclick="openForgotPassword()">Forgot password?</button>
       </div>
       <div class="auth-panel" id="panelSignup">
         <div class="auth-heading">Create your account</div>
@@ -533,6 +652,11 @@ body{overflow:hidden}
     <div class="progress-label"><span id="sb-level">Level 3 · Technician</span><strong id="sb-xp">620 XP</strong></div>
     <div class="xp-track"><div class="xp-fill" id="sb-xp-fill"></div></div>
     <div class="xp-sub" id="sb-xp-sub">Build more to earn XP</div>
+    <div class="xp-sub" id="sb-streak-sub" style="color:var(--amber);display:none">🔥 <span id="sb-streak-count">0</span>-day streak!</div>
+    <button class="darkmode-btn" id="darkmodeBtn" onclick="toggleDarkMode()">
+      <svg id="dmIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span id="dmLabel">Dark mode</span>
+    </button>
     <button class="signout-btn" onclick="handleSignOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</button>
   </div>
 </aside>
@@ -540,9 +664,9 @@ body{overflow:hidden}
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <div class="page-title" id="pageTitle">Home</div>
-    <div class="topbar-right">
+    <div class="page-title" id="pageTitle">Home</div>    <div class="topbar-right">
       <div class="search-pill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search lessons…" oninput="searchLessons(this.value)"></div>
+      <button class="search-icon-btn" onclick="toggleMobileSearch()" title="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
       <!-- Notification Bell -->
       <div style="position:relative">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotifTray()" title="Notifications" aria-label="Notifications">
@@ -561,6 +685,11 @@ body{overflow:hidden}
       </div>
       <div class="avatar-pill" id="avatarPill" onclick="nav('profile','ni-profile')" title="My Profile"></div>
     </div>
+  </div>
+
+  <div class="mobile-search-bar" id="mobileSearchBar">
+    <input class="mobile-search-input" id="mobileSearchInput" placeholder="Search lessons…" oninput="searchLessons(this.value)">
+    <button class="mobile-search-close" onclick="closeMobileSearch()">✕</button>
   </div>
 
   <div class="content">
@@ -598,6 +727,7 @@ body{overflow:hidden}
         <button class="filter-btn" onclick="filterL('Theory',this)">Theory</button>
         <button class="filter-btn" onclick="filterL('Programming',this)">Programming</button>
         <button class="filter-btn" onclick="filterL('Electronics',this)">Electronics</button>
+        <button class="filter-btn" onclick="filterL('Bookmarked',this)">🔖 Bookmarked</button>
       </div>
       <div class="lesson-list" id="lessonList"></div>
     </div>
@@ -659,13 +789,23 @@ body{overflow:hidden}
     <!-- COMMUNITY -->
     <div class="page" id="page-community">
       <div class="community-error" id="communityError"></div>
+
+      <!-- Leaderboard -->
+      <div class="leaderboard-wrap" id="leaderboardWrap">
+        <div class="leaderboard-head">
+          <span class="leaderboard-title">🏆 Top Learners</span>
+          <button class="leaderboard-toggle" id="lbToggleBtn" onclick="toggleLeaderboard()">Hide</button>
+        </div>
+        <div class="leaderboard-list" id="leaderboardList"><div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">Loading leaderboard…</div></div>
+      </div>
       <div class="compose-wrap">
         <div class="compose">
           <div class="compose-av" id="composeAv"></div>
           <div class="compose-right">
-            <textarea class="compose-input" id="composeInput" placeholder="Share something with the community… (text &amp; emoji only)" rows="2" maxlength="500"></textarea>
+            <textarea class="compose-input" id="composeInput" placeholder="Share something with the community… (text &amp; emoji only)" rows="2" maxlength="400" oninput="updateCharCounter()"></textarea>
             <div class="compose-bottom">
               <button class="emoji-trigger" onclick="toggleEmojiPanel(event)" title="Add emoji">😊</button>
+              <span class="compose-counter" id="charCounter">400</span>
               <button class="compose-post" onclick="postMessage()">Post</button>
             </div>
           </div>
@@ -701,8 +841,13 @@ body{overflow:hidden}
           <div class="profile-stats-grid" id="profileStatsGrid">
             <div class="profile-stat"><div class="profile-stat-num" id="ps-done">0</div><div class="profile-stat-label">Lessons done</div></div>
             <div class="profile-stat"><div class="profile-stat-num" id="ps-xp">0</div><div class="profile-stat-label">Total XP</div></div>
-            <div class="profile-stat"><div class="profile-stat-num" id="ps-streak">—</div><div class="profile-stat-label">Level</div></div>
+            <div class="profile-stat"><div class="profile-stat-num" id="ps-streak">0</div><div class="profile-stat-label">Day streak 🔥</div></div>
           </div>
+        </div>
+
+        <div class="profile-section" id="achievementsSection">
+          <div class="profile-section-title">Achievements</div>
+          <div class="achievements-grid" id="achievementsGrid"></div>
         </div>
 
         <div class="profile-section">
@@ -1525,10 +1670,12 @@ function renderPosts(posts) {
     const timeStr = formatPostTime(p.timestamp);
     const initial = ((p.user || '?').charAt(0)).toUpperCase();
     const avBg = p.authorColor || p.av || '#333';
+    const isOwn = uid && p.authorUid === uid;
     return `<div class="post-card" data-post-id="${p.id}">
       <div class="post-head">
         <div class="post-av" style="background:${avBg}">${escHtml(initial)}</div>
-        <div><div class="post-user">${escHtml(p.user || 'Student')}</div><div class="post-time">${timeStr}</div></div>
+        <div style="flex:1;min-width:0"><div class="post-user">${escHtml(p.user || 'Student')}</div><div class="post-time">${timeStr}</div></div>
+        ${isOwn ? `<button class="post-action" onclick="deletePost('${p.id}')" title="Delete post" style="color:var(--text3);padding:2px 6px;border-radius:6px;transition:color .12s,background .12s" onmouseover="this.style.color='var(--red)';this.style.background='rgba(239,68,68,.06)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">✕</button>` : ''}
       </div>
       <div class="post-text">${escHtml(p.text || '')}</div>
       <div class="post-actions">
@@ -1555,6 +1702,20 @@ function likePost(postId, currentlyLiked) {
   if (!uid) return;
   const ref = db.ref(`community/posts/${postId}/likedBy/${uid}`);
   if (currentlyLiked) ref.remove(); else ref.set(true);
+}
+
+function deletePost(postId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  if (!confirm('Delete this post? This cannot be undone.')) return;
+  db.ref(`community/posts/${postId}`).once('value').then(snap => {
+    const post = snap.val();
+    if (!post || post.authorUid !== uid) {
+      alert('You can only delete your own posts.');
+      return;
+    }
+    db.ref(`community/posts/${postId}`).remove();
+  });
 }
 
 function toggleReply(postId) {
@@ -1619,6 +1780,12 @@ function postMessage() {
     likedBy: { _placeholder: true },
   }).then(() => {
     if (btn) { btn.disabled = false; btn.textContent = 'Post'; }
+    // First post achievement
+    if (!userProfile.achievFirstPost) {
+      db.ref(`users/${uid}/profile/achievFirstPost`).set(true);
+      userProfile.achievFirstPost = true;
+      showToast('🏅 Achievement unlocked: Community Voice!');
+    }
   }).catch(err => {
     input.value = txt;
     if (btn) { btn.disabled = false; btn.textContent = 'Post'; }
@@ -1680,6 +1847,16 @@ function insertEmoji(emoji) {
   input.value = val.slice(0, pos) + emoji + val.slice(pos);
   input.selectionStart = input.selectionEnd = pos + emoji.length;
   input.focus();
+  updateCharCounter();
+}
+
+function updateCharCounter() {
+  const input = document.getElementById('composeInput');
+  const counter = document.getElementById('charCounter');
+  if (!input || !counter) return;
+  const remaining = 400 - input.value.length;
+  counter.textContent = remaining;
+  counter.className = 'compose-counter' + (remaining <= 20 ? ' danger' : remaining <= 80 ? ' warning' : '');
 }
 
 document.addEventListener('click', (e) => {
@@ -1749,9 +1926,53 @@ function loadUserProfile(uid) {
       bio: data.bio || '',
       avatarColor: data.avatarColor || colorFromUid(uid),
       photo: data.photo || '',
+      quizXp: data.quizXp || 0,
+      streak: data.streak || 0,
+      lastActive: data.lastActive || 0,
+      achievFirstPost: data.achievFirstPost || false,
+      achievQuizAce: data.achievQuizAce || false,
     };
+    // Update streak
+    updateDailyStreak(uid);
     applyProfileToUI();
   });
+  // Load bookmarks
+  db.ref(`users/${uid}/bookmarks`).on('value', snap => {
+    userBookmarks = snap.val() || {};
+    renderLessons();
+  });
+  // Load project completions
+  db.ref(`users/${uid}/projectsDone`).on('value', snap => {
+    userProjectsDone = snap.val() || {};
+    renderProjects();
+  });
+}
+
+function updateDailyStreak(uid) {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const todayMs = today.getTime();
+  const lastActive = userProfile.lastActive || 0;
+  const lastDay = new Date(lastActive);
+  lastDay.setHours(0,0,0,0);
+  const lastDayMs = lastDay.getTime();
+  const diff = todayMs - lastDayMs;
+  let streak = userProfile.streak || 0;
+  if (diff === 0) {
+    // Same day, no change
+  } else if (diff === 86400000) {
+    // Consecutive day
+    streak += 1;
+    db.ref(`users/${uid}/profile`).update({ streak, lastActive: Date.now() });
+    userProfile.streak = streak;
+    userProfile.lastActive = Date.now();
+  } else if (diff > 86400000) {
+    // Streak broken
+    streak = 1;
+    db.ref(`users/${uid}/profile`).update({ streak, lastActive: Date.now() });
+    userProfile.streak = streak;
+    userProfile.lastActive = Date.now();
+  }
 }
 
 function applyProfileToUI() {
@@ -1820,17 +2041,33 @@ function selectAvatarColor(color) {
 
 function updateProfileStats() {
   const done = Object.values(userProgress).filter(v=>v>=100).length;
-  const xp = done * 50 + Object.values(userProgress).reduce((a,b)=>a+Math.floor(b/10),0) * 5;
+  const lessonXp = done * 50 + Object.values(userProgress).reduce((a,b)=>a+Math.floor(b/10),0) * 5;
+  const xp = lessonXp + (userProfile.quizXp || 0);
   const level = Math.floor(xp / 200) + 1;
+  const streak = userProfile.streak || 0;
   const el = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
   el('ps-done', done);
   el('ps-xp', xp + ' XP');
-  el('ps-streak', 'Lv ' + level);
+  el('ps-streak', streak);
   el('sb-xp', xp + ' XP');
   el('sb-level', 'Level ' + level);
   const fill = document.getElementById('sb-xp-fill');
   if (fill) fill.style.width = ((xp % 200) / 200 * 100) + '%';
   el('sb-xp-sub', (200 - (xp % 200)) + ' XP to Level ' + (level+1));
+  const streakSub = document.getElementById('sb-streak-sub');
+  const streakCount = document.getElementById('sb-streak-count');
+  if (streakSub && streakCount) {
+    if (streak > 0) { streakCount.textContent = streak; streakSub.style.display = 'block'; }
+    else streakSub.style.display = 'none';
+  }
+  renderAchievements(done, streak, xp);
+  // Publish XP to leaderboard node so others can read it
+  const uid = auth.currentUser?.uid;
+  if (uid && xp > 0) {
+    const name = userProfile.displayName || auth.currentUser?.displayName || 'Student';
+    const color = userProfile.avatarColor || colorFromUid(uid);
+    db.ref(`leaderboard/${uid}`).set({ name, xp, color, uid });
+  }
 }
 
 async function saveProfile() {
@@ -1895,6 +2132,8 @@ function handlePhotoUpload(input) {
    LESSON PROGRESS
 ══════════════════════════════════════ */
 let userProgress = {};
+let userBookmarks = {};
+let userProjectsDone = {};
 let currentLessonIdx = -1;
 
 function loadUserProgress(uid) {
@@ -2018,7 +2257,28 @@ function answer(i) {
   if (i===q.ans) qScore++;
   document.getElementById('nextBtn').disabled=false;
 }
-function nextQ() { qIdx++; qAnswered=false; renderQuestion(); }
+function nextQ() {
+  qIdx++; qAnswered=false;
+  // On quiz completion, save XP to Firebase
+  if (qIdx >= shuffledQ.length) {
+    const earned = qScore * 10;
+    const uid = auth.currentUser?.uid;
+    if (uid && earned > 0) {
+      const current = userProfile.quizXp || 0;
+      const newTotal = current + earned;
+      db.ref(`users/${uid}/profile/quizXp`).set(newTotal);
+      userProfile.quizXp = newTotal;
+      updateProfileStats();
+      // Quiz ace achievement
+      if (qScore === shuffledQ.length && !userProfile.achievQuizAce) {
+        db.ref(`users/${uid}/profile/achievQuizAce`).set(true);
+        userProfile.achievQuizAce = true;
+        setTimeout(() => showToast('🏅 Achievement unlocked: Quiz Ace!'), 1500);
+      }
+    }
+  }
+  renderQuestion();
+}
 
 /* ══════════════════════════════════════
    PROJECTS
@@ -2026,19 +2286,23 @@ function nextQ() { qIdx++; qAnswered=false; renderQuestion(); }
 function renderProjects() {
   const dc = {Beginner:'var(--green)',Intermediate:'var(--amber)',Advanced:'var(--red)'};
   const bg = {Beginner:'var(--green-dim)',Intermediate:'var(--amber-dim)',Advanced:'rgba(239,68,68,.08)'};
-  document.getElementById('projGrid').innerHTML = PROJECTS.map((p,i) => `
+  document.getElementById('projGrid').innerHTML = PROJECTS.map((p,i) => {
+    const done = !!userProjectsDone[i];
+    return `
     <div class="proj-card" onclick="openProject(${i})">
       <div class="proj-thumb" style="background:${p.bg}">${p.icon}</div>
       <div class="proj-body">
         <div class="proj-title">${p.title}</div>
         <div class="proj-meta"><span class="diff-pip" style="background:${dc[p.diff]}"></span>${p.diff} · ${p.time}</div>
         <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
+        ${done ? '<div style="margin-top:8px"><span class="proj-built-badge">✓ Built</span></div>' : ''}
         <button class="proj-sim-btn" onclick="event.stopPropagation();openProject(${i})">
           <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           Open with Simulator
         </button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function openProject(i) {
@@ -2079,7 +2343,15 @@ function openProject(i) {
     </div>
     <div class="proj-detail-desc">${p.desc}</div>
 
-    <div class="proj-section-title">🔧 Components Needed</div>
+    <div id="projMarkWrap" style="margin-bottom:20px">
+      ${userProjectsDone[i] 
+        ? '<span class="proj-built-badge" style="font-size:13px;padding:8px 16px">✓ You\'ve built this project!</span>'
+        : `<button class="proj-mark-btn" onclick="markProjectBuilt(${i})">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>
+            Mark as Built
+           </button>`
+      }
+    </div>
     <div class="components-list">${componentsHtml}</div>
 
     <div class="proj-section-title">📋 Build Steps</div>
@@ -2113,9 +2385,20 @@ function openProject(i) {
   nav('project-detail', null);
 }
 
-/* ══════════════════════════════════════
-   LESSONS
-══════════════════════════════════════ */
+function markProjectBuilt(i) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  db.ref(`users/${uid}/projectsDone/${i}`).set(true);
+  // Update UI immediately
+  const wrap = document.getElementById('projMarkWrap');
+  if (wrap) wrap.innerHTML = '<span class="proj-built-badge" style="font-size:13px;padding:8px 16px">✓ You\'ve built this project!</span>';
+  showToast('🏗️ Project marked as built!');
+  // Award XP for project completion
+  const earnedXp = (userProfile.quizXp || 0);
+  db.ref(`users/${uid}/profile/quizXp`).set(earnedXp + 100);
+  userProfile.quizXp = earnedXp + 100;
+  updateProfileStats();
+}
 function openLesson(i) {
   const l = LESSONS[i];
   if (!l) return;
@@ -2135,6 +2418,33 @@ function openLesson(i) {
   }
   markLessonOpened(i);
   nav('reader', null);
+  // Attach scroll progress listener
+  setTimeout(attachScrollProgress, 100);
+}
+
+function attachScrollProgress() {
+  const content = document.querySelector('.content');
+  if (!content || content._scrollListenerAttached) return;
+  content._scrollListenerAttached = true;
+  content.addEventListener('scroll', handleReaderScroll, { passive: true });
+}
+
+function handleReaderScroll() {
+  const page = document.getElementById('page-reader');
+  if (!page || !page.classList.contains('active')) return;
+  if (currentLessonIdx < 0) return;
+  const current = userProgress[currentLessonIdx] || 0;
+  if (current >= 100) return; // already complete
+  const content = document.querySelector('.content');
+  const scrollable = content.scrollHeight - content.clientHeight;
+  if (scrollable <= 0) return;
+  const pct = Math.round((content.scrollTop / scrollable) * 100);
+  // Update at 25% milestones
+  const milestone = Math.floor(pct / 25) * 25;
+  if (milestone > current && milestone < 100) {
+    const uid = auth.currentUser?.uid;
+    if (uid) db.ref(`users/${uid}/progress/${currentLessonIdx}`).set(milestone);
+  }
 }
 
 function renderLessons(query) {
@@ -2145,13 +2455,16 @@ function renderLessons(query) {
     const q = query.toLowerCase();
     list = list.filter(l => l.title.toLowerCase().includes(q) || l.topic.toLowerCase().includes(q) || l.level.toLowerCase().includes(q));
   } else {
-    list = list.filter(l => currentFilter==='All' || l.level===currentFilter || l.topic===currentFilter);
+    list = list.filter(l => currentFilter==='All' || currentFilter==='Bookmarked'
+      ? (currentFilter==='All' || userBookmarks[LESSONS.indexOf(l)])
+      : l.level===currentFilter || l.topic===currentFilter);
   }
   const el = document.getElementById('lessonList');
   if (!el) return;
   el.innerHTML = list.map(l => {
     const i = LESSONS.indexOf(l);
     const pct = userProgress[i] || 0;
+    const saved = !!userBookmarks[i];
     return `<div class="lesson-row" onclick="openLesson(${i})">
       <div class="lr-icon" style="background:${bg[l.level]}">${l.icon}</div>
       <div class="lr-body">
@@ -2160,6 +2473,9 @@ function renderLessons(query) {
       </div>
       ${pct>0 ? `<div class="lr-progress">${pct}%</div>` : ''}
       <span class="lr-badge" style="background:${bg[l.level]};color:${color[l.level]}">${l.level}</span>
+      <button class="lr-bookmark ${saved?'saved':''}" onclick="event.stopPropagation();toggleBookmark(${i})" title="${saved?'Remove bookmark':'Bookmark'}">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      </button>
     </div>`;
   }).join('');
 }
@@ -2169,6 +2485,19 @@ function filterL(val, el) {
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderLessons();
+}
+
+function toggleBookmark(lessonIdx) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  const ref = db.ref(`users/${uid}/bookmarks/${lessonIdx}`);
+  if (userBookmarks[lessonIdx]) {
+    ref.remove();
+    showToast('Bookmark removed');
+  } else {
+    ref.set(true);
+    showToast('📌 Lesson bookmarked!');
+  }
 }
 
 function searchLessons(q) {
@@ -2378,8 +2707,171 @@ document.addEventListener('click', e => {
 });
 
 /* ══════════════════════════════════════
-   FIREBASE INIT
+   DARK MODE
 ══════════════════════════════════════ */
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('lex-darkmode', isDark ? '1' : '0');
+  updateDarkModeBtn(isDark);
+}
+function updateDarkModeBtn(isDark) {
+  const icon = document.getElementById('dmIcon');
+  const label = document.getElementById('dmLabel');
+  if (!icon || !label) return;
+  if (isDark) {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    label.textContent = 'Light mode';
+  } else {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    label.textContent = 'Dark mode';
+  }
+}
+// Restore on load
+(function() {
+  const saved = localStorage.getItem('lex-darkmode');
+  if (saved === '1') {
+    document.body.classList.add('dark');
+    updateDarkModeBtn(true);
+  }
+})();
+
+/* ══════════════════════════════════════
+   MOBILE SEARCH
+══════════════════════════════════════ */
+function toggleMobileSearch() {
+  const bar = document.getElementById('mobileSearchBar');
+  bar.classList.toggle('open');
+  if (bar.classList.contains('open')) {
+    document.getElementById('mobileSearchInput').focus();
+  }
+}
+function closeMobileSearch() {
+  document.getElementById('mobileSearchBar').classList.remove('open');
+  document.getElementById('mobileSearchInput').value = '';
+  renderLessons();
+}
+
+/* ══════════════════════════════════════
+   FORGOT PASSWORD
+══════════════════════════════════════ */
+function openForgotPassword() {
+  const modal = document.getElementById('forgotModal');
+  const emailInput = document.getElementById('loginEmail');
+  if (emailInput && emailInput.value) {
+    document.getElementById('forgotEmail').value = emailInput.value;
+  }
+  document.getElementById('forgotMsg').className = 'modal-msg';
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('forgotEmail').focus(), 100);
+}
+function closeForgotPassword() {
+  document.getElementById('forgotModal').classList.remove('open');
+}
+async function handleForgotPassword() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const msg = document.getElementById('forgotMsg');
+  const btn = document.getElementById('forgotSendBtn');
+  if (!email || !email.includes('@')) {
+    msg.textContent = 'Please enter a valid email address.';
+    msg.className = 'modal-msg error';
+    return;
+  }
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  try {
+    await auth.sendPasswordResetEmail(email);
+    msg.textContent = 'Reset link sent! Check your inbox (and spam folder).';
+    msg.className = 'modal-msg success';
+    btn.textContent = 'Sent ✓';
+    setTimeout(() => closeForgotPassword(), 3000);
+  } catch(e) {
+    msg.textContent = firebaseErrMsg(e.code);
+    msg.className = 'modal-msg error';
+    btn.textContent = 'Send link →'; btn.disabled = false;
+  }
+}
+document.addEventListener('click', e => {
+  const modal = document.getElementById('forgotModal');
+  if (modal && modal.classList.contains('open') && e.target === modal) closeForgotPassword();
+});
+
+/* ══════════════════════════════════════
+   LEADERBOARD
+══════════════════════════════════════ */
+let lbVisible = true;
+function toggleLeaderboard() {
+  lbVisible = !lbVisible;
+  document.getElementById('leaderboardList').style.display = lbVisible ? '' : 'none';
+  document.getElementById('lbToggleBtn').textContent = lbVisible ? 'Hide' : 'Show';
+}
+
+function loadLeaderboard() {
+  db.ref('leaderboard').orderByChild('xp').limitToLast(10).on('value', snap => {
+    const uid = auth.currentUser?.uid;
+    const rows = [];
+    snap.forEach(child => rows.push(child.val()));
+    rows.sort((a,b) => (b.xp||0) - (a.xp||0));
+    const list = document.getElementById('leaderboardList');
+    if (!list) return;
+    if (!rows.length) {
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">No leaderboard data yet</div>';
+      return;
+    }
+    list.innerHTML = rows.map((r, idx) => {
+      const isYou = r.uid === uid;
+      const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '';
+      return `<div class="lb-row">
+        <span class="lb-rank ${idx<3?'top3':''}">${medal || (idx+1)}</span>
+        <div class="lb-av" style="background:${r.color||'#333'}">${escHtml((r.name||'?').charAt(0).toUpperCase())}</div>
+        <span class="lb-name">${escHtml(r.name||'Student')}${isYou ? '<span class="lb-you">(you)</span>' : ''}</span>
+        <span class="lb-xp">${r.xp||0} XP</span>
+      </div>`;
+    }).join('');
+  });
+}
+
+/* ══════════════════════════════════════
+   ACHIEVEMENTS
+══════════════════════════════════════ */
+const ACHIEVEMENTS = [
+  { id:'first_lesson', emoji:'📖', name:'First Step', desc:'Open your first lesson' },
+  { id:'beginner_done', emoji:'🎓', name:'Beginner Graduate', desc:'Complete all Beginner lessons' },
+  { id:'first_post', emoji:'💬', name:'Community Voice', desc:'Post in the community' },
+  { id:'streak_3', emoji:'🔥', name:'On Fire', desc:'3-day streak' },
+  { id:'streak_7', emoji:'💪', name:'Week Warrior', desc:'7-day streak' },
+  { id:'streak_10', emoji:'⚡', name:'Unstoppable', desc:'10-day streak' },
+  { id:'quiz_ace', emoji:'🏆', name:'Quiz Ace', desc:'Score 100% on a quiz' },
+  { id:'first_project', emoji:'🔨', name:'Builder', desc:'Complete your first project' },
+  { id:'all_lessons', emoji:'🌟', name:'Scholar', desc:'Complete all lessons' },
+];
+
+function renderAchievements(done, streak, xp) {
+  const grid = document.getElementById('achievementsGrid');
+  if (!grid) return;
+  const beginnerLessons = LESSONS.filter(l=>l.level==='Beginner').length;
+  const beginnerDone = LESSONS.filter((l,i)=>l.level==='Beginner'&&(userProgress[i]||0)>=100).length;
+  const unlocked = new Set();
+  if (done >= 1) unlocked.add('first_lesson');
+  if (beginnerDone >= beginnerLessons) unlocked.add('beginner_done');
+  if (streak >= 3) unlocked.add('streak_3');
+  if (streak >= 7) unlocked.add('streak_7');
+  if (streak >= 10) unlocked.add('streak_10');
+  if (Object.keys(userProjectsDone).length >= 1) unlocked.add('first_project');
+  if (done >= LESSONS.length) unlocked.add('all_lessons');
+  // first_post and quiz_ace are stored in profile
+  if (userProfile.achievFirstPost) unlocked.add('first_post');
+  if (userProfile.achievQuizAce) unlocked.add('quiz_ace');
+  grid.innerHTML = ACHIEVEMENTS.map(a => `
+    <div class="achievement-badge ${unlocked.has(a.id)?'unlocked':''}">
+      <div class="achievement-emoji">${a.emoji}</div>
+      <div class="achievement-name">${a.name}</div>
+      <div class="achievement-desc">${a.desc}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   LESSONS — also load on enterApp
+══════════════════════════════════════ */
+
 const firebaseConfig = {
   apiKey: "AIzaSyBm2y7fNCHshVvS0HDJXNVlLxKtZ7384DI",
   authDomain: "lex-academy-3dbba.firebaseapp.com",
@@ -2416,6 +2908,7 @@ function enterApp(user) {
   initCommunity();                // seed defaults + start real-time listener
   loadUserProgress(user.uid);    // per-user lesson progress
   loadUserProfile(user.uid);     // per-user profile data
+  loadLeaderboard();             // community leaderboard
   // Request browser notification permission
   requestNotifPermission();
 }
@@ -2547,6 +3040,20 @@ document.addEventListener('keydown', e => {
   else handleSignup();
 });
 </script>
+<!-- Password Reset Modal -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-box">
+    <div class="modal-title">Reset your password</div>
+    <div class="modal-sub">Enter your email and we'll send you a reset link.</div>
+    <div class="modal-msg" id="forgotMsg"></div>
+    <input class="modal-input" id="forgotEmail" type="email" placeholder="you@example.com" autocomplete="email">
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeForgotPassword()">Cancel</button>
+      <button class="modal-btn primary" id="forgotSendBtn" onclick="handleForgotPassword()">Send link →</button>
+    </div>
+  </div>
+</div>
+
 <!-- Notification Toast -->
 <div class="notif-toast" id="notifToast">
   <span class="notif-toast-icon">🔔</span>
