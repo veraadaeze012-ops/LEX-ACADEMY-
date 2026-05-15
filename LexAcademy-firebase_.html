@@ -71,6 +71,72 @@ body{overflow:hidden}
 .avatar-pill{width:34px;height:34px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;cursor:pointer;overflow:hidden;flex-shrink:0;transition:opacity .15s;border:2px solid transparent}
 .avatar-pill:hover{opacity:.85}
 .avatar-pill img{width:100%;height:100%;object-fit:cover}
+
+/* ══ NOTIFICATION BELL ══ */
+.notif-btn{
+  position:relative;width:34px;height:34px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .12s;flex-shrink:0;
+}
+.notif-btn:hover{background:var(--bg)}
+.notif-btn svg{width:15px;height:15px;stroke:var(--text2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .12s}
+.notif-btn.has-unread svg{stroke:var(--dark)}
+.notif-badge{
+  position:absolute;top:-3px;right:-3px;
+  min-width:17px;height:17px;border-radius:9px;
+  background:var(--red);color:#fff;
+  font-size:9.5px;font-weight:700;
+  display:none;align-items:center;justify-content:center;
+  padding:0 4px;border:2px solid var(--bg);
+  font-family:var(--font);letter-spacing:0;
+}
+.notif-badge.show{display:flex}
+
+/* Notification tray */
+.notif-tray{
+  position:absolute;top:calc(100% + 10px);right:0;
+  width:320px;max-height:420px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);box-shadow:0 8px 40px rgba(0,0,0,.12);
+  z-index:500;overflow:hidden;
+  display:none;flex-direction:column;
+  animation:trayIn .2s cubic-bezier(.22,.68,0,1.2);
+}
+.notif-tray.open{display:flex}
+@keyframes trayIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
+.notif-tray-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.notif-tray-title{font-size:13px;font-weight:600}
+.notif-clear-btn{font-size:11.5px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0}
+.notif-tray-clear-btn:hover{text-decoration:underline}
+.notif-list{overflow-y:auto;flex:1}
+.notif-list::-webkit-scrollbar{width:3px}
+.notif-list::-webkit-scrollbar-thumb{background:var(--border-med);border-radius:2px}
+.notif-item{display:flex;gap:10px;padding:11px 15px;border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+.notif-item:hover{background:var(--bg)}
+.notif-item.unread{background:var(--blue-dim)}
+.notif-item:last-child{border-bottom:none}
+.notif-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px}
+.notif-body{flex:1;min-width:0}
+.notif-msg{font-size:12.5px;line-height:1.45;color:var(--text)}
+.notif-msg strong{font-weight:600}
+.notif-time{font-size:11px;color:var(--text3);margin-top:3px}
+.notif-empty{text-align:center;padding:32px 20px;color:var(--text3);font-size:13px}
+
+/* In-app toast */
+.notif-toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--dark);color:#fff;
+  border-radius:30px;padding:11px 18px;
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:500;
+  box-shadow:0 4px 24px rgba(0,0,0,.25);
+  z-index:9000;opacity:0;transition:all .3s cubic-bezier(.22,.68,0,1.2);
+  pointer-events:none;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.notif-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.notif-toast-icon{font-size:16px;flex-shrink:0}
+@media(min-width:769px){.notif-toast{bottom:24px}}
 .content{flex:1;overflow-y:auto;padding:20px 28px 28px;scroll-behavior:smooth}
 .content::-webkit-scrollbar{width:4px}
 .content::-webkit-scrollbar-thumb{background:var(--border-med);border-radius:2px}
@@ -477,6 +543,22 @@ body{overflow:hidden}
     <div class="page-title" id="pageTitle">Home</div>
     <div class="topbar-right">
       <div class="search-pill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search lessons…" oninput="searchLessons(this.value)"></div>
+      <!-- Notification Bell -->
+      <div style="position:relative">
+        <button class="notif-btn" id="notifBtn" onclick="toggleNotifTray()" title="Notifications" aria-label="Notifications">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge"></span>
+        </button>
+        <div class="notif-tray" id="notifTray">
+          <div class="notif-tray-head">
+            <span class="notif-tray-title">Notifications</span>
+            <button class="notif-clear-btn" onclick="clearNotifications()">Mark all read</button>
+          </div>
+          <div class="notif-list" id="notifList">
+            <div class="notif-empty">No notifications yet 🔔</div>
+          </div>
+        </div>
+      </div>
       <div class="avatar-pill" id="avatarPill" onclick="nav('profile','ni-profile')" title="My Profile"></div>
     </div>
   </div>
@@ -1386,18 +1468,33 @@ function startPostsListener() {
     postsRef.off('value', postsListener);
   }
   postsRef = db.ref('community/posts');
+
+  // child_added fires for EVERY existing post on load, then for new ones.
+  // We suppress notifications for the initial bulk load using postsInitDone.
+  postsRef.on('child_added', snap => {
+    if (!postsInitDone) return; // skip history on initial load
+    const post = { id: snap.key, ...snap.val() };
+    const uid  = auth.currentUser?.uid;
+    // Don't notify for your own posts
+    if (post.authorUid && post.authorUid === uid) return;
+    addNotification(post);
+  });
+
   postsListener = postsRef.on('value',
     snap => {
       const posts = [];
       snap.forEach(child => {
         const val = child.val();
         if (!val) return;
-        // Never store large base64 photos in posts — strip if present
         if (val.authorPhoto && val.authorPhoto.length > 200) val.authorPhoto = '';
         posts.push({ id: child.key, ...val });
       });
       posts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
       renderPosts(posts);
+      // After first full load, enable new-post notifications
+      if (!postsInitDone) {
+        setTimeout(() => { postsInitDone = true; }, 500);
+      }
     },
     err => {
       const errEl = document.getElementById('communityError');
@@ -2122,6 +2219,165 @@ buildEmojiPanel();
 });
 
 /* ══════════════════════════════════════
+   NOTIFICATION SYSTEM
+══════════════════════════════════════ */
+let notifications = [];   // { id, user, text, timestamp, color, read }
+let unreadCount   = 0;
+let postsInitDone = false; // prevent firing on initial load of existing posts
+let toastTimeout  = null;
+
+/* ── Web Audio notification sound ── */
+function playNotifSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.18, ctx.currentTime);
+    master.connect(ctx.destination);
+
+    // Two-note chime: C5 → E5
+    [[523.25, 0], [659.25, 0.18]].forEach(([freq, delay]) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.9, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.55);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.6);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch (e) { /* audio not available */ }
+}
+
+/* ── Request browser notification permission ── */
+async function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+/* ── Show browser push notification (works when tab is backgrounded) ── */
+function showBrowserNotif(title, body, color) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    const n = new Notification(title, {
+      body,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23111"/><text x="32" y="44" text-anchor="middle" font-size="32">📡</text></svg>',
+      badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23111"/></svg>',
+      tag: 'lex-community',
+      renotify: true,
+    });
+    n.onclick = () => { window.focus(); nav('community','ni-community'); n.close(); };
+  } catch(e) {}
+}
+
+/* ── Show in-app toast ── */
+function showToast(msg) {
+  const toast = document.getElementById('notifToast');
+  const msgEl = document.getElementById('notifToastMsg');
+  if (!toast || !msgEl) return;
+  msgEl.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3800);
+}
+
+/* ── Add notification to tray ── */
+function addNotification(post) {
+  const notif = {
+    id: post.id,
+    user: post.user || 'Someone',
+    text: post.text || '',
+    timestamp: post.timestamp || Date.now(),
+    color: post.authorColor || post.av || '#444',
+    read: false
+  };
+  notifications.unshift(notif);
+  if (notifications.length > 30) notifications = notifications.slice(0, 30);
+  unreadCount++;
+  updateBadge();
+  renderNotifTray();
+
+  // Sound + toast + browser push
+  playNotifSound();
+  const preview = notif.text.length > 60 ? notif.text.slice(0, 57) + '…' : notif.text;
+  showToast(`${notif.user}: ${preview}`);
+  showBrowserNotif(`${notif.user} posted in Lex Academy`, preview, notif.color);
+}
+
+/* ── Update bell badge ── */
+function updateBadge() {
+  const badge = document.getElementById('notifBadge');
+  const btn   = document.getElementById('notifBtn');
+  if (!badge || !btn) return;
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+    badge.classList.add('show');
+    btn.classList.add('has-unread');
+  } else {
+    badge.classList.remove('show');
+    btn.classList.remove('has-unread');
+  }
+}
+
+/* ── Render notification tray ── */
+function renderNotifTray() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifications.length) {
+    list.innerHTML = '<div class="notif-empty">No notifications yet 🔔</div>';
+    return;
+  }
+  list.innerHTML = notifications.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" onclick="notifClick('${n.id}')">
+      <div class="notif-av" style="background:${n.color}">${escHtml(n.user.charAt(0).toUpperCase())}</div>
+      <div class="notif-body">
+        <div class="notif-msg"><strong>${escHtml(n.user)}</strong> posted: ${escHtml(n.text.length > 70 ? n.text.slice(0,67)+'…' : n.text)}</div>
+        <div class="notif-time">${formatPostTime(n.timestamp)}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Toggle tray open/close ── */
+function toggleNotifTray() {
+  const tray = document.getElementById('notifTray');
+  if (!tray) return;
+  tray.classList.toggle('open');
+  if (tray.classList.contains('open')) renderNotifTray();
+}
+
+/* ── Click notification → go to community ── */
+function notifClick(postId) {
+  const n = notifications.find(x => x.id === postId);
+  if (n) n.read = true;
+  unreadCount = notifications.filter(x => !x.read).length;
+  updateBadge();
+  document.getElementById('notifTray')?.classList.remove('open');
+  nav('community','ni-community');
+}
+
+/* ── Mark all read ── */
+function clearNotifications() {
+  notifications.forEach(n => n.read = true);
+  unreadCount = 0;
+  updateBadge();
+  renderNotifTray();
+}
+
+/* ── Close tray when clicking outside ── */
+document.addEventListener('click', e => {
+  const btn  = document.getElementById('notifBtn');
+  const tray = document.getElementById('notifTray');
+  if (tray && tray.classList.contains('open') && !btn?.contains(e.target) && !tray.contains(e.target)) {
+    tray.classList.remove('open');
+  }
+});
+
+/* ══════════════════════════════════════
    FIREBASE INIT
 ══════════════════════════════════════ */
 const firebaseConfig = {
@@ -2160,6 +2416,8 @@ function enterApp(user) {
   initCommunity();                // seed defaults + start real-time listener
   loadUserProgress(user.uid);    // per-user lesson progress
   loadUserProfile(user.uid);     // per-user profile data
+  // Request browser notification permission
+  requestNotifPermission();
 }
 
 /* ══════════════════════════════════════
@@ -2289,5 +2547,11 @@ document.addEventListener('keydown', e => {
   else handleSignup();
 });
 </script>
+<!-- Notification Toast -->
+<div class="notif-toast" id="notifToast">
+  <span class="notif-toast-icon">🔔</span>
+  <span id="notifToastMsg">New post in community</span>
+</div>
+
 </body>
 </html>
