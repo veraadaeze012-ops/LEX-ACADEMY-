@@ -757,6 +757,7 @@ body{overflow:hidden}
         <button class="filter-btn" onclick="filterL('Theory',this)">Theory</button>
         <button class="filter-btn" onclick="filterL('Programming',this)">Programming</button>
         <button class="filter-btn" onclick="filterL('Electronics',this)">Electronics</button>
+        <button class="filter-btn" onclick="filterL('Course',this)">📚 Courses</button>
         <button class="filter-btn" onclick="filterL('Bookmarked',this)">🔖 Bookmarked</button>
       </div>
       <div class="lesson-list" id="lessonList"></div>
@@ -1059,7 +1060,7 @@ body{overflow:hidden}
   <button class="mob-tab" id="mt-lessons" onclick="nav('lessons','mt-lessons')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><span class="mob-tab-label">Lessons</span></button>
   <button class="mob-tab" id="mt-projects" onclick="nav('projects','mt-projects')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="mob-tab-label">Projects</span></button>
   <button class="mob-tab" id="mt-community" onclick="nav('community','mt-community')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="mob-tab-label">Community</span></button>
-  <button class="mob-tab" id="mt-profile" onclick="nav('profile','mt-profile')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="mob-tab-label">Profile</span></button>
+  <button class="mob-tab" id="mt-simulator" onclick="nav('simulator','mt-simulator')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><span class="mob-tab-label">Simulator</span></button>
   <button class="mob-tab" id="mt-settings" onclick="nav('settings','mt-settings')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="mob-tab-label">Settings</span></button>
 </nav>
 
@@ -1428,6 +1429,206 @@ void motorBrake() {
 void motorCoast() {
   analogWrite(ENA, 0);
 }</div><h3>Modern alternatives to L298N</h3><p><strong>TB6612FNG</strong> — lower dropout voltage, more efficient, smaller. Handles 1.2A per channel.</p><p><strong>DRV8833</strong> — ultra-compact, built-in current limiting, 1.5A per channel.</p><p><strong>BTS7960 (IBT-2)</strong> — high power, handles 43A peak. Used for heavy robots.</p><div class="warn-box">⚠ Always add a flyback diode across motor terminals if your driver doesn't include them. Motor inductance creates voltage spikes that can destroy ICs.</div>`},
+
+  /* 13 */ {icon:"📚",title:"Introduction to Arduino",level:"Beginner",topic:"Course",duration:"22 min",body:`<h3>📚 Course: Introduction to Arduino</h3><p>This course takes you from zero to writing your first programs on real hardware. Arduino is an open-source electronics platform based on easy-to-use hardware and software, ideal for beginners who want to build interactive projects.</p><div class="info-box">🎯 By the end of this course you will understand Arduino's hardware layout, write and upload your first sketch, wire components on a breadboard, and read sensors.</div><h3>1 · What is Arduino?</h3><p>Arduino is both a microcontroller board (the hardware) and a programming environment (the IDE). The most popular board is the <strong>Arduino Uno</strong>, which uses an ATmega328P running at 16MHz with 32KB flash, 2KB SRAM, and 14 digital I/O pins (6 PWM) plus 6 analogue inputs.</p><p>Other popular boards include the <strong>Arduino Nano</strong> (compact), <strong>Arduino Mega</strong> (more pins), and the <strong>Arduino Nano Every</strong> (modern core). All use the same IDE and similar code.</p><h3>2 · The Arduino IDE</h3><p>Download the free IDE from <em>arduino.cc/en/software</em>. Every sketch has two functions: <code>setup()</code> runs once at startup and <code>loop()</code> runs forever. Upload via USB.</p><div class="code-block">// Your first sketch — Blink
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT); // pin 13 = built-in LED
+}
+
+void loop() {
+  digitalWrite(LED_BUILTIN, HIGH); // ON
+  delay(1000);                     // wait 1 second
+  digitalWrite(LED_BUILTIN, LOW);  // OFF
+  delay(1000);
+}</div><h3>3 · Breadboard & wiring basics</h3><p>A breadboard lets you connect components without soldering. Rows a–e are connected horizontally; rows f–j are connected horizontally on the other side. The long rails (+/−) run vertically — connect them to Arduino's 5V and GND pins.</p><p>Always add a <strong>220–330Ω resistor</strong> in series with an LED to limit current to ~20mA and protect the LED from burning out.</p><h3>4 · Reading sensors</h3><p>Use <code>analogRead(A0)</code> to read 0–5V as 0–1023. Use <code>digitalRead(pin)</code> to read HIGH/LOW. Use <code>Serial.begin(9600)</code> in setup and <code>Serial.println(value)</code> to debug via the Serial Monitor.</p><div class="code-block">// Read a potentiometer and control LED brightness
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int raw = analogRead(A0);         // 0–1023
+  int brightness = raw / 4;         // scale to 0–255
+  analogWrite(9, brightness);       // PWM output
+  Serial.println(brightness);
+  delay(50);
+}</div><div class="warn-box">⚠ Never connect two power sources directly together without proper voltage regulation. Mixing 3.3V and 5V logic can damage sensors. Check your sensor's datasheet first.</div>`},
+
+  /* 14 */ {icon:"🤖",title:"Build Your First Robot",level:"Beginner",topic:"Course",duration:"25 min",body:`<h3>📚 Course: Build Your First Robot</h3><p>This beginner course walks you through designing, wiring, and programming a two-wheeled differential drive robot from scratch using an Arduino Uno, two DC motors, an L298N driver, and an HC-SR04 ultrasonic sensor.</p><div class="info-box">🛒 Parts list: Arduino Uno, L298N motor driver, 2× DC gear motors, 4×AA battery pack, HC-SR04 sensor, chassis (or cardboard), jumper wires, breadboard.</div><h3>1 · Chassis & mechanical design</h3><p>Mount two gear motors on opposite sides of your chassis. Add a caster wheel or skid plate at the rear for balance. Gear motors with a ratio of 1:48 give a good balance of torque and speed for a small robot.</p><h3>2 · Wiring the L298N driver</h3><p>Connect motor A to OUT1/OUT2, motor B to OUT3/OUT4. Wire ENA and ENB to PWM pins on Arduino (9, 10). Wire IN1/IN2 to digital pins 4,5 and IN3/IN4 to 6,7. Power the driver from your battery pack, and connect GND to Arduino GND.</p><div class="code-block">// Simple obstacle avoidance robot
+#define ENA 9  #define IN1 4  #define IN2 5
+#define ENB 10 #define IN3 6  #define IN4 7
+#define TRIG 11 #define ECHO 12
+
+void setup() {
+  pinMode(ENA,OUTPUT); pinMode(IN1,OUTPUT); pinMode(IN2,OUTPUT);
+  pinMode(ENB,OUTPUT); pinMode(IN3,OUTPUT); pinMode(IN4,OUTPUT);
+  pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT);
+}
+
+float getDistance() {
+  digitalWrite(TRIG,LOW); delayMicroseconds(2);
+  digitalWrite(TRIG,HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG,LOW);
+  return pulseIn(ECHO,HIGH) / 58.0;
+}
+
+void forward(int spd) {
+  digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW); analogWrite(ENA,spd);
+  digitalWrite(IN3,HIGH); digitalWrite(IN4,LOW); analogWrite(ENB,spd);
+}
+
+void turnRight(int spd) {
+  digitalWrite(IN1,LOW);  digitalWrite(IN2,HIGH); analogWrite(ENA,spd);
+  digitalWrite(IN3,HIGH); digitalWrite(IN4,LOW);  analogWrite(ENB,spd);
+}
+
+void stopMotors() {
+  analogWrite(ENA,0); analogWrite(ENB,0);
+}
+
+void loop() {
+  float dist = getDistance();
+  if (dist > 20) forward(180);   // clear path
+  else { stopMotors(); delay(300); turnRight(180); delay(500); }
+}</div><h3>3 · Calibrating & testing</h3><p>Upload the sketch and open the Serial Monitor to debug distance readings. Adjust the speed values (0–255) to make both wheels run at the same speed — cheap motors often differ slightly. Add a small delay between direction changes to prevent driver overcurrent.</p>`},
+
+  /* 15 */ {icon:"📡",title:"Bluetooth & RF Communication",level:"Intermediate",topic:"Electronics",duration:"13 min",body:`<h3>Wireless robotics</h3><p>Adding wireless communication lets you remote-control your robot, send telemetry to a phone, or build multi-robot systems that talk to each other. The main options at Arduino level are Bluetooth Classic, BLE, NRF24L01 RF, and LoRa for long range.</p><h3>HC-05 / HC-06 Bluetooth Classic</h3><p>These modules communicate over serial (UART) at 9600 baud by default. Pair them with Android Bluetooth Terminal apps. Wire TX→RX, RX→TX via a voltage divider (HC-05 is 3.3V logic, Arduino is 5V).</p><div class="code-block">#include &lt;SoftwareSerial.h&gt;
+SoftwareSerial bt(10, 11); // RX, TX
+
+void setup() {
+  bt.begin(9600);
+  Serial.begin(9600);
+  // Set motor pins as output here...
+}
+
+void loop() {
+  if (bt.available()) {
+    char cmd = bt.read();
+    Serial.println(cmd);        // debug
+    if (cmd == 'F') forward();
+    if (cmd == 'B') backward();
+    if (cmd == 'L') turnLeft();
+    if (cmd == 'R') turnRight();
+    if (cmd == 'S') stopAll();
+  }
+}</div><h3>NRF24L01 — long range 2.4GHz RF</h3><p>These cheap 2.4GHz modules use SPI communication and the RF24 library. Range is 50–100m (100m+ with the PA+LNA version). Great for RC robots where you want low latency and don't need phone connectivity.</p><div class="code-block">// Master (transmitter)
+#include &lt;RF24.h&gt;
+RF24 radio(9, 10); // CE, CSN
+const byte addr[6] = "00001";
+struct Payload { int x; int y; } joy;
+
+void setup() {
+  radio.begin();
+  radio.openWritingPipe(addr);
+  radio.stopListening();
+}
+
+void loop() {
+  joy.x = analogRead(A0) - 512;
+  joy.y = analogRead(A1) - 512;
+  radio.write(&joy, sizeof(joy));
+  delay(10);
+}</div><div class="info-box">💡 ESP32 has built-in WiFi AND Bluetooth — for new projects, consider using an ESP32 instead of Arduino+HC-05. You get a web-based controller accessible from any browser on your network.</div>`},
+
+  /* 16 */ {icon:"🗺️",title:"Robot Navigation & Pathfinding",level:"Advanced",topic:"Programming",duration:"20 min",body:`<h3>How robots find their way</h3><p>Navigation is the process by which a robot determines where it is, where it wants to go, and how to get there without hitting things. It combines <strong>localisation</strong>, <strong>mapping</strong>, and <strong>path planning</strong>.</p><h3>Dead reckoning with encoders</h3><p>Without GPS or visual landmarks, use wheel encoders to track position. Count encoder pulses, multiply by wheel circumference / pulses per revolution, and integrate heading from differential counts between left and right wheels.</p><div class="code-block">// Differential drive odometry
+const float WHEEL_DIAM = 0.065; // metres
+const float WHEEL_BASE = 0.15;  // metres between wheels
+const int   PPR        = 360;   // pulses per revolution
+
+volatile long leftCount = 0, rightCount = 0;
+
+// Called in ISR (interrupts)
+void leftISR()  { leftCount++; }
+void rightISR() { rightCount++; }
+
+float x = 0, y = 0, theta = 0; // pose
+
+void updateOdometry() {
+  static long prevL = 0, prevR = 0;
+  long dL = leftCount - prevL;
+  long dR = rightCount - prevR;
+  prevL = leftCount; prevR = rightCount;
+
+  float distL = (dL / (float)PPR) * PI * WHEEL_DIAM;
+  float distR = (dR / (float)PPR) * PI * WHEEL_DIAM;
+  float dist  = (distL + distR) / 2.0;
+  float dTheta = (distR - distL) / WHEEL_BASE;
+
+  theta += dTheta;
+  x += dist * cos(theta);
+  y += dist * sin(theta);
+}</div><h3>Potential field navigation</h3><p>Assign a <em>repulsive force</em> to obstacles (detected by sensors) and an <em>attractive force</em> to the goal. Sum the vectors to get the robot's desired heading. Simple to implement, but can trap the robot in local minima.</p><h3>A* pathfinding on a grid</h3><p>For mapped environments, represent the world as a 2D grid. A* explores nodes from start to goal, prioritising cells with the lowest <code>f = g + h</code>, where g is the cost from start and h is the estimated cost to goal (heuristic, e.g. Euclidean distance).</p><div class="info-box">🧭 On resource-constrained microcontrollers like Arduino, full A* on large grids is slow. Use it on an ESP32 or Raspberry Pi, and send waypoints to the Arduino over serial.</div>`},
+
+  /* 17 */ {icon:"👁️",title:"Computer Vision Basics",level:"Advanced",topic:"Course",duration:"18 min",body:`<h3>📚 Course: Computer Vision for Robotics</h3><p>Computer vision lets your robot "see" — detecting objects, colours, faces, and tracking movement. While heavyweight CV typically runs on a Raspberry Pi or Jetson Nano, lightweight detection can run on ESP32-CAM.</p><div class="info-box">🔧 Tools: Python + OpenCV for Raspberry Pi. ESP32-CAM with JPEG streaming + server-side processing. OpenMV Cam for embedded vision.</div><h3>1 · Colour detection with OpenCV</h3><p>Convert frames to HSV (Hue-Saturation-Value) colour space, then create a mask for the target colour range and find contours.</p><div class="code-block">import cv2
+import numpy as np
+
+cap = cv2.VideoCapture(0)
+
+while True:
+  ret, frame = cap.read()
+  hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+  # Detect red objects
+  lower = np.array([0, 120, 70])
+  upper = np.array([10, 255, 255])
+  mask  = cv2.inRange(hsv, lower, upper)
+
+  contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+  for c in contours:
+    area = cv2.contourArea(c)
+    if area > 500:
+      x,y,w,h = cv2.boundingRect(c)
+      cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 2)
+      cx, cy = x + w//2, y + h//2
+      print(f"Object centre: ({cx}, {cy})")
+
+  cv2.imshow('Frame', frame)
+  if cv2.waitKey(1) == ord('q'): break</div><h3>2 · Face detection with Haar cascades</h3><p>OpenCV includes pre-trained classifiers. Load with <code>cv2.CascadeClassifier</code> and call <code>detectMultiScale()</code> on a grayscale frame. Face detection runs at ~10–20 FPS on a Raspberry Pi 4.</p><h3>3 · Edge detection (Canny)</h3><p>Use Canny edge detection to find object boundaries for navigation — useful in line-following robots that use a camera instead of IR sensors.</p><div class="code-block">gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+blur  = cv2.GaussianBlur(gray, (5,5), 0)
+edges = cv2.Canny(blur, 50, 150)
+# edges is a binary image — white pixels = edges</div>`},
+
+  /* 18 */ {icon:"🖨️",title:"3D Printing for Robotics",level:"Intermediate",topic:"Theory",duration:"11 min",body:`<h3>Why 3D print for robotics?</h3><p>3D printing lets you create custom brackets, chassis, gears, sensor mounts, and enclosures in hours. This eliminates reliance on pre-made parts and lets you iterate your robot's design rapidly.</p><h3>Choosing a material</h3><p><strong>PLA</strong> — easiest to print, biodegradable, rigid. Great for non-structural parts, housings, display stands. Not suited for high temperatures (&gt;60°C).</p><p><strong>PETG</strong> — tougher and more flexible than PLA, better heat resistance (80°C). Good for structural parts, wheels, and brackets.</p><p><strong>TPU</strong> — flexible filament. Use for wheels, grippers, and vibration dampeners. Excellent grip.</p><p><strong>ABS</strong> — strong and heat-resistant but prone to warping. Needs an enclosure printer. Good for motor brackets exposed to heat.</p><h3>Design tips for robotics</h3><p>• Add <strong>0.2mm clearance</strong> on mating parts for press-fit joints.<br>• Use <strong>heat-set brass inserts</strong> for screw holes — they're much stronger than threading plastic.<br>• Print gears with 40–60% infill and 3+ perimeters for strength.<br>• Orient parts so layer lines are perpendicular to the primary load direction.</p><div class="info-box">📐 Free design tools: Fusion 360 (professional, free for education/hobbyists), FreeCAD (open source), Tinkercad (browser-based, beginner-friendly).</div><h3>Slicing parameters</h3><p>Use Cura or PrusaSlicer. Key settings: layer height 0.2mm (0.1mm for fine detail), infill 20–40% for most parts, 3 walls, supports for overhangs &gt;45°. PLA at 200°C nozzle / 60°C bed works reliably on most printers.</p>`},
+
+  /* 19 */ {icon:"🥧",title:"Raspberry Pi & Linux Robotics",level:"Advanced",topic:"Course",duration:"24 min",body:`<h3>📚 Course: Raspberry Pi for Robotics</h3><p>The Raspberry Pi is a full Linux computer on a board. Where Arduino handles real-time hardware control, Raspberry Pi handles high-level computation: vision, voice, AI inference, web servers, and coordination of multiple subsystems.</p><div class="info-box">🔗 Common architecture: Raspberry Pi (brain) talks to Arduino/ESP32 (reflexes) over serial/I2C. Pi handles planning; microcontroller handles motor control and sensors at millisecond speed.</div><h3>1 · GPIO with Python</h3><div class="code-block">import RPi.GPIO as GPIO
+import time
+
+LED_PIN = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+# PWM for LED dimming
+pwm = GPIO.PWM(LED_PIN, 100)  # 100 Hz
+pwm.start(0)
+
+for dc in range(0, 101, 5):
+  pwm.ChangeDutyCycle(dc)
+  time.sleep(0.05)
+
+pwm.stop()
+GPIO.cleanup()</div><h3>2 · Serial communication with Arduino</h3><div class="code-block">import serial
+import time
+
+# Open serial port (find yours with: ls /dev/ttyACM*)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+time.sleep(2)  # wait for Arduino to reset
+
+ser.write(b'F')        # send 'Forward' command
+line = ser.readline()  # read response
+print(line.decode().strip())
+ser.close()</div><h3>3 · Running a web dashboard</h3><p>Use Flask to create a web interface for your robot — accessible from any browser on your home network. Display live sensor data, stream the camera, and send control commands.</p><div class="code-block">from flask import Flask, jsonify, render_template
+app = Flask(__name__)
+
+@app.route('/api/sensors')
+def sensors():
+  return jsonify({'temp': 23.4, 'dist': 45.2, 'speed': 180})
+
+@app.route('/control/&lt;cmd&gt;')
+def control(cmd):
+  ser.write(cmd.encode())
+  return jsonify({'ok': True, 'cmd': cmd})
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=5000)</div><h3>4 · Running code at startup</h3><p>Edit <code>/etc/rc.local</code> or create a systemd service file to launch your robot script automatically when the Pi powers on — no keyboard or monitor needed.</p>`},
 ];
 
 /* ══════════════════════════════════════
