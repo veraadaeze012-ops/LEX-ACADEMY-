@@ -3558,7 +3558,7 @@ document.addEventListener('keydown', e => {
 /* ── Chat Panel ── */
 .leon-panel{
   position:fixed;bottom:88px;right:22px;z-index:9001;
-  width:360px;max-height:540px;
+  width:300px;max-height:390px;
   background:var(--surface);border:1px solid var(--border);
   border-radius:20px;
   box-shadow:0 12px 48px rgba(0,0,0,.18);
@@ -3568,7 +3568,7 @@ document.addEventListener('keydown', e => {
 }
 .leon-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
 @media(max-width:420px){
-  .leon-panel{width:calc(100vw - 24px);right:12px;bottom:80px}
+  .leon-panel{width:calc(100vw - 32px);right:12px;bottom:80px}
   .leon-fab{bottom:16px;right:12px}
 }
 
@@ -3711,7 +3711,7 @@ body.dark .leon-send-btn svg{stroke:#111}
 </style>
 
 <!-- Floating Button -->
-<button class="leon-fab" id="leonFab" onclick="toggleLeon()" style="display:none" title="Ask Leon"></button>
+<button class="leon-fab" id="leonFab" style="display:none" title="Ask Leon — drag to move"></button>
 
 <!-- Chat Panel -->
 <div class="leon-panel" id="leonPanel">
@@ -3795,11 +3795,91 @@ IMPORTANT RULES:
     }
   };
 
+  /* ── Draggable FAB ── */
+  (function(){
+    const fab = document.getElementById('leonFab');
+    let dragging = false, startX, startY, origX, origY, moved = false;
+
+    fab.addEventListener('mousedown', function(e){
+      dragging = true; moved = false;
+      startX = e.clientX; startY = e.clientY;
+      const rect = fab.getBoundingClientRect();
+      origX = rect.left; origY = rect.top;
+      fab.style.transition = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if(Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      const newX = Math.max(8, Math.min(window.innerWidth - 64, origX + dx));
+      const newY = Math.max(8, Math.min(window.innerHeight - 64, origY + dy));
+      fab.style.left = newX + 'px';
+      fab.style.top  = newY + 'px';
+      fab.style.right = 'auto';
+      fab.style.bottom = 'auto';
+    });
+
+    document.addEventListener('mouseup', function(){
+      if(dragging){
+        dragging = false;
+        fab.style.transition = '';
+        if(!moved) toggleLeon();
+      }
+    });
+
+    // Touch support
+    fab.addEventListener('touchstart', function(e){
+      const t = e.touches[0];
+      dragging = true; moved = false;
+      startX = t.clientX; startY = t.clientY;
+      const rect = fab.getBoundingClientRect();
+      origX = rect.left; origY = rect.top;
+      fab.style.transition = 'none';
+    }, {passive:true});
+
+    fab.addEventListener('touchmove', function(e){
+      if(!dragging) return;
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if(Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      const newX = Math.max(8, Math.min(window.innerWidth - 64, origX + dx));
+      const newY = Math.max(8, Math.min(window.innerHeight - 64, origY + dy));
+      fab.style.left = newX + 'px';
+      fab.style.top  = newY + 'px';
+      fab.style.right = 'auto';
+      fab.style.bottom = 'auto';
+      e.preventDefault();
+    }, {passive:false});
+
+    fab.addEventListener('touchend', function(){
+      dragging = false;
+      fab.style.transition = '';
+      if(!moved) toggleLeon();
+    });
+  })();
+
   /* ── Toggle panel ── */
   window.toggleLeon = function(){
     const panel = document.getElementById('leonPanel');
     panel.classList.toggle('open');
     if(panel.classList.contains('open')){
+      // Position panel near the fab
+      const fab = document.getElementById('leonFab');
+      const rect = fab.getBoundingClientRect();
+      const panelW = 300, panelH = 390, gap = 12;
+      let left = rect.left + rect.width/2 - panelW/2;
+      let top  = rect.top - panelH - gap;
+      // Keep within viewport
+      left = Math.max(8, Math.min(window.innerWidth - panelW - 8, left));
+      top  = Math.max(8, top < 8 ? rect.bottom + gap : top);
+      panel.style.left   = left + 'px';
+      panel.style.top    = top  + 'px';
+      panel.style.right  = 'auto';
+      panel.style.bottom = 'auto';
       setTimeout(()=>document.getElementById('leonInput').focus(), 250);
     }
   };
