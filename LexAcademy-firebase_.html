@@ -3899,8 +3899,8 @@ IMPORTANT RULES:
   }
 
   /* ── Send message ── */
-  const GEMINI_KEY = 'AIzaSyBgewCUVBnEEV-sE70KcH1VIESHun7kkPk';
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+  const GROQ_KEY = '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';
+  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
   window.sendToLeon = async function(){
     if(isThinking) return;
@@ -3912,19 +3912,26 @@ IMPORTANT RULES:
     input.style.height='auto';
 
     appendMsg('user', text);
-    history.push({ role:'user', parts:[{ text }] });
+    history.push({ role:'user', content: text });
 
     isThinking = true;
     document.getElementById('leonSendBtn').disabled = true;
     showTyping();
 
     try {
-      const res = await fetch(GEMINI_URL, {
+      const res = await fetch(GROQ_URL, {
         method:'POST',
-        headers:{ 'Content-Type':'application/json' },
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer ' + GROQ_KEY
+        },
         body: JSON.stringify({
-          system_instruction:{ parts:[{ text: MODES[currentMode].system }] },
-          contents: history
+          model: 'llama-3.1-8b-instant',
+          max_tokens: 600,
+          messages: [
+            { role:'system', content: MODES[currentMode].system },
+            ...history
+          ]
         })
       });
 
@@ -3937,8 +3944,8 @@ IMPORTANT RULES:
         return;
       }
 
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I didn't get that — try again.";
-      history.push({ role:'model', parts:[{ text: reply }] });
+      const reply = data.choices?.[0]?.message?.content || "I didn't get that — try again.";
+      history.push({ role:'assistant', content: reply });
       hideTyping();
       appendMsg('leon', reply);
 
