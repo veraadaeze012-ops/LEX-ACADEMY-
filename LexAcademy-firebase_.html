@@ -3529,25 +3529,25 @@ document.addEventListener('keydown', e => {
 /* ── Floating Trigger Button ── */
 .leon-fab{
   position:fixed;bottom:28px;right:22px;z-index:9000;
-  display:flex;align-items:center;gap:9px;
-  padding:0 18px 0 10px;height:50px;
-  background:var(--dark);color:#fff;
-  border:none;border-radius:25px;cursor:pointer;
-  font-family:var(--font);font-size:13.5px;font-weight:600;
-  box-shadow:0 4px 20px rgba(0,0,0,.22);
+  width:56px;height:56px;
+  background:radial-gradient(ellipse at 62% 28%, #c0a8d8 0%, #d07898 28%, #d86870 52%, #e88858 75%, #f4aa58 100%);
+  border:none;border-radius:50%;cursor:pointer;
+  box-shadow:0 4px 20px rgba(208,120,152,.45);
   transition:transform .18s,box-shadow .18s;
   user-select:none;
+  overflow:hidden;
+  padding:0;
 }
-.leon-fab:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.28)}
-.leon-fab:active{transform:translateY(0)}
+.leon-fab:hover{transform:translateY(-2px) scale(1.06);box-shadow:0 8px 28px rgba(208,120,152,.55)}
+.leon-fab:active{transform:translateY(0) scale(1)}
 .leon-fab-avatar{
-  width:32px;height:32px;border-radius:50%;
+  width:100%;height:100%;border-radius:50%;
   overflow:hidden;
   flex-shrink:0;
   animation:leonPulse 2.8s ease-in-out infinite;
 }
-@keyframes leonPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,113,227,.5)}60%{box-shadow:0 0 0 6px rgba(0,113,227,0)}}
-body.dark .leon-fab{background:#fff;color:#111}
+@keyframes leonPulse{0%,100%{box-shadow:0 0 0 0 rgba(208,120,152,.6)}60%{box-shadow:0 0 0 8px rgba(208,120,152,0)}}
+body.dark .leon-fab{background:radial-gradient(ellipse at 62% 28%, #c0a8d8 0%, #d07898 28%, #d86870 52%, #e88858 75%, #f4aa58 100%)}
 
 
 /* ── Chat Panel ── */
@@ -3706,22 +3706,19 @@ body.dark .leon-send-btn svg{stroke:#111}
 </style>
 
 <!-- Floating Button -->
-<button class="leon-fab" id="leonFab" onclick="toggleLeon()" style="display:none">
-  <div class="leon-orb leon-orb-direct" id="leonFabOrb"></div>
-  Ask Leon
-</button>
+<button class="leon-fab" id="leonFab" onclick="toggleLeon()" style="display:none" title="Ask Leon"></button>
 
 <!-- Chat Panel -->
 <div class="leon-panel" id="leonPanel">
 
   <!-- Header -->
   <div class="leon-header">
-    <div class="leon-header-avatar"><div class="leon-orb leon-orb-direct" id="leonHeaderOrb"></div></div>
+    <div class="leon-header-avatar"><div class="leon-orb leon-orb-calm" id="leonHeaderOrb"></div></div>
     <div class="leon-header-info">
       <div class="leon-header-name">Leon</div>
       <div class="leon-header-status">
         <span class="leon-dot"></span>
-        <span id="leonStatusText">Your Robotics Tutor</span>
+        <span id="leonStatusText">Calm Mode — Robotics Tutor</span>
       </div>
     </div>
     <button class="leon-close-btn" onclick="toggleLeon()">
@@ -3733,10 +3730,10 @@ body.dark .leon-send-btn svg{stroke:#111}
   <div class="leon-mode-wrap">
     <div class="leon-mode-label">Leon's Style</div>
     <div class="leon-mode-toggle">
-      <button class="leon-mode-btn active" id="modeDirect" onclick="setMode('direct')">⚡ Direct</button>
-      <button class="leon-mode-btn" id="modeCalm" onclick="setMode('calm')">🌿 Calm</button>
+      <button class="leon-mode-btn" id="modeDirect" onclick="setMode('direct')">⚡ Direct</button>
+      <button class="leon-mode-btn active" id="modeCalm" onclick="setMode('calm')">🌿 Calm</button>
     </div>
-    <div class="leon-mode-desc" id="leonModeDesc">Sharp & straight to the point — no fluff, just answers.</div>
+    <div class="leon-mode-desc" id="leonModeDesc">Patient &amp; thorough — walks you through everything step by step.</div>
   </div>
 
   <!-- API Key Setup (shown if no key saved) -->
@@ -3752,7 +3749,7 @@ body.dark .leon-send-btn svg{stroke:#111}
   <!-- Messages -->
   <div class="leon-messages" id="leonMessages">
     <div class="leon-empty" id="leonEmpty">
-      <div class="leon-empty-icon"><div class="leon-orb leon-orb-direct" id="leonEmptyOrb" style="width:52px;height:52px;margin:0 auto"></div></div>
+      <div class="leon-empty-icon"><div class="leon-orb leon-orb-calm" id="leonEmptyOrb" style="width:52px;height:52px;margin:0 auto"></div></div>
       <div class="leon-empty-title">Hey, I'm Leon!</div>
       <div class="leon-empty-sub">Ask me anything about robotics — sensors, motors, circuits, code, you name it.</div>
     </div>
@@ -3771,7 +3768,7 @@ body.dark .leon-send-btn svg{stroke:#111}
 <script>
 /* ── LEON AI ── */
 (function(){
-  let currentMode = 'direct';
+  let currentMode = 'calm';
   let isThinking = false;
   const history = [];
 
@@ -3821,7 +3818,7 @@ IMPORTANT RULES:
     // Swap orb style
     const orbClass = 'leon-orb-' + mode;
     const otherClass = mode==='direct' ? 'leon-orb-calm' : 'leon-orb-direct';
-    ['leonFabOrb','leonHeaderOrb','leonEmptyOrb'].forEach(id=>{
+    ['leonHeaderOrb','leonEmptyOrb'].forEach(id=>{
       const el = document.getElementById(id);
       if(el){ el.classList.remove(otherClass); el.classList.add(orbClass); }
     });
