@@ -3741,15 +3741,7 @@ body.dark .leon-send-btn svg{stroke:#111}
     <div class="leon-mode-desc" id="leonModeDesc">Patient &amp; thorough — walks you through everything step by step.</div>
   </div>
 
-  <!-- API Key Setup (shown if no key saved) -->
-  <div class="leon-apikey-wrap" id="leonApiKeyWrap">
-    <div class="leon-apikey-title">🔑 Connect Leon to AI</div>
-    <div class="leon-apikey-sub">Paste your Anthropic API key to activate Leon. It's saved only on this device.</div>
-    <div class="leon-apikey-row">
-      <input class="leon-apikey-input" id="leonApiKeyInput" type="password" placeholder="sk-ant-api03-...">
-      <button class="leon-apikey-save" onclick="saveApiKey()">Save</button>
-    </div>
-  </div>
+
 
   <!-- Messages -->
   <div class="leon-messages" id="leonMessages">
@@ -3808,7 +3800,6 @@ IMPORTANT RULES:
     const panel = document.getElementById('leonPanel');
     panel.classList.toggle('open');
     if(panel.classList.contains('open')){
-      checkApiKey();
       setTimeout(()=>document.getElementById('leonInput').focus(), 250);
     }
   };
@@ -3834,24 +3825,6 @@ IMPORTANT RULES:
     document.querySelectorAll('.leon-msg-orb').forEach(el=>{
       el.className = 'leon-orb ' + orbClass + ' leon-msg-orb';
     });
-  };
-
-  /* ── API Key ── */
-  function checkApiKey(){
-    const key = localStorage.getItem('leon_api_key');
-    document.getElementById('leonApiKeyWrap').classList.toggle('show', !key);
-  }
-
-  window.saveApiKey = function(){
-    const val = document.getElementById('leonApiKeyInput').value.trim();
-    if(!val.startsWith('sk-')){
-      document.getElementById('leonApiKeyInput').style.borderColor='var(--red)';
-      setTimeout(()=>document.getElementById('leonApiKeyInput').style.borderColor='',1500);
-      return;
-    }
-    localStorage.setItem('leon_api_key', val);
-    document.getElementById('leonApiKeyWrap').classList.remove('show');
-    document.getElementById('leonApiKeyInput').value='';
   };
 
   /* ── Auto-resize textarea ── */
@@ -3926,42 +3899,32 @@ IMPORTANT RULES:
   }
 
   /* ── Send message ── */
+  const GEMINI_KEY = 'AIzaSyBgewCUVBnEEV-sE70KcH1VIESHun7kkPk';
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+
   window.sendToLeon = async function(){
     if(isThinking) return;
     const input = document.getElementById('leonInput');
     const text = input.value.trim();
     if(!text) return;
 
-    const key = localStorage.getItem('leon_api_key');
-    if(!key){
-      document.getElementById('leonApiKeyWrap').classList.add('show');
-      return;
-    }
-
     input.value='';
     input.style.height='auto';
 
     appendMsg('user', text);
-    history.push({ role:'user', content: text });
+    history.push({ role:'user', parts:[{ text }] });
 
     isThinking = true;
     document.getElementById('leonSendBtn').disabled = true;
     showTyping();
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch(GEMINI_URL, {
         method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key': key,
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-direct-browser-access':'true'
-        },
+        headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:600,
-          system: MODES[currentMode].system,
-          messages: history
+          system_instruction:{ parts:[{ text: MODES[currentMode].system }] },
+          contents: history
         })
       });
 
@@ -3969,17 +3932,13 @@ IMPORTANT RULES:
 
       if(!res.ok){
         const errMsg = data?.error?.message || 'Something went wrong.';
-        if(errMsg.toLowerCase().includes('api') || res.status===401){
-          localStorage.removeItem('leon_api_key');
-          document.getElementById('leonApiKeyWrap').classList.add('show');
-        }
         hideTyping();
         appendMsg('leon', `⚠️ ${errMsg}`);
         return;
       }
 
-      const reply = data.content?.[0]?.text || "I didn't get that — try again.";
-      history.push({ role:'assistant', content: reply });
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I didn't get that — try again.";
+      history.push({ role:'model', parts:[{ text: reply }] });
       hideTyping();
       appendMsg('leon', reply);
 
