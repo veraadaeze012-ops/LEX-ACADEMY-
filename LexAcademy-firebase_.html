@@ -1065,13 +1065,6 @@ body.dark .level-option.selected{border-color:#fff;background:#fff;color:#111}
     <div class="page" id="page-lessons">
       <div class="filter-row">
         <button class="filter-btn active" onclick="filterL('All',this)">All</button>
-        <button class="filter-btn" onclick="filterL('Beginner',this)">Beginner</button>
-        <button class="filter-btn" onclick="filterL('Intermediate',this)">Intermediate</button>
-        <button class="filter-btn" onclick="filterL('Advanced',this)">Advanced</button>
-        <button class="filter-btn" onclick="filterL('Theory',this)">Theory</button>
-        <button class="filter-btn" onclick="filterL('Programming',this)">Programming</button>
-        <button class="filter-btn" onclick="filterL('Electronics',this)">Electronics</button>
-        <button class="filter-btn" onclick="filterL('Course',this)">📚 Courses</button>
         <button class="filter-btn" onclick="filterL('Bookmarked',this)">🔖 Bookmarked</button>
       </div>
       <div id="lessonSections"></div>
@@ -3700,31 +3693,52 @@ function loadSectionProgress(uid) {
 }
 
 function renderLessons(query) {
-  const color = {Beginner:'var(--blue)',Intermediate:'var(--amber)',Advanced:'var(--purple)'};
-  const bg    = {Beginner:'var(--blue-dim)',Intermediate:'var(--amber-dim)',Advanced:'var(--purple-dim)'};
+  const color = {Beginner:'var(--blue)',Intermediate:'var(--amber)',Advanced:'var(--purple)',Expert:'var(--red)'};
+  const bg    = {Beginner:'var(--blue-dim)',Intermediate:'var(--amber-dim)',Advanced:'var(--purple-dim)',Expert:'rgba(239,68,68,.08)'};
+
+  // Build set of lesson indices that are in unlocked sections only
+  const unlockedIndices = new Set();
+  SECTIONS.forEach((sec, sIdx) => {
+    if (isSectionUnlocked(sIdx)) sec.lessonIndices.forEach(i => unlockedIndices.add(i));
+  });
+
   let list = LESSONS;
   if (query) {
     const q = query.toLowerCase();
-    list = list.filter(l => l.title.toLowerCase().includes(q) || l.topic.toLowerCase().includes(q) || l.level.toLowerCase().includes(q));
+    list = list.filter(l => {
+      const i = LESSONS.indexOf(l);
+      return unlockedIndices.has(i) && (l.title.toLowerCase().includes(q) || l.topic.toLowerCase().includes(q) || l.level.toLowerCase().includes(q));
+    });
+  } else if (currentFilter === 'Bookmarked') {
+    list = list.filter(l => {
+      const i = LESSONS.indexOf(l);
+      return unlockedIndices.has(i) && !!userBookmarks[i];
+    });
   } else {
-    list = list.filter(l => currentFilter==='All' || currentFilter==='Bookmarked'
-      ? (currentFilter==='All' || userBookmarks[LESSONS.indexOf(l)])
-      : l.level===currentFilter || l.topic===currentFilter);
+    // All — handled by renderSections, but fallback shows only unlocked
+    list = list.filter(l => unlockedIndices.has(LESSONS.indexOf(l)));
   }
+
   const el = document.getElementById('lessonList');
   if (!el) return;
+
+  if (!list.length && currentFilter === 'Bookmarked') {
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px">No bookmarked lessons yet.<br>Bookmark lessons as you study them!</div>';
+    return;
+  }
+
   el.innerHTML = list.map(l => {
     const i = LESSONS.indexOf(l);
     const pct = userProgress[i] || 0;
     const saved = !!userBookmarks[i];
     return `<div class="lesson-row" onclick="openLesson(${i})">
-      <div class="lr-icon" style="background:${bg[l.level]}">${l.icon}</div>
+      <div class="lr-icon" style="background:${bg[l.level]||'var(--bg)'}">${l.icon}</div>
       <div class="lr-body">
         <div class="lr-title">${l.title}</div>
         <div class="lr-meta">${l.topic} · ${l.duration}</div>
       </div>
       ${pct>0 ? `<div class="lr-progress">${pct}%</div>` : ''}
-      <span class="lr-badge" style="background:${bg[l.level]};color:${color[l.level]}">${l.level}</span>
+      <span class="lr-badge" style="background:${bg[l.level]||'var(--bg)'};color:${color[l.level]||'var(--text2)'}">${l.level}</span>
       <button class="lr-bookmark ${saved?'saved':''}" onclick="event.stopPropagation();toggleBookmark(${i})" title="${saved?'Remove bookmark':'Bookmark'}">
         <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
       </button>
@@ -3735,13 +3749,16 @@ function renderLessons(query) {
 function filterL(val, el) {
   currentFilter = val;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
+  const secEl = document.getElementById('lessonSections');
+  const ll = document.getElementById('lessonList');
   if (val === 'All') {
+    if (secEl) secEl.style.display = '';
+    if (ll) ll.style.display = 'none';
     renderSections();
   } else {
-    const sec = document.getElementById('lessonSections');
-    if (sec) sec.style.display = 'none';
-    const ll = document.getElementById('lessonList');
+    // Bookmarked or search result — show flat list (unlocked only)
+    if (secEl) secEl.style.display = 'none';
     if (ll) ll.style.display = '';
     renderLessons();
   }
@@ -3763,7 +3780,15 @@ function toggleBookmark(lessonIdx) {
 function searchLessons(q) {
   if (q && q.length > 0) {
     nav('lessons','ni-lessons');
+    // Show flat list for search, hide sections
+    const secEl = document.getElementById('lessonSections');
+    const ll = document.getElementById('lessonList');
+    if (secEl) secEl.style.display = 'none';
+    if (ll) ll.style.display = '';
     renderLessons(q);
+  } else {
+    // Restore sections view when search cleared
+    filterL('All', document.querySelector('.filter-btn'));
   }
 }
 
