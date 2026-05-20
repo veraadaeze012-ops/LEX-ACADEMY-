@@ -3290,7 +3290,7 @@ function confirmLevel() {
 
 function isSectionUnlocked(sIdx) {
   if (sIdx === 0) return true; // first section always open
-  const startIdx = LEVEL_START[userEntryLevel] || 0;
+  const startIdx = userEntryLevel ? (LEVEL_START[userEntryLevel] || 0) : 0;
   if (sIdx <= startIdx) return true;
   // Need prev section quiz passed
   return !!sectionQuizPassed[SECTIONS[sIdx - 1].id];
@@ -3879,7 +3879,6 @@ function updateHomeBookProgress() {
    INIT
 ══════════════════════════════════════ */
 renderLessons();
-renderSections();
 renderProjects();
 renderBooks();
 updateHomeBookProgress();
