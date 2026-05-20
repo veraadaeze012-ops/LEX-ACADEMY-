@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -742,7 +741,6 @@ body.dark .level-option.selected{border-color:#fff;background:#fff;color:#111}
 .section-lock.unlocked{color:var(--green)}
 .section-lock.locked{color:var(--text3)}
 .section-lessons{display:flex;flex-direction:column;gap:6px;padding-left:10px}
-.section-lessons.locked-section .lesson-row{opacity:.45;pointer-events:none}
 .section-quiz-btn{
   display:flex;align-items:center;gap:8px;
   padding:11px 16px;border-radius:var(--r-xs);
@@ -753,8 +751,31 @@ body.dark .level-option.selected{border-color:#fff;background:#fff;color:#111}
 }
 .section-quiz-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
 .section-quiz-btn.passed{border-color:var(--green);color:var(--green);background:var(--green-dim);cursor:default}
-.section-quiz-btn.locked-quiz{opacity:.4;cursor:not-allowed}
 .section-quiz-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* Locked section block */
+.section-block.locked-block{opacity:1}
+.section-block.locked-block .section-header-row{opacity:.5}
+.section-locked-wall{
+  border-radius:var(--r-xs);border:1.5px dashed var(--border);
+  background:var(--bg);
+  padding:24px 16px;text-align:center;margin-top:4px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.section-locked-icon{font-size:32px;opacity:.4}
+.section-locked-title{font-size:13.5px;font-weight:600;color:var(--text2)}
+.section-locked-sub{font-size:12px;color:var(--text3);line-height:1.5;max-width:280px}
+.section-locked-preview{
+  display:flex;flex-direction:column;gap:4px;width:100%;margin-top:4px;
+  filter:blur(2.5px);pointer-events:none;user-select:none;opacity:.35;
+}
+.section-locked-preview-row{
+  height:44px;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;display:flex;align-items:center;gap:10px;padding:0 12px;
+}
+.section-locked-preview-dot{width:28px;height:28px;border-radius:8px;background:var(--border);flex-shrink:0}
+.section-locked-preview-lines{flex:1;display:flex;flex-direction:column;gap:5px}
+.section-locked-preview-line{height:8px;border-radius:4px;background:var(--border)}
 
 /* ── SECTION QUIZ MODAL ── */
 .sq-overlay{
@@ -3457,12 +3478,49 @@ function renderSections() {
     const unlocked = isSectionUnlocked(sIdx);
     const passed = isSectionQuizPassed(sec.id);
 
+    // --- LOCKED SECTION: show blurred preview wall, no lessons accessible ---
+    if (!unlocked) {
+      // Generate 3 fake blurred preview rows
+      const previewRows = [1,2,3].map(() => `
+        <div class="section-locked-preview-row">
+          <div class="section-locked-preview-dot"></div>
+          <div class="section-locked-preview-lines">
+            <div class="section-locked-preview-line" style="width:${50+Math.random()*30}%"></div>
+            <div class="section-locked-preview-line" style="width:${30+Math.random()*20}%"></div>
+          </div>
+        </div>`).join('');
+
+      // Find which section must be completed first
+      const prevSec = SECTIONS[sIdx - 1];
+      const unlockMsg = prevSec
+        ? `Complete the <strong>${prevSec.name}</strong> section quiz to unlock this level.`
+        : 'Complete the previous section to unlock.';
+
+      return `<div class="section-block locked-block">
+        <div class="section-header-row">
+          <div class="section-icon" style="opacity:.4">${sec.icon}</div>
+          <div class="section-info">
+            <div class="section-name" style="opacity:.4">${sec.name}</div>
+            <div class="section-meta" style="opacity:.4">${sec.level} · ${sec.lessonIndices.length} lessons</div>
+          </div>
+          <div class="section-lock locked">🔒 Locked</div>
+        </div>
+        <div class="section-locked-wall">
+          <div class="section-locked-icon">🔒</div>
+          <div class="section-locked-title">Level Locked</div>
+          <div class="section-locked-sub">${unlockMsg}</div>
+          <div class="section-locked-preview">${previewRows}</div>
+        </div>
+      </div>`;
+    }
+
+    // --- UNLOCKED SECTION: show full lessons ---
     const lessonsHtml = sec.lessonIndices.map(i => {
       const l = LESSONS[i];
       if (!l) return '';
       const pct = userProgress[i] || 0;
       const saved = !!userBookmarks[i];
-      return `<div class="lesson-row ${unlocked ? '' : ''}" onclick="${unlocked ? `openLesson(${i})` : 'showToast(\"🔒 Complete the previous section quiz to unlock this!\")'}" style="${unlocked ? '' : 'opacity:.4;cursor:not-allowed'}">
+      return `<div class="lesson-row" onclick="openLesson(${i})">
         <div class="lr-icon" style="background:${bg[l.level]||'var(--bg)'}">${l.icon}</div>
         <div class="lr-body">
           <div class="lr-title">${l.title}</div>
@@ -3470,25 +3528,20 @@ function renderSections() {
         </div>
         ${pct>0 ? `<div class="lr-progress">${pct}%</div>` : ''}
         <span class="lr-badge" style="background:${bg[l.level]||'var(--bg)'};color:${color[l.level]||'var(--text2)'}">${l.level}</span>
-        ${unlocked ? `<button class="lr-bookmark ${saved?'saved':''}" onclick="event.stopPropagation();toggleBookmark(${i})" title="${saved?'Remove bookmark':'Bookmark'}">
+        <button class="lr-bookmark ${saved?'saved':''}" onclick="event.stopPropagation();toggleBookmark(${i})" title="${saved?'Remove bookmark':'Bookmark'}">
           <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        </button>` : ''}
+        </button>
       </div>`;
     }).join('');
 
     let quizBtnClass = 'section-quiz-btn';
     let quizBtnContent = '';
     let quizBtnClick = '';
-    if (!unlocked) {
-      quizBtnClass += ' locked-quiz';
-      quizBtnContent = `<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Section locked`;
-      quizBtnClick = '';
-    } else if (passed) {
+    if (passed) {
       quizBtnClass += ' passed';
-      quizBtnContent = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Section Quiz Passed ✓ — Next section unlocked!`;
-      quizBtnClick = '';
+      quizBtnContent = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Section Quiz Passed ✓ — Next level unlocked!`;
     } else {
-      quizBtnContent = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg> Take Section Quiz to unlock next level`;
+      quizBtnContent = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg> Take Section Quiz to unlock the next level`;
       quizBtnClick = `openSectionQuiz('${sec.id}')`;
     }
 
@@ -3499,12 +3552,12 @@ function renderSections() {
           <div class="section-name">${sec.name}</div>
           <div class="section-meta">${sec.level} · ${sec.lessonIndices.length} lessons · Pass ${sec.passMark}% to advance</div>
         </div>
-        <div class="section-lock ${unlocked ? 'unlocked' : 'locked'}">
-          ${passed ? '✓ Done' : unlocked ? '🔓 Open' : '🔒 Locked'}
+        <div class="section-lock ${passed ? 'unlocked' : 'unlocked'}">
+          ${passed ? '✅ Done' : '🔓 In Progress'}
         </div>
       </div>
       <div class="section-lessons">${lessonsHtml}</div>
-      <button class="${quizBtnClass}" ${quizBtnClick ? `onclick="${quizBtnClick}"` : ''} ${!unlocked || passed ? 'disabled' : ''}>${quizBtnContent}</button>
+      <button class="${quizBtnClass}" ${quizBtnClick ? `onclick="${quizBtnClick}"` : ''} ${passed ? 'disabled' : ''}>${quizBtnContent}</button>
     </div>`;
   }).join('');
 }
