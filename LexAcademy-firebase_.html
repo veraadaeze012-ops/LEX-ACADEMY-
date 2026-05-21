@@ -3643,7 +3643,7 @@ function markProjectBuilt(i) {
 // ── Read progress state ──
 let readPct = 0;
 let scrollUnlocked = false;  // true once student has read 85%+
-const SCROLL_THRESHOLD = 85; // % of lesson that must be read
+const SCROLL_THRESHOLD = 90; // % of lesson that must be read
 
 function openLesson(i) {
   const l = LESSONS[i];
@@ -3731,11 +3731,13 @@ function handleReaderScroll() {
   if (pct >= SCROLL_THRESHOLD && !scrollUnlocked) {
     scrollUnlocked = true;
     const btn = document.getElementById('rCompleteBtn');
-    if (btn && !btn.disabled) {
+    if (btn) {
       btn.textContent = 'Take Quick Quiz ✏️';
       btn.classList.remove('locked');
       btn.disabled = false;
     }
+    // Auto-pop the quiz
+    setTimeout(openLessonQuiz, 500);
   }
 }
 
@@ -12468,6 +12470,21 @@ auth.onAuthStateChanged(user => {
   }
 });
 
+
+/* ── Progress Reset (version-gated) ── */
+const APP_VERSION = 'v15-quiz'; // bump this to force a progress reset for all users
+
+async function checkAndResetProgress(uid) {
+  const snap = await db.ref('users/' + uid + '/meta/appVersion').once('value');
+  if (snap.val() !== APP_VERSION) {
+    // New version — wipe all lesson progress so quiz gate applies from start
+    await db.ref('users/' + uid + '/progress').remove();
+    await db.ref('users/' + uid + '/meta/appVersion').set(APP_VERSION);
+    userProgress = {};
+    console.log('Progress reset for new version:', APP_VERSION);
+  }
+}
+
 function enterApp(user) {
   // Hide auth screen
   const screen = document.getElementById('authScreen');
@@ -12479,6 +12496,7 @@ function enterApp(user) {
   // Init Firebase features
   initCommunity();                // seed defaults + start real-time listener
   loadUserProgress(user.uid);    // per-user lesson progress
+  checkAndResetProgress(user.uid); // reset if new version
   loadUserProfile(user.uid);     // per-user profile data
   loadLeaderboard();             // community leaderboard
   loadSectionProgress(user.uid); // pathway sections & entry level
