@@ -12699,7 +12699,7 @@ document.addEventListener('keydown', e => {
 /* ── Chat Panel ── */
 .leon-panel{
   position:fixed;bottom:88px;right:22px;z-index:9001;
-  width:300px;max-height:390px;
+  width:340px;max-height:420px;
   background:var(--surface);border:1px solid var(--border);
   border-radius:20px;
   box-shadow:0 12px 48px rgba(0,0,0,.18);
@@ -12708,9 +12708,16 @@ document.addEventListener('keydown', e => {
   transition:transform .22s cubic-bezier(.22,.68,0,1.2),opacity .18s;
 }
 .leon-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
-@media(max-width:420px){
-  .leon-panel{width:calc(100vw - 32px);right:12px;bottom:80px}
-  .leon-fab{bottom:16px;right:12px}
+/* On any screen narrower than 480px, pin to full width with margin so send btn never clips */
+@media(max-width:480px){
+  .leon-panel{
+    left:12px !important;
+    right:12px !important;
+    width:auto !important;
+    bottom:76px;
+    border-radius:18px;
+  }
+  .leon-fab{bottom:16px;right:16px}
 }
 
 /* ── Panel Header ── */
@@ -12819,10 +12826,11 @@ body.dark .leon-msg.user .leon-msg-bubble{background:#fff;color:#111}
 /* ── Input Bar ── */
 .leon-input-bar{
   display:flex;align-items:flex-end;gap:8px;
-  padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;
+  padding:10px 12px 12px;border-top:1px solid var(--border);flex-shrink:0;
+  box-sizing:border-box;width:100%;
 }
 .leon-textarea{
-  flex:1;resize:none;border:1.5px solid var(--border);
+  flex:1;min-width:0;resize:none;border:1.5px solid var(--border);
   background:var(--bg);color:var(--text);
   font-family:var(--font);font-size:13px;line-height:1.5;
   border-radius:12px;padding:9px 12px;outline:none;
@@ -12833,7 +12841,7 @@ body.dark .leon-msg.user .leon-msg-bubble{background:#fff;color:#111}
 .leon-textarea::-webkit-scrollbar{display:none}
 .leon-textarea:focus{border-color:var(--blue)}
 .leon-send-btn{
-  width:38px;height:38px;border:none;border-radius:50%;
+  width:38px;height:38px;flex-shrink:0;border:none;border-radius:50%;
   background:var(--dark);color:#fff;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;transition:opacity .15s,transform .12s;
