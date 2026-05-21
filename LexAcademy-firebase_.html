@@ -842,6 +842,28 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
 .book-page-text{white-space:normal!important}
 .book-page-text:empty::after{display:none}
 
+
+/* ── Learn Sub-Tabs ── */
+.learn-tabs{
+  display:flex;gap:4px;padding:4px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:14px;flex-shrink:0;
+}
+.learn-tab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 8px;border:none;border-radius:9px;
+  font-family:var(--font);font-size:12.5px;font-weight:500;
+  color:var(--text2);background:none;cursor:pointer;
+  transition:background .15s,color .15s,box-shadow .15s;
+}
+.learn-tab.active{
+  background:var(--dark);color:#fff;
+  box-shadow:0 1px 6px rgba(0,0,0,.15);
+}
+body.dark .learn-tab.active{background:#fff;color:#111}
+.learn-tab svg{flex-shrink:0;opacity:.8}
+.learn-tab.active svg{opacity:1}
+
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAADrUlEQVRYhcWXTUhjVxiGn3OjxlYhJghBI9MYRBAUJYuAmFbMJri1IhS6kFLiD0Wj7s3eRQy0iCgUq7iJBJfitiCiVmaTQRvSECZNIRTzozOaqLm3CydhHDVN4s+8q8P3nvO97/nOd++5V/ARtFrtK0VRJoUQ/YAR+IKnwXvgT8BbVVX1SywWe58jRG6g0+l+VBTlZ6D6iUQfwltZlr9NpVJ/5A18EF9+ZuGP8U5RlG+SyeRrodVqX3FTnufe+af4S6PRtKuqq6tnhRBfv7A4gC6dTv8rfWi4zwIhxHcVwFflLJYkif7+G+9bW1vIslxOmnYJ+LLUVTabDZ/Ph9VqxWq14vP5sNls5RioFVqtVil2ttlsZmpqiqurK+bm5jg+PgbAZDIxMTFBQ0MDHo+H3d3doh0UZaCjo4Px8XHUajVutxu/33/vvNbWVsbHx6mvr2d+fp7Dw8PHGdDr9Xg8HoQQuN1u9vf3b/EtLS0ABIPBW3GLxcL09DTn5+c4nU5OT08fNFBRyJ1er0en0yHLMgaDAZVKRTabzfM9PT13DKhUKgwGAxqNhsrKSqqqqgpJIBUir66uCAQCDA8P09XVxebmJna7HSHEvfO7u7vxer309vbicDg4ODjg8vKyoIGCFcghFovhcrkwGAw4HA5GR0dZXFy8JTw9PU00GmVmZoZwOAzcNKdOpyv/CBKJRL7TAaLRKC6Xi7a2NiYnJzGZTACEQiFmZ2c5Ojq6tT4UChGPxwturqTH8FPY7XYAtre37+XHxsZYWVnh4uLieQwYjUaAfMnLQVE98BDsdjtms5lAIHArfnp6yvJycbd7yQYaGxsZGRkBoL29HbVaTSaTAcDv97Ozs4PL5Xo+A01NTWQyGdbW1hgcHEQIwcbGBnq9noGBAZaWlgqe+aMNAKRSKSKRCCcnJwBEIpFyb8PH9cDZ2Vl+bLFY6OzspKKitJQF34T3oa+vD6vVeife3NxMOp2mpqampHwlV0CtVnN9fY0kSdTW1ubjbrebhYUF0ul0SfnKeg9IkoQsy3i9XgCGhobynMlkYn19HafTyd7e3v/mquDmp6GkuuUabnV19c7FpCgKwWAQRSlqX+eirq5uTwhhKcXAE+KNBKx/JnGALWE0GqtTqdQbwPTC4hdCiFYpHA6nFUUZBN69pLoQ4qd4PP63BJBMJl/LstwHvH0B7QtFUX6Ix+O/Aqhy0Uwm849Go1nOZrMpIYQO0ACFP+hKEAUCwG9CiO8TicTvOeI/5jlWu1ZajUEAAAAASUVORK5CYII=">
 <link rel="apple-touch-icon" sizes="192x192" href="data:image/png;base64,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">
@@ -977,8 +999,6 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
     <div class="nav-group-label">Learn</div>
     <button class="nav-item active" id="ni-home" onclick="nav('home','ni-home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span>Home</span></button>
     <button class="nav-item" id="ni-lessons" onclick="nav('lessons','ni-lessons')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><span>Lessons</span></button>
-    <button class="nav-item" id="ni-books" onclick="nav('books','ni-books')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><span>Books</span></button>
-    <button class="nav-item" id="ni-projects" onclick="nav('projects','ni-projects')"><div class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span>Projects</span></button>
     <button class="nav-item" id="ni-quiz" onclick="nav('quiz','ni-quiz')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg></div><span>Quiz</span></button>
     <div class="nav-group-label" style="margin-top:6px">Practice</div>
     <button class="nav-item" id="ni-simulator" onclick="nav('simulator','ni-simulator')"><div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><span>Simulator</span></button>
@@ -1067,8 +1087,8 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
         <div class="lesson-card" onclick="openLesson(5)"><span class="lc-icon">🔄</span><div class="lc-level" style="color:var(--purple)">Advanced</div><div class="lc-title">PID Control</div><div class="lc-meta">18 min · Programming</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>
         <div class="lesson-card" onclick="openLesson(7)"><span class="lc-icon">🔌</span><div class="lc-level" style="color:var(--purple)">Advanced</div><div class="lc-title">I2C &amp; SPI Protocols</div><div class="lc-meta">14 min · Programming</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>
       </div>
-      <div class="section-header"><h2>📚 Books</h2><button class="btn-text" onclick="nav('books','ni-books')">See all →</button></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;display:flex;align-items:center;gap:16px;cursor:pointer;margin-bottom:20px" onclick="nav('books','ni-books')">
+      <div class="section-header"><h2>📚 Books</h2><button class="btn-text" onclick="navToLearnTab('books')">See all →</button></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;display:flex;align-items:center;gap:16px;cursor:pointer;margin-bottom:20px" onclick="navToLearnTab('books')">
         <div style="width:52px;height:68px;border-radius:8px;background:linear-gradient(145deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🍰</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13.5px;font-weight:600;letter-spacing:-.2px;margin-bottom:3px">Introduction to Arduino: A Piece of Cake!</div>
@@ -1081,12 +1101,44 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
 
     <!-- LESSONS -->
     <div class="page" id="page-lessons">
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="filterL('All',this)">All</button>
-        <button class="filter-btn" onclick="filterL('Bookmarked',this)">🔖 Bookmarked</button>
+      <!-- Sub-tab bar -->
+      <div class="learn-tabs">
+        <button class="learn-tab active" id="lt-lessons" onclick="switchLearnTab('lessons')">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Lessons
+        </button>
+        <button class="learn-tab" id="lt-books" onclick="switchLearnTab('books')">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Books
+        </button>
+        <button class="learn-tab" id="lt-projects" onclick="switchLearnTab('projects')">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Projects
+        </button>
       </div>
-      <div id="lessonSections"></div>
-      <div class="lesson-list" id="lessonList" style="display:none"></div>
+      <!-- Lessons sub-panel -->
+      <div id="learnPanel-lessons">
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterL('All',this)">All</button>
+          <button class="filter-btn" onclick="filterL('Bookmarked',this)">🔖 Bookmarked</button>
+        </div>
+        <div id="lessonSections"></div>
+        <div class="lesson-list" id="lessonList" style="display:none"></div>
+      </div>
+      <!-- Books sub-panel -->
+      <div id="learnPanel-books" style="display:none">
+        <div class="books-hero">
+          <div class="books-hero-label">📚 Library</div>
+          <div class="books-hero-title">Books</div>
+          <div class="books-hero-sub">Read curated Arduino &amp; robotics books at your own pace. Your progress is saved automatically.</div>
+          <div class="books-hero-glyph">📖</div>
+        </div>
+        <div class="books-grid" id="booksGrid"></div>
+      </div>
+      <!-- Projects sub-panel -->
+      <div id="learnPanel-projects" style="display:none">
+        <div class="proj-grid" id="projGrid"></div>
+      </div>
     </div>
 
     <!-- READER -->
@@ -1104,22 +1156,13 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
       </div>
     </div>
 
-    <!-- BOOKS -->
-    <div class="page" id="page-books">
-      <div class="books-hero">
-        <div class="books-hero-label">📚 Library</div>
-        <div class="books-hero-title">Books</div>
-        <div class="books-hero-sub">Read curated Arduino & robotics books at your own pace. Your progress is saved automatically.</div>
-        <div class="books-hero-glyph">📖</div>
-      </div>
-      <div class="books-grid" id="booksGrid"></div>
-    </div>
+    <!-- Books moved into Lessons sub-tabs -->
 
     <!-- BOOK READER -->
     <div class="page" id="page-book-reader">
       <div class="book-reader-wrap">
         <div class="book-reader-header">
-          <button class="book-back-btn" onclick="nav('books','ni-books')">
+          <button class="book-back-btn" onclick="navToLearnTab('books')">
             <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="15 18 9 12 15 6"/></svg>
             Books
           </button>
@@ -1173,9 +1216,7 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
         <div style="text-align:center;font-size:11.5px;color:var(--text3);margin-top:6px" id="brProgressLabel"></div>
       </div>
     </div>
-    <div class="page" id="page-projects">
-      <div class="proj-grid" id="projGrid"></div>
-    </div>
+    <!-- Projects moved into Lessons sub-tabs -->
 
     <!-- PROJECT DETAIL -->
     <div class="page" id="page-project-detail">
@@ -1452,8 +1493,6 @@ body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
 <nav class="mobile-bar">
   <button class="mob-tab active" id="mt-home" onclick="nav('home','mt-home')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="mob-tab-label">Home</span></button>
   <button class="mob-tab" id="mt-lessons" onclick="nav('lessons','mt-lessons')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><span class="mob-tab-label">Lessons</span></button>
-  <button class="mob-tab" id="mt-books" onclick="nav('books','mt-books')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><span class="mob-tab-label">Books</span></button>
-  <button class="mob-tab" id="mt-projects" onclick="nav('projects','mt-projects')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="mob-tab-label">Projects</span></button>
   <button class="mob-tab" id="mt-community" onclick="nav('community','mt-community')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="mob-tab-label">Community</span></button>
   <button class="mob-tab" id="mt-simulator" onclick="nav('simulator','mt-simulator')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><span class="mob-tab-label">Simulator</span></button>
   <button class="mob-tab" id="mt-settings" onclick="nav('settings','mt-settings')"><div class="mob-tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="mob-tab-label">Settings</span></button>
@@ -3192,7 +3231,7 @@ function openProject(i) {
     </div>`).join('');
 
   document.getElementById('projDetailWrap').innerHTML = `
-    <button class="proj-detail-back" onclick="nav('projects','ni-projects')">← Back to Projects</button>
+    <button class="proj-detail-back" onclick="navToLearnTab('projects')">← Back to Projects</button>
     <div class="proj-detail-hero">
       <div class="proj-detail-emoji">${p.icon}</div>
       <div class="proj-detail-info">
