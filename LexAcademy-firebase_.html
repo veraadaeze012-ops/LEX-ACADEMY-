@@ -3366,137 +3366,173 @@ function markLessonOpened(lessonIdx) {
 
 /* ── Per-Lesson Mini Quizzes ── */
 const LESSON_QUIZZES = [
-  /* 0 - Electricity & Circuits */
+  /* 0 - How Robots Work — The Core Pillars */
   { qs:[
-    {q:"What three things does every complete electrical circuit need?",opts:["Battery, wire, switch","Power source, component, return path","Resistor, capacitor, LED","Voltage, current, resistance"],ans:1},
-    {q:"Ohm's Law states that V = ?",opts:["I + R","I × R","I / R","R / I"],ans:1},
-    {q:"A short circuit occurs when:",opts:["Too many LEDs are connected","Current flows with little or no resistance","The battery is too old","A resistor is missing"],ans:1}
+    {q:"Which three systems make up every robot?",opts:["Motor, battery, switch","Sensors, processor/microcontroller, actuators","Keyboard, screen, speaker","Wheels, frame, camera"],ans:1},
+    {q:"An HC-SR04 ultrasonic sensor measures distance by:",opts:["Reflecting light","Measuring temperature change","Sending sound and timing the echo","Counting motor rotations"],ans:2},
+    {q:"In the Sense → Think → Act loop, 'Think' refers to:",opts:["Recharging the battery","The microcontroller processing sensor data to decide what to do","The motor spinning","The sensor detecting an obstacle"],ans:1}
   ]},
-  /* 1 - Servo Motors */
+  /* 1 - Servo Motors & Control */
   { qs:[
-    {q:"A servo motor rotates to a specific angle using:",opts:["Voltage level","PWM signal","I2C commands","Analog current"],ans:1},
-    {q:"The standard servo range is:",opts:["0° to 90°","0° to 360°","0° to 180°","−90° to 90°"],ans:2},
-    {q:"Why should multiple servos use a separate power supply?",opts:["They need AC power","They draw too much current for the Arduino","They require 12V","They communicate via SPI"],ans:1}
+    {q:"Unlike a DC motor, a servo motor:",opts:["Spins continuously at full speed","Rotates to a specific angle and holds it","Only works on 12V","Requires no control signal"],ans:1},
+    {q:"What pulse width commands a servo to its 90° centre position?",opts:["0.5ms","1ms","1.5ms","2ms"],ans:2},
+    {q:"Why should 3 or more servos be powered from a separate supply rather than the Arduino 5V pin?",opts:["They need AC power","They draw more current than the Arduino 5V pin can supply","They require 12V","They use I2C communication"],ans:1}
   ]},
-  /* 2 - Intro to Arduino */
+  /* 2 - Coding for Beginners — Your First Steps */
   { qs:[
-    {q:"Which function runs once when an Arduino powers on?",opts:["loop()","begin()","setup()","start()"],ans:2},
-    {q:"pinMode(13, OUTPUT) sets pin 13 as:",opts:["An input that reads voltage","An output that sends voltage","An analog input","A PWM channel"],ans:1},
-    {q:"delay(1000) pauses the program for:",opts:["1 millisecond","100ms","1 second","10 seconds"],ans:2}
+    {q:"Which tool is recommended for someone who has never written any code before?",opts:["Arduino C++ IDE","Block-based coding like Scratch","Python on Raspberry Pi","Assembly language"],ans:1},
+    {q:"Why is Python recommended as a text-based starter language?",opts:["It's the fastest language","It reads almost like plain English with minimal syntax","It works directly on Arduino hardware","It requires no computer"],ans:1},
+    {q:"What is the recommended beginner learning order?",opts:["C++ → Python → Scratch","Scratch/Blockly → Python → Arduino C++","Python → Scratch → Assembly","Arduino → Scratch → Python"],ans:1}
   ]},
-  /* 3 - C++ for Robotics */
+  /* 3 - Arduino C++ Basics */
   { qs:[
-    {q:"What does 'volatile' do when used with a variable in an ISR?",opts:["Stores it in EEPROM","Prevents compiler from caching it","Makes it global","Doubles its size"],ans:1},
-    {q:"A struct in C++ groups:",opts:["Functions only","Variables of different types","Classes together","Pointers only"],ans:1},
-    {q:"int arr[5] declares an array that holds how many integers?",opts:["4","5","6","10"],ans:1}
+    {q:"Which Arduino function runs once when the board powers on?",opts:["loop()","begin()","setup()","start()"],ans:2},
+    {q:"Why should you avoid using the String class on Arduino Uno for repeated concatenation?",opts:["It's too slow","It causes heap fragmentation and memory instability","It's not available on Uno","It blocks the loop() function"],ans:1},
+    {q:"What does 'DDRB |= (1 << 5)' do?",opts:["Reads pin 13","Sets pin 13 (PB5) as an OUTPUT using direct port manipulation","Toggles pin 13","Disables pin 13"],ans:1}
   ]},
   /* 4 - Power Systems */
   { qs:[
-    {q:"Li-Po batteries should never be discharged below:",opts:["2V/cell","3V/cell","4V/cell","1.5V/cell"],ans:1},
-    {q:"A buck converter steps voltage:",opts:["Up","Down","Both directions","Neither"],ans:1},
-    {q:"Why use a capacitor across motor power rails?",opts:["Increase voltage","Filter voltage spikes","Store energy long-term","Reduce current"],ans:1}
+    {q:"What is the minimum safe discharge voltage per cell for a Li-Po battery?",opts:["2V/cell","3V/cell","4V/cell","1.5V/cell"],ans:1},
+    {q:"Why use a buck converter instead of an LM7805 linear regulator in a battery-powered robot?",opts:["Buck converters are simpler","Buck converters are 85–95% efficient, wasting less energy as heat","Buck converters provide higher voltage","LM7805 requires I2C configuration"],ans:1},
+    {q:"Using the runtime formula: a 2000mAh battery with a 500mA total draw lasts approximately:",opts:["1 hour","2 hours","4 hours","10 hours"],ans:2}
   ]},
-  /* 5 - PID Control */
+  /* 5 - PID Control Theory */
   { qs:[
-    {q:"Which PID term eliminates steady-state error?",opts:["Proportional","Integral","Derivative","Feedforward"],ans:1},
-    {q:"A high Kd (derivative gain) primarily helps with:",opts:["Speed","Overshoot and oscillation","Steady-state error","Sensor noise"],ans:1},
-    {q:"Error in PID is defined as:",opts:["Current speed","Setpoint minus measured value","Measured value only","Output signal"],ans:1}
+    {q:"Which PID term accumulates past error to eliminate steady-state offset?",opts:["Proportional (P)","Integral (I)","Derivative (D)","Feedforward"],ans:1},
+    {q:"Error in a PID controller is defined as:",opts:["The output signal value","Setpoint minus the measured value","The measured value only","The derivative of the output"],ans:1},
+    {q:"A high Kd (derivative) gain primarily helps by:",opts:["Increasing speed of response","Reducing overshoot and oscillation","Eliminating steady-state error","Increasing the setpoint"],ans:1}
   ]},
-  /* 6 - PWM & Motor Control */
+  /* 6 - PWM & Analog Control */
   { qs:[
-    {q:"A 50% PWM duty cycle on a 5V pin gives an effective voltage of:",opts:["5V","1V","2.5V","0V"],ans:2},
-    {q:"Why is an H-bridge needed to drive a DC motor?",opts:["To add WiFi","To amplify current & allow direction reversal","To convert I2C to UART","To reduce noise"],ans:1},
+    {q:"A 50% PWM duty cycle on a 5V Arduino pin delivers an effective voltage of:",opts:["5V","1V","2.5V","0V"],ans:2},
+    {q:"On Arduino Uno, which function is used to output a PWM signal?",opts:["digitalWrite()","pwmWrite()","analogWrite()","serialWrite()"],ans:2},
     {q:"analogWrite(pin, 128) sets a duty cycle of approximately:",opts:["25%","50%","75%","100%"],ans:1}
   ]},
-  /* 7 - I2C & SPI */
+  /* 7 - I2C & SPI Protocols */
   { qs:[
-    {q:"I2C requires how many wires (excluding power)?",opts:["1","2","3","4"],ans:1},
-    {q:"SPI is faster than I2C because:",opts:["It uses fewer wires","It has a dedicated clock and separate MOSI/MISO lines","It uses less power","It has error correction"],ans:1},
-    {q:"What is the purpose of pull-up resistors on I2C lines?",opts:["Limit current","Pull lines HIGH when idle","Speed up communication","Filter noise"],ans:1}
+    {q:"I2C communication requires how many signal wires (excluding power and ground)?",opts:["1","2","3","4"],ans:1},
+    {q:"What is the purpose of pull-up resistors on I2C SDA and SCL lines?",opts:["Limit current to protect the MCU","Pull the lines HIGH when idle so devices can pull them LOW","Speed up communication","Filter electrical noise"],ans:1},
+    {q:"SPI is generally faster than I2C because:",opts:["It uses fewer wires","It has dedicated clock and separate MOSI/MISO data lines","It uses less power","It has built-in error correction"],ans:1}
   ]},
   /* 8 - Hardware Interrupts */
   { qs:[
-    {q:"An ISR (Interrupt Service Routine) should be:",opts:["Long and detailed","As short and fast as possible","Blocking","Recursive"],ans:1},
-    {q:"RISING edge interrupt fires when a pin goes from:",opts:["HIGH to LOW","LOW to HIGH","Any change","LOW to LOW"],ans:1},
-    {q:"Variables shared between main code and ISRs must be declared:",opts:["static","extern","volatile","const"],ans:2}
+    {q:"Why are hardware interrupts preferred over polling for encoder pulse counting?",opts:["They use less power","Polling can miss fast pulses that occur between loop() checks; interrupts catch every event","They are easier to code","They work on all pins"],ans:1},
+    {q:"A RISING edge interrupt fires when a pin transitions from:",opts:["HIGH to LOW","LOW to HIGH","Any voltage change","LOW to LOW"],ans:1},
+    {q:"Variables shared between main code and an ISR must be declared as:",opts:["static","extern","volatile","const"],ans:2}
   ]},
-  /* 9 - OLED Displays */
+  /* 9 - OLED Display Programming */
   { qs:[
     {q:"The SSD1306 OLED most commonly communicates via:",opts:["UART","SPI only","I2C or SPI","CAN bus"],ans:2},
-    {q:"display.clearDisplay() should be called before drawing because:",opts:["It refreshes the I2C bus","It clears the buffer so old content doesn't show","It resets the cursor","It increases contrast"],ans:1},
-    {q:"display.display() is needed because:",opts:["It powers on the screen","It sends the buffer to the physical display","It initialises the library","It sets the I2C address"],ans:1}
+    {q:"Why must display.clearDisplay() be called before drawing new content?",opts:["It refreshes the I2C bus","It clears the buffer so old content does not bleed through to the next frame","It resets the cursor position","It increases screen contrast"],ans:1},
+    {q:"What does display.display() actually do?",opts:["Powers on the OLED screen","Sends the in-memory buffer to the physical display pixels","Initialises the Adafruit library","Sets the I2C device address"],ans:1}
   ]},
-  /* 10 - ESP32 & IoT */
+  /* 10 - ESP32 WiFi & IoT */
   { qs:[
-    {q:"ESP32 runs at what CPU speed?",opts:["16 MHz","72 MHz","240 MHz","1 GHz"],ans:2},
-    {q:"WiFi.begin(ssid, password) initiates:",opts:["A Bluetooth connection","A WiFi connection to a router","An OTA update","An HTTP server"],ans:1},
-    {q:"MQTT is a messaging protocol best described as:",opts:["File transfer","Publish/subscribe lightweight messaging","Video streaming","Database query"],ans:1}
+    {q:"What is one key hardware advantage the ESP32 has over the Arduino Uno?",opts:["Larger physical size","Built-in WiFi and Bluetooth with a 240MHz dual-core CPU","Supports only I2C","Runs on AC power"],ans:1},
+    {q:"WiFi.begin(ssid, password) initiates:",opts:["A Bluetooth Classic pairing","A WiFi connection to the specified router","An OTA firmware update","An HTTP web server"],ans:1},
+    {q:"MQTT is best described as:",opts:["A file transfer protocol","A lightweight publish/subscribe messaging protocol","A video streaming standard","A database query language"],ans:1}
   ]},
   /* 11 - Finite State Machines */
   { qs:[
-    {q:"A Finite State Machine helps avoid:",opts:["Low memory","Complex nested if/else spaghetti","Slow WiFi","Float rounding errors"],ans:1},
-    {q:"In an FSM, a 'transition' is:",opts:["A power state","A condition that changes the current state","An output signal","A timer"],ans:1},
-    {q:"Which is NOT a valid FSM state for a robot?",opts:["IDLE","MOVING","OBSTACLE_DETECTED","COMPILE_ERROR"],ans:2}
+    {q:"What problem do Finite State Machines primarily solve in robot code?",opts:["Slow WiFi connections","Tangled, hard-to-maintain nested if/else spaghetti logic","Low battery","Float rounding errors"],ans:1},
+    {q:"In an FSM, a 'transition' is:",opts:["A power supply state","A condition or event that moves the machine from one state to another","An output signal value","A hardware timer"],ans:1},
+    {q:"Which of the following is NOT a valid robot FSM state?",opts:["IDLE","MOVING","OBSTACLE_DETECTED","COMPILE_ERROR"],ans:3}
   ]},
-  /* 12 - Motor Drivers */
+  /* 12 - Motor Drivers & H-Bridge */
   { qs:[
-    {q:"An H-bridge gets its name from:",opts:["Its inventor","The shape of the transistor circuit","Its power rating","The H in High-current"],ans:1},
-    {q:"To reverse a DC motor with an L298N, you must:",opts:["Reduce PWM","Swap the IN1/IN2 logic signals","Increase voltage","Add a capacitor"],ans:1},
-    {q:"EN (Enable) pin on L298N controls:",opts:["Direction","Motor speed via PWM","Power supply","Communication"],ans:1}
+    {q:"Why does a DC motor need a motor driver IC rather than connecting directly to an Arduino pin?",opts:["Arduino pins output AC voltage","A motor draws 200mA–5A but an Arduino pin can only supply ~40mA","Motors require I2C signals","Drivers convert digital to analog"],ans:1},
+    {q:"To reverse a DC motor using an L298N, you must:",opts:["Reduce the PWM duty cycle to zero","Swap the IN1/IN2 logic signal levels","Increase the supply voltage","Add a capacitor across the motor terminals"],ans:1},
+    {q:"The EN (Enable) pin on an L298N motor driver controls:",opts:["Motor direction","Motor speed via PWM","The power supply voltage","I2C communication"],ans:1}
   ]},
-  /* 13 - Build Your First Robot */
+  /* 13 - Project 1 — Vibrobot */
   { qs:[
-    {q:"Before uploading code to Arduino, you must select the correct:",opts:["Font in IDE","Board and COM port","Library version","Screen resolution"],ans:1},
-    {q:"If a sensor reading is unstable, the first thing to check is:",opts:["The code logic","Power and ground connections","WiFi signal","Library version"],ans:1},
-    {q:"A chassis in robotics refers to:",opts:["The microcontroller","The physical frame/body of the robot","The motor driver","The power supply"],ans:1}
+    {q:"What three things does every complete electrical circuit need?",opts:["Battery, wire, LED","Power source, a component that consumes power, and a return path","Resistor, capacitor, and switch","Voltage, current, and resistance only"],ans:1},
+    {q:"Why does a vibrobot move forward rather than just vibrating on the spot?",opts:["The motor is magnetic","The angled bristles act as a one-way ratchet, converting vibration into forward motion","The battery is offset","The motor spins in one direction only"],ans:1},
+    {q:"What type of motor makes a vibrobot move?",opts:["Servo motor","Stepper motor","Eccentric mass (coin vibration) motor","Brushless DC motor"],ans:2}
   ]},
-  /* 14 - Sensors Deep Dive */
+  /* 14 - Project 2 — Line Follower Robot */
   { qs:[
-    {q:"An HC-SR04 ultrasonic sensor measures distance using:",opts:["Light pulses","Sound wave echo timing","Magnetic fields","Infrared reflection"],ans:1},
-    {q:"An IR sensor detects dark surfaces because they:",opts:["Reflect IR light","Absorb IR light (no reflection back)","Emit IR light","Block ultrasonic waves"],ans:1},
-    {q:"A PIR sensor detects:",opts:["Distance","Changes in infrared radiation (motion)","Colour","Temperature directly"],ans:1}
+    {q:"How does an IR sensor detect a black line on a white surface?",opts:["Black lines reflect more IR light","Black lines absorb IR light so the receiver gets no reflection back","White surfaces absorb all IR light","The sensor measures colour temperature"],ans:1},
+    {q:"In the line-follower logic, what happens when BOTH IR sensors detect white (off the line)?",opts:["The robot stops","The robot reverses","The robot drives straight forward","The robot turns left"],ans:2},
+    {q:"What does the ENA pin on the L298N motor driver control in the line-follower project?",opts:["Motor direction","Motor speed via PWM","Power supply","Serial communication"],ans:1}
   ]},
-  /* 15 - Bluetooth & Wireless */
+  /* 15 - Bluetooth & RF Communication */
   { qs:[
-    {q:"HC-05 Bluetooth module communicates with Arduino via:",opts:["I2C","SPI","UART (Serial)","PWM"],ans:2},
-    {q:"What is the typical range of HC-05 in open space?",opts:["1–2m","10m","100m","1km"],ans:1},
-    {q:"AT commands are used to:",opts:["Flash firmware","Configure the HC-05 module settings","Send sensor data","Power the module"],ans:1}
+    {q:"The HC-05 Bluetooth module communicates with Arduino via:",opts:["I2C","SPI","UART serial","PWM signal"],ans:2},
+    {q:"What is the typical open-space range of the HC-05 module?",opts:["1–2 metres","~10 metres","100 metres","1 kilometre"],ans:1},
+    {q:"AT commands are used with the HC-05 to:",opts:["Flash new firmware","Configure module settings such as name, PIN, and baud rate","Transmit sensor data","Provide power to the module"],ans:1}
   ]},
-  /* 16 - Robot Navigation */
+  /* 16 - Robot Navigation & Pathfinding */
   { qs:[
-    {q:"Dead reckoning estimates position using:",opts:["GPS","Known speed and heading over time","Camera vision","Ultrasonic sensors"],ans:1},
-    {q:"An encoder on a motor measures:",opts:["Temperature","Speed and direction of rotation","Battery level","PWM duty cycle"],ans:1},
-    {q:"PID is used in line-following to:",opts:["Detect obstacles","Correct steering error based on sensor position","Control Bluetooth","Manage power"],ans:1}
+    {q:"Dead reckoning estimates a robot's position using:",opts:["GPS coordinates","Known speed and heading integrated over time","Camera vision","Ultrasonic sensor readings"],ans:1},
+    {q:"A wheel encoder on a motor measures:",opts:["Battery temperature","Speed and direction of rotation by counting pulses","PWM duty cycle","WiFi signal strength"],ans:1},
+    {q:"PID control is used in a line-following robot to:",opts:["Detect obstacles ahead","Continuously correct the steering error based on sensor position relative to the line","Manage Bluetooth connections","Monitor battery voltage"],ans:1}
   ]},
-  /* 17 - Computer Vision */
+  /* 17 - Computer Vision Basics */
   { qs:[
-    {q:"OpenCV's primary function is:",opts:["Database management","Image processing and computer vision","WiFi management","Motor control"],ans:1},
-    {q:"A contour in image processing represents:",opts:["Pixel colour average","A curve joining continuous points of same colour/intensity","The frame border","A histogram"],ans:1},
-    {q:"HSV colour space is preferred over RGB for detection because:",opts:["It uses fewer bytes","Hue separates colour from lighting conditions","It's faster to compute","It has higher resolution"],ans:1}
+    {q:"Why is HSV colour space preferred over RGB for colour detection in OpenCV?",opts:["It uses fewer bytes of memory","The Hue channel separates colour from lighting conditions, making detection more reliable","It is faster to compute on all hardware","It has higher pixel resolution"],ans:1},
+    {q:"What does cv2.inRange() do in a colour detection pipeline?",opts:["Resizes the image","Creates a binary mask isolating pixels within a specified colour range","Detects edges","Finds contours"],ans:1},
+    {q:"A contour in OpenCV image processing represents:",opts:["The average colour of a region","A curve connecting continuous points of the same colour or intensity boundary","The image frame border","A brightness histogram"],ans:1}
   ]},
-  /* 18 - 3D Printing for Robots */
+  /* 18 - 3D Printing for Robotics */
   { qs:[
-    {q:"FDM 3D printing builds parts by:",opts:["Curing resin with UV light","Melting and extruding filament layer by layer","Sintering metal powder","Cutting material away"],ans:1},
-    {q:"Infill percentage in a 3D print affects:",opts:["Print colour","Part strength and weight","Layer height","Nozzle temperature"],ans:1},
-    {q:"PLA filament is popular for beginners because:",opts:["It's waterproof","It's easy to print and biodegradable","It's the strongest","It requires a heated bed"],ans:1}
+    {q:"FDM 3D printing builds parts by:",opts:["Curing liquid resin with UV light","Melting and extruding filament layer by layer","Sintering metal powder with a laser","Cutting material away with a CNC router"],ans:1},
+    {q:"Which filament is recommended for beginners because it's easy to print and biodegradable?",opts:["ABS","TPU","PETG","PLA"],ans:3},
+    {q:"Why should gears and structural robotics parts be printed with 40–60% infill?",opts:["To save filament cost","To balance strength and weight for load-bearing applications","Lower infill always prints faster","High infill causes warping"],ans:1}
   ]},
-  /* 19 - Team Project */
+  /* 19 - Raspberry Pi & Linux Robotics */
   { qs:[
-    {q:"Version control (e.g. Git) in team projects helps:",opts:["Speed up motors","Track code changes and collaborate","Improve sensor accuracy","Reduce power consumption"],ans:1},
-    {q:"A system diagram before building helps:",opts:["Choose filament colour","Map component connections and catch design issues early","Speed up printing","Pick a team name"],ans:1},
-    {q:"When a robot behaves unexpectedly, the best first step is:",opts:["Rewrite all the code","Isolate and test each subsystem individually","Replace all sensors","Add more power"],ans:1}
+    {q:"What is the main role of a Raspberry Pi in a robot that also has an Arduino?",opts:["Direct motor control at millisecond speed","High-level computation — vision, AI, web servers, coordinating subsystems","Supplying power to sensors","Running the Servo library"],ans:1},
+    {q:"In the common Pi + Arduino architecture, which handles real-time motor and sensor control?",opts:["Raspberry Pi","Arduino / microcontroller","Both equally","Neither — a separate FPGA does it"],ans:1},
+    {q:"RPi.GPIO.setup(pin, GPIO.OUT) in Python does what?",opts:["Reads the current pin voltage","Configures the specified GPIO pin as an output","Starts the I2C bus","Sets the PWM frequency"],ans:1}
   ]},
-  /* 20 - Logic & Algorithms */
+  /* 20 - Project 3 — Obstacle Avoidance Rover */
   { qs:[
-    {q:"A while loop runs as long as its condition is:",opts:["False","True","Zero","Undefined"],ans:1},
-    {q:"What does a flowchart represent?",opts:["Circuit diagram","Step-by-step logic/algorithm visually","Power distribution","Sensor wiring"],ans:1},
-    {q:"Boolean logic uses values of:",opts:["0–255","0 and 1 (true/false)","−1 to 1","Any integer"],ans:1}
+    {q:"What sensor does the obstacle avoidance rover use to detect objects ahead?",opts:["IR sensor","PIR motion sensor","HC-SR04 ultrasonic sensor","LDR light sensor"],ans:2},
+    {q:"The HC-SR04 ECHO pin goes HIGH for:",opts:["A fixed 10 microseconds","As long as the echo sound wave takes to return — which is proportional to distance","The duration of the TRIG pulse","500 microseconds always"],ans:1},
+    {q:"What is the avoidance routine sequence when an obstacle is detected?",opts:["Turn immediately then continue","Stop → back up → turn → continue forward","Speed up to pass the obstacle","Flash an LED and halt permanently"],ans:1}
   ]},
-  /* 21 - Safety & Best Practices */
+  /* 21 - Project 4 — Cardboard Robotic Arm */
   { qs:[
-    {q:"Before modifying a live circuit, you should always:",opts:["Work faster","Power it off first","Add more LEDs","Check WiFi"],ans:1},
-    {q:"A fuse in a power circuit protects against:",opts:["Low voltage","Overcurrent that could damage components","High frequency noise","Signal interference"],ans:1},
-    {q:"ESD (Electrostatic Discharge) can damage components by:",opts:["Overheating them","Delivering a static voltage spike","Reversing polarity","Draining the battery"],ans:1}
+    {q:"Inside a servo motor, what component tracks the current arm angle?",opts:["An encoder disc","A potentiometer wired to the output shaft","A Hall-effect sensor","A second motor"],ans:1},
+    {q:"The Servo library function to move a servo to 90 degrees is:",opts:["servo.set(90)","servo.move(90)","servo.write(90)","servo.angle(90)"],ans:2},
+    {q:"Why is it recommended to add a delay() between servo movements in a sequence?",opts:["To charge the servo capacitor","To allow the servo time to physically reach the target angle before the next command","To reset the PWM timer","To prevent I2C bus collisions"],ans:1}
+  ]},
+  /* 22 - Electricity & Circuits — The Foundation */
+  { qs:[
+    {q:"Voltage is best described as:",opts:["The flow of electrons per second","Electric pressure that pushes electrons around a circuit","The opposition to current flow","The energy stored in a capacitor"],ans:1},
+    {q:"Using Ohm's Law: a 5V supply, LED forward voltage 2V, target current 20mA — the required resistor is:",opts:["100Ω","150Ω","500Ω","1000Ω"],ans:1},
+    {q:"What is the most common beginner mistake that makes a sensor appear completely dead?",opts:["Wrong code uploaded","Forgetting to connect the sensor's GND to Arduino GND","Using the wrong PWM pin","Wrong baud rate in Serial Monitor"],ans:1}
+  ]},
+  /* 23 - Your First Arduino Sketch — LED Blink */
+  { qs:[
+    {q:"What does pinMode(13, OUTPUT) do?",opts:["Turns pin 13 on immediately","Declares to Arduino that pin 13 will be used as an output","Sets pin 13 to 5V","Reads the state of pin 13"],ans:1},
+    {q:"delay(1000) pauses the program for:",opts:["1 microsecond","100 milliseconds","1 second","10 seconds"],ans:2},
+    {q:"Arduino Uno has a built-in LED connected to which pin?",opts:["Pin 0","Pin 1","Pin 12","Pin 13"],ans:3}
+  ]},
+  /* 24 - Breadboards & Electronic Components */
+  { qs:[
+    {q:"On a breadboard, the long edge rails are used for:",opts:["Signal wires between components","Distributing power (5V) and ground (GND) to the whole board","Connecting the two sides of the board","Holding IC chips in place"],ans:1},
+    {q:"LEDs are polarised — what happens if you insert one backwards on a breadboard?",opts:["It burns out immediately","It simply does not light up but is not damaged","It lights up dimly","It reverses the voltage rail"],ans:1},
+    {q:"Why should you never measure resistance with a multimeter in a live (powered) circuit?",opts:["The reading will be in the wrong units","It can damage the multimeter","Resistance changes when powered","The meter needs AC, not DC"],ans:1}
+  ]},
+  /* 25 - Digital I/O — Buttons & LEDs */
+  { qs:[
+    {q:"What problem does a floating pin cause?",opts:["The pin draws too much current","The pin reads random HIGH/LOW noise because it has no defined voltage when the button is open","The LED turns on by itself","The Arduino resets"],ans:1},
+    {q:"When using INPUT_PULLUP, pressing a button that connects the pin to GND makes the pin read:",opts:["HIGH","LOW","Floating","5V"],ans:1},
+    {q:"Button bouncing occurs because:",opts:["The resistor value is too high","Mechanical contacts briefly make and break contact multiple times when pressed","The button is wired backwards","The Arduino runs too slowly"],ans:1}
+  ]},
+  /* 26 - Analog Sensors — Reading the World */
+  { qs:[
+    {q:"Arduino Uno's analogRead() returns a value in what range?",opts:["0–255","0–512","0–1023","0–4095"],ans:2},
+    {q:"How do you wire a potentiometer to create a variable voltage input for Arduino?",opts:["Connect only the centre wiper to A0","Connect ends to 5V and GND, wiper to A0","Connect all three legs to analog pins","Connect ends to two digital pins"],ans:1},
+    {q:"An LDR (Light Dependent Resistor) in a voltage divider circuit: in bright light the resistance falls, so the voltage at the analog pin:",opts:["Drops to zero","Rises","Stays constant","Becomes negative"],ans:1}
+  ]},
+  /* 27 - Serial Monitor & Debugging */
+  { qs:[
+    {q:"The baud rate in Serial.begin() and the Arduino IDE Serial Monitor must be:",opts:["Different to avoid conflicts","The same on both sides","Set to 115200 always","Set automatically"],ans:0},
+    {q:"What is the difference between Serial.print() and Serial.println()?",opts:["println() prints numbers only","println() adds a newline at the end; print() stays on the same line","print() is faster","There is no difference"],ans:1},
+    {q:"The Serial Plotter (Tools → Serial Plotter) is useful for:",opts:["Uploading code wirelessly","Visualising numeric sensor values as a live scrolling graph","Reading incoming Bluetooth data","Configuring the baud rate automatically"],ans:1}
   ]}
 ];
 
