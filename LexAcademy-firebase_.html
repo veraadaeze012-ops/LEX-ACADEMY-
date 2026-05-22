@@ -513,7 +513,13 @@ body{overflow:hidden}
 .post-user{font-size:13px;font-weight:500}
 .post-time{font-size:11.5px;color:var(--text3)}
 .post-text{font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
-.post-actions{display:flex;gap:14px}
+.post-bell-btn{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .12s,opacity .12s;flex-shrink:0}
+.post-bell-btn:hover{background:var(--bg)}
+.post-bell-btn svg{width:15px;height:15px;stroke:var(--text3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .12s,fill .12s}
+.post-bell-btn.following svg{stroke:var(--blue);fill:rgba(59,130,246,.12)}
+.post-bell-btn.following{background:rgba(59,130,246,.06)}
+body.dark .post-bell-btn.following svg{stroke:#c9a84c;fill:rgba(201,168,76,.12)}
+body.dark .post-bell-btn.following{background:rgba(201,168,76,.07)}
 .post-action{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;transition:color .12s}
 .post-action:hover{color:var(--text2)}
 .post-action.liked{color:var(--red)}
@@ -1227,7 +1233,11 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
             <div class="profile-stat"><div class="profile-stat-num" id="ps-done">0</div><div class="profile-stat-label">Lessons done</div></div>
             <div class="profile-stat"><div class="profile-stat-num" id="ps-xp">0</div><div class="profile-stat-label">Total XP</div></div>
             <div class="profile-stat"><div class="profile-stat-num" id="ps-streak">0</div><div class="profile-stat-label">Day streak 🔥</div></div>
-            <div class="profile-stat"><div class="profile-stat-num" id="ps-followers">0</div><div class="profile-stat-label">Followers 🔔</div></div>
+          </div>
+          <!-- Followers count: only the profile owner sees this -->
+          <div id="followersStatRow" style="display:none;align-items:center;gap:8px;margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:var(--r-xs);border:1px solid var(--border)">
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:var(--text2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span style="font-size:13px;color:var(--text2)"><strong id="followersCountDisplay" style="color:var(--text)">0</strong> people have turned on notifications for you</span>
           </div>
         </div>
 
@@ -2651,6 +2661,8 @@ const EMOJIS = [
 // Community starts clean — real users make real posts
 
 let db, postsListener = null, postsRef = null;
+let followedUsers = {};      // { [authorUid]: true } — users this person has bell-followed
+let followersListener = null; // Firebase listener for own followers count
 
 function initCommunity() {
   // Only start listener once — onAuthStateChanged can fire multiple times
@@ -2666,17 +2678,16 @@ function startPostsListener() {
 
   // child_added fires for EVERY existing post on load, then for new ones.
   // We suppress notifications for the initial bulk load using postsInitDone.
-  // Notifications only fire for users the current user follows.
+  // After that, only notify if the current user is following that author.
   postsRef.on('child_added', snap => {
     if (!postsInitDone) return; // skip history on initial load
     const post = { id: snap.key, ...snap.val() };
     const uid  = auth.currentUser?.uid;
-    // Don't notify for your own posts or unknown authors
-    if (!uid || !post.authorUid || post.authorUid === uid) return;
-    // Only notify if the current user follows this poster
-    db.ref('users/' + uid + '/following/' + post.authorUid).once('value', fSnap => {
-      if (fSnap.val() === true) addNotification(post);
-    });
+    // Don't notify for your own posts
+    if (post.authorUid && post.authorUid === uid) return;
+    // Only notify if user has bell-followed this author
+    if (!post.authorUid || !followedUsers[post.authorUid]) return;
+    addNotification(post);
   });
 
   postsListener = postsRef.on('value',
@@ -2706,7 +2717,50 @@ function startPostsListener() {
   );
 }
 
+/* ── Load which users the current user is following (bell subscriptions) ── */
+function loadFollowedUsers(uid) {
+  db.ref(`users/${uid}/following`).on('value', snap => {
+    followedUsers = snap.val() || {};
+    renderPosts(lastRenderedPosts || []);
+  });
+}
+
+/* ── Load and listen to own followers count (only visible to the profile owner) ── */
+function loadOwnFollowersCount(uid) {
+  if (followersListener) return;
+  followersListener = db.ref(`users/${uid}/followers`).on('value', snap => {
+    const count = snap.val() ? Object.keys(snap.val()).length : 0;
+    const el = document.getElementById('followersCountDisplay');
+    if (el) {
+      el.textContent = count;
+      const row = document.getElementById('followersStatRow');
+      if (row) row.style.display = count > 0 ? 'flex' : 'none';
+    }
+  });
+}
+
+/* ── Toggle bell-follow for a specific author ── */
+function toggleFollowUser(authorUid, authorName) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !authorUid) return;
+  const isFollowing = !!followedUsers[authorUid];
+  if (isFollowing) {
+    // Unfollow
+    db.ref(`users/${uid}/following/${authorUid}`).remove();
+    db.ref(`users/${authorUid}/followers/${uid}`).remove();
+    showToast(`🔕 You'll no longer get notifications for ${authorName}`);
+  } else {
+    // Follow
+    db.ref(`users/${uid}/following/${authorUid}`).set(true);
+    db.ref(`users/${authorUid}/followers/${uid}`).set(true);
+    showToast(`🔔 You'll be notified when ${authorName} posts`);
+  }
+}
+
+let lastRenderedPosts = [];
+
 function renderPosts(posts) {
+  if (posts.length) lastRenderedPosts = posts;
   const uid = auth.currentUser?.uid;
   const listEl = document.getElementById('postList');
   if (!listEl) return;
@@ -2725,19 +2779,20 @@ function renderPosts(posts) {
     const initial = ((p.user || '?').charAt(0)).toUpperCase();
     const avBg = p.authorColor || p.av || '#333';
     const isOwn = uid && p.authorUid === uid;
-    // Avatar: show photo if available, else colour + initial
+    const isFollowing = uid && followedUsers[p.authorUid];
+
+    // Avatar: show photo if stored, else color+initial
     const avHtml = p.authorPhoto
-      ? `<div class="post-av" style="background:${avBg};padding:0;overflow:hidden"><img src="${escHtml(p.authorPhoto)}" alt="${escHtml(initial)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
+      ? `<div class="post-av" style="background:transparent"><img src="${p.authorPhoto}" alt="${escHtml(initial)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
       : `<div class="post-av" style="background:${avBg}">${escHtml(initial)}</div>`;
-    // Follow button (not shown on own posts)
-    const followBtn = (!isOwn && p.authorUid)
-      ? `<button class="post-action follow-btn" id="followBtn-${p.id}" data-author="${p.authorUid}" onclick="toggleFollow('${p.authorUid}','${p.id}')" style="font-size:11.5px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:none;cursor:pointer;font-family:var(--font);color:var(--text2);transition:all .15s">Follow</button>`
-      : '';
+
     return `<div class="post-card" data-post-id="${p.id}">
       <div class="post-head">
         ${avHtml}
         <div style="flex:1;min-width:0"><div class="post-user">${escHtml(p.user || 'Student')}</div><div class="post-time">${timeStr}</div></div>
-        ${followBtn}
+        ${!isOwn && p.authorUid ? `<button class="post-bell-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollowUser('${p.authorUid}','${escHtml(p.user||'Student')}')" title="${isFollowing ? 'Stop notifications for '+escHtml(p.user||'this person') : 'Notify me when '+escHtml(p.user||'this person')+' posts'}">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>${isFollowing ? '<line x1="1" y1="1" x2="23" y2="23" style="display:none"/>' : ''}</svg>
+        </button>` : ''}
         ${isOwn ? `<button class="post-action" onclick="deletePost('${p.id}')" title="Delete post" style="color:var(--text3);padding:2px 6px;border-radius:6px;transition:color .12s,background .12s" onmouseover="this.style.color='var(--red)';this.style.background='rgba(239,68,68,.06)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">✕</button>` : ''}
       </div>
       <div class="post-text">${escHtml(p.text || '')}</div>
@@ -2751,74 +2806,15 @@ function renderPosts(posts) {
           <button onclick="submitReply('${p.id}')" style="background:var(--dark);color:#fff;border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);flex-shrink:0;margin-top:2px">Send</button>
         </div>
       </div>
-      ${p.replies ? '<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">' + Object.values(p.replies).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).map(r=>{
-        const rInitial = escHtml((r.user||'?').charAt(0).toUpperCase());
-        const rAvHtml = r.authorPhoto
-          ? `<div style="width:24px;height:24px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${escHtml(r.authorPhoto)}" alt="${rInitial}" style="width:100%;height:100%;object-fit:cover"></div>`
-          : `<div style="width:24px;height:24px;border-radius:50%;background:${r.authorColor||'#555'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0">${rInitial}</div>`;
-        return `<div style="display:flex;gap:8px;align-items:flex-start;background:var(--bg);border-radius:8px;padding:8px 10px">
-          ${rAvHtml}
+      ${p.replies ? '<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">' + Object.values(p.replies).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).map(r=>`
+        <div style="display:flex;gap:8px;align-items:flex-start;background:var(--bg);border-radius:8px;padding:8px 10px">
+          ${r.authorPhoto
+            ? `<img src="${r.authorPhoto}" alt="${escHtml((r.user||'?').charAt(0).toUpperCase())}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+            : `<div style="width:24px;height:24px;border-radius:50%;background:${r.authorColor||'#555'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0">${escHtml((r.user||'?').charAt(0).toUpperCase())}</div>`}
           <div><div style="font-size:12px;font-weight:500;margin-bottom:2px">${escHtml(r.user||'Student')}</div><div style="font-size:13px;color:var(--text2);line-height:1.55">${escHtml(r.text||'')}</div></div>
-        </div>`;
-      }).join('') + '</div>' : ''}
+        </div>`).join('') + '</div>' : ''}
     </div>`;
   }).join('');
-
-  // After rendering, hydrate follow button states
-  hydrateFollowButtons(posts, uid);
-}
-
-/* ── Follow / Unfollow ── */
-function toggleFollow(authorUid, postId) {
-  const uid = auth.currentUser?.uid;
-  if (!uid || !authorUid) return;
-  const ref = db.ref('users/' + uid + '/following/' + authorUid);
-  const fwdRef = db.ref('users/' + authorUid + '/followers/' + uid);
-  ref.once('value', snap => {
-    if (snap.val() === true) {
-      // Unfollow
-      ref.remove();
-      fwdRef.remove();
-    } else {
-      // Follow
-      ref.set(true);
-      fwdRef.set(true);
-      showToast('🔔 You'll now be notified when they post!');
-    }
-    // Re-hydrate all buttons for this author across all visible posts
-    hydrateFollowButtons(null, uid, authorUid);
-  });
-}
-
-function hydrateFollowButtons(posts, uid, specificAuthor) {
-  if (!uid) return;
-  // Gather all unique author UIDs from follow buttons
-  const btns = document.querySelectorAll('.follow-btn[data-author]');
-  const authors = new Set();
-  btns.forEach(btn => {
-    const a = btn.dataset.author;
-    if (!specificAuthor || a === specificAuthor) authors.add(a);
-  });
-  authors.forEach(authorUid => {
-    db.ref('users/' + uid + '/following/' + authorUid).once('value', snap => {
-      const following = snap.val() === true;
-      document.querySelectorAll(`.follow-btn[data-author="${authorUid}"]`).forEach(btn => {
-        btn.textContent = following ? 'Following' : 'Follow';
-        btn.style.color = following ? 'var(--blue)' : 'var(--text2)';
-        btn.style.borderColor = following ? 'var(--blue)' : 'var(--border)';
-        btn.style.background = following ? 'var(--blue-dim)' : 'none';
-      });
-    });
-  });
-}
-
-/* ── Followers count (visible only to the profile owner) ── */
-function loadFollowersCount(uid) {
-  db.ref('users/' + uid + '/followers').on('value', snap => {
-    const count = snap.exists() ? Object.keys(snap.val() || {}).length : 0;
-    const el = document.getElementById('ps-followers');
-    if (el) el.textContent = count;
-  });
 }
 
 function likePost(postId, currentlyLiked) {
@@ -2862,14 +2858,14 @@ function submitReply(postId) {
   if (!user) return;
   const name  = userProfile.displayName || user.displayName || user.email?.split('@')[0] || 'Student';
   const color = userProfile.avatarColor || colorFromUid(user.uid);
+  const photo = userProfile.photo || '';
   inp.value = '';
   document.getElementById('reply-' + postId).style.display = 'none';
-  const rPhoto = userProfile.photo || '';
   db.ref('community/posts/' + postId + '/replies').push({
     user: name,
     authorColor: color,
-    authorPhoto: rPhoto,
     authorUid: user.uid,
+    authorPhoto: photo,
     text: txt,
     timestamp: firebase.database.ServerValue.TIMESTAMP,
   });
@@ -2891,18 +2887,18 @@ function postMessage() {
 
   const name  = userProfile.displayName || user.displayName || user.email?.split('@')[0] || 'Student';
   const color = userProfile.avatarColor || colorFromUid(uid);
+  const photo = userProfile.photo || '';
 
   if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
   input.value = '';
   closeEmojiPanel();
 
-  const photo = userProfile.photo || '';
   db.ref('community/posts').push({
     user: name,
     av: color,
     authorColor: color,
-    authorPhoto: photo,
     authorUid: uid,
+    authorPhoto: photo,
     text: txt,
     timestamp: firebase.database.ServerValue.TIMESTAMP,
     likedBy: { _placeholder: true },
@@ -3063,8 +3059,6 @@ function loadUserProfile(uid) {
     // Update streak
     updateDailyStreak(uid);
     applyProfileToUI();
-    // Load followers count (only visible to the logged-in user on their own profile)
-    loadFollowersCount(uid);
   });
   // Load bookmarks
   db.ref(`users/${uid}/bookmarks`).on('value', snap => {
@@ -3076,6 +3070,10 @@ function loadUserProfile(uid) {
     userProjectsDone = snap.val() || {};
     renderProjects();
   });
+  // Load bell-followed users
+  loadFollowedUsers(uid);
+  // Load own followers count (private — only visible to this user)
+  loadOwnFollowersCount(uid);
 }
 
 function updateDailyStreak(uid) {
