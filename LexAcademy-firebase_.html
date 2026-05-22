@@ -2783,7 +2783,7 @@ function toggleFollow(authorUid, postId) {
       // Follow
       ref.set(true);
       fwdRef.set(true);
-      showToast('🔔 You'll now be notified when they post!');
+      showToast("🔔 You'll now be notified when they post!");
     }
     // Re-hydrate all buttons for this author across all visible posts
     hydrateFollowButtons(null, uid, authorUid);
