@@ -52,75 +52,7 @@ body.dark .toggle-switch input:checked + .toggle-track{background:var(--blue)}
 .settings-action-btn:hover{background:var(--bg);color:var(--text)}
 .settings-action-btn.danger{border-color:rgba(239,68,68,.3);color:var(--red)}
 .settings-action-btn.danger:hover{background:rgba(239,68,68,.06)}
-/* BOOKS PAGE */
-.books-hero{background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 60%,#16213e 100%);border-radius:var(--r);padding:28px 24px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
-.books-hero-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.5;margin-bottom:8px}
-.books-hero-title{font-size:22px;font-weight:600;letter-spacing:-.5px;margin-bottom:4px}
-.books-hero-sub{font-size:13px;opacity:.55;line-height:1.5}
-.books-hero-glyph{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:72px;opacity:.08;pointer-events:none}
-.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
-.book-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;gap:10px}
-.book-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1)}
-.book-cover{width:100%;aspect-ratio:3/4;border-radius:8px;background:linear-gradient(145deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:4px;position:relative;overflow:hidden}
-.book-cover-spine{position:absolute;left:0;top:0;bottom:0;width:6px;background:rgba(255,255,255,.1);border-radius:4px 0 0 4px}
-.book-progress-bar{height:3px;background:var(--bg);border-radius:2px;overflow:hidden}
-.book-progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s}
-.book-title{font-size:13.5px;font-weight:600;letter-spacing:-.2px;line-height:1.3}
-.book-author{font-size:11.5px;color:var(--text3)}
-.book-meta{font-size:11px;color:var(--text3);display:flex;gap:8px;align-items:center}
-.book-badge{display:inline-flex;padding:2px 8px;border-radius:10px;background:var(--blue-dim);color:var(--blue);font-size:10.5px;font-weight:600}
-/* BOOK READER */
-.book-reader-wrap{max-width:680px;margin:0 auto;padding-bottom:60px}
-.book-reader-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.book-back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .12s;flex-shrink:0}
-.book-back-btn:hover{background:var(--bg);color:var(--text)}
-.book-reader-title{font-size:16px;font-weight:600;letter-spacing:-.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.book-page-indicator{font-size:12px;color:var(--text3);flex-shrink:0;font-variant-numeric:tabular-nums}
-/* Page content */
-.book-page-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:32px;min-height:400px;margin-bottom:16px;position:relative}
-.book-page-text{font-size:14.5px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:var(--font)}
-.book-page-text:empty::after{content:'(This page has diagrams or images — refer to the PDF for visuals.)';color:var(--text3);font-style:italic}
-/* Navigation controls */
-.book-nav-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.book-nav-btn{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .12s}
-.book-nav-btn:hover:not(:disabled){background:var(--bg);color:var(--text)}
-.book-nav-btn:disabled{opacity:.35;cursor:default}
-.book-nav-btn.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
-.book-nav-btn.primary:hover{opacity:.85}
-body.dark .book-nav-btn.primary{background:#fff;color:#111;border-color:#fff}
-/* Page jump input */
-.book-page-jump{display:flex;align-items:center;gap:8px}
-.book-page-input{width:56px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:13px;color:var(--text);text-align:center;outline:none}
-.book-page-input:focus{border-color:var(--blue)}
-.book-page-jump-label{font-size:12px;color:var(--text3)}
-/* Bookmark strip */
-.book-bookmark-strip{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:16px}
-.book-bookmark-info{font-size:12.5px;color:var(--text2)}
-.book-bookmark-info strong{color:var(--text)}
-.book-bookmark-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:none;font-family:var(--font);font-size:12px;color:var(--text2);cursor:pointer;transition:all .12s}
-.book-bookmark-btn:hover{background:var(--bg);color:var(--text)}
-.book-bookmark-btn.marked{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
-.book-bookmark-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.book-bookmark-btn.marked svg{fill:var(--amber)}
-/* Resume banner */
-.book-resume-banner{display:none;background:var(--blue-dim);border:1px solid rgba(0,113,227,.2);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px}
-.book-resume-banner.show{display:flex}
-.book-resume-text{font-size:12.5px;color:var(--blue)}
-.book-resume-btn{padding:5px 12px;border-radius:7px;border:none;background:var(--blue);color:#fff;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer}
-/* Progress in books list */
-.book-read-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;background:var(--green-dim);color:var(--green);font-size:10.5px;font-weight:600}
-/* Table of contents */
-.book-toc-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:16px;overflow:hidden}
-.book-toc-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer}
-.book-toc-title{font-size:13px;font-weight:600}
-.book-toc-toggle{font-size:11.5px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font)}
-.book-toc-list{padding:6px 0;display:none}
-.book-toc-list.open{display:block}
-.book-toc-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;transition:background .1s;font-size:13px}
-.book-toc-item:hover{background:var(--bg)}
-.book-toc-num{font-size:11.5px;color:var(--text3);min-width:24px;font-weight:600}
-.book-toc-name{flex:1;color:var(--text2)}
-.book-toc-page{font-size:11.5px;color:var(--text3)}
+
 /* DARK MODE */
 body.dark{
   --bg:#111;--surface:#1a1a1a;--surface-dim:#222;
@@ -827,22 +759,6 @@ body.dark .level-option.selected{border-color:#fff;background:#fff;color:#111}
 .sq-result-btn.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
 .sq-result-btn.primary:hover{opacity:.85}
 
-/* ── Rich Book Reader Styles ── */
-.book-page-text h3.book-h3{font-size:16px;font-weight:700;color:var(--text);margin:18px 0 6px;letter-spacing:-.2px}
-.book-page-text h4.book-h4{font-size:14px;font-weight:600;color:var(--text);margin:14px 0 4px}
-.book-page-text p.book-p{font-size:14px;line-height:1.75;color:var(--text);margin:6px 0;white-space:normal}
-.book-page-text p.book-p:empty{display:none}
-.book-page-text pre.book-code{
-  font-family:'SF Mono','Fira Code','Courier New',monospace;
-  font-size:12px;line-height:1.6;
-  background:var(--bg);border:1px solid var(--border);border-radius:10px;
-  padding:14px 16px;margin:12px 0;overflow-x:auto;
-  color:var(--text);white-space:pre-wrap;word-break:break-word;
-}
-body.dark .book-page-text pre.book-code{background:#1a1a1a;border-color:#333}
-.book-page-text img{max-width:100%;border-radius:8px;margin:14px 0;display:block;box-shadow:0 2px 16px rgba(0,0,0,.10);border:1px solid var(--border)}
-.book-page-text{white-space:normal!important}
-.book-page-text:empty::after{display:none}
 
 
 /* ── Learn Sub-Tabs ── */
@@ -1164,16 +1080,6 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
         <div class="lesson-card" onclick="openLesson(5)"><span class="lc-icon">🔄</span><div class="lc-level" style="color:var(--purple)">Advanced</div><div class="lc-title">PID Control</div><div class="lc-meta">18 min · Programming</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>
         <div class="lesson-card" onclick="openLesson(7)"><span class="lc-icon">🔌</span><div class="lc-level" style="color:var(--purple)">Advanced</div><div class="lc-title">I2C &amp; SPI Protocols</div><div class="lc-meta">14 min · Programming</div><div class="lc-bar"><div class="lc-fill" style="width:0%"></div></div></div>
       </div>
-      <div class="section-header"><h2>📚 Books</h2><button class="btn-text" onclick="navToLearnTab('books')">See all →</button></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;display:flex;align-items:center;gap:16px;cursor:pointer;margin-bottom:20px" onclick="navToLearnTab('books')">
-        <div style="width:52px;height:68px;border-radius:8px;background:linear-gradient(145deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🍰</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13.5px;font-weight:600;letter-spacing:-.2px;margin-bottom:3px">Introduction to Arduino: A Piece of Cake!</div>
-          <div style="font-size:11.5px;color:var(--text3);margin-bottom:8px">Bright Sunday Attai · 168 pages</div>
-          <div id="homeBookProgress" style="height:3px;background:var(--bg);border-radius:2px"><div id="homeBookProgressFill" style="height:100%;width:0%;background:var(--blue);border-radius:2px;transition:width .3s"></div></div>
-        </div>
-        <div style="font-size:12px;color:var(--blue);flex-shrink:0" id="homeBookPct">Start reading →</div>
-      </div>
     </div>
 
     <!-- LESSONS -->
@@ -1183,10 +1089,6 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
         <button class="learn-tab active" id="lt-lessons" onclick="switchLearnTab('lessons')">
           <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           Lessons
-        </button>
-        <button class="learn-tab" id="lt-books" onclick="switchLearnTab('books')">
-          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          Books
         </button>
         <button class="learn-tab" id="lt-projects" onclick="switchLearnTab('projects')">
           <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -1201,16 +1103,6 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
         </div>
         <div id="lessonSections"></div>
         <div class="lesson-list" id="lessonList" style="display:none"></div>
-      </div>
-      <!-- Books sub-panel -->
-      <div id="learnPanel-books" style="display:none">
-        <div class="books-hero">
-          <div class="books-hero-label">📚 Library</div>
-          <div class="books-hero-title">Books</div>
-          <div class="books-hero-sub">Read curated Arduino &amp; robotics books at your own pace. Your progress is saved automatically.</div>
-          <div class="books-hero-glyph">📖</div>
-        </div>
-        <div class="books-grid" id="booksGrid"></div>
       </div>
       <!-- Projects sub-panel -->
       <div id="learnPanel-projects" style="display:none">
@@ -1236,68 +1128,6 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
         </div>
       </div>
     </div>
-
-    <!-- Books moved into Lessons sub-tabs -->
-
-    <!-- BOOK READER -->
-    <div class="page" id="page-book-reader">
-      <div class="book-reader-wrap">
-        <div class="book-reader-header">
-          <button class="book-back-btn" onclick="navToLearnTab('books')">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="15 18 9 12 15 6"/></svg>
-            Books
-          </button>
-          <div class="book-reader-title" id="brTitle">–</div>
-          <div class="book-page-indicator" id="brPageIndicator">p. 1 / 168</div>
-        </div>
-
-        <!-- Resume banner -->
-        <div class="book-resume-banner" id="brResumeBanner">
-          <span class="book-resume-text" id="brResumeText">You were on page <strong></strong> — continue where you left off?</span>
-          <button class="book-resume-btn" onclick="resumeBook()">Resume</button>
-        </div>
-
-        <!-- Table of contents -->
-        <div class="book-toc-wrap">
-          <div class="book-toc-head" onclick="toggleBookToc()">
-            <span class="book-toc-title">📋 Table of Contents</span>
-            <button class="book-toc-toggle" id="tocToggleBtn">Show</button>
-          </div>
-          <div class="book-toc-list" id="bookTocList"></div>
-        </div>
-
-        <!-- Bookmark strip -->
-        <div class="book-bookmark-strip">
-          <span class="book-bookmark-info" id="brBookmarkInfo">No bookmark set</span>
-          <button class="book-bookmark-btn" id="brBookmarkBtn" onclick="toggleBookBookmark()">
-            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            Bookmark this page
-          </button>
-        </div>
-
-        <!-- Page content -->
-        <div class="book-page-content">
-          <div class="book-page-text" id="brPageText"></div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="book-nav-controls">
-          <button class="book-nav-btn" id="brPrevBtn" onclick="bookPageNav(-1)">← Previous</button>
-          <div class="book-page-jump">
-            <span class="book-page-jump-label">Go to page:</span>
-            <input type="number" class="book-page-input" id="brPageInput" min="1" max="168" onchange="jumpToPage(this.value)" onkeydown="if(event.key==='Enter')jumpToPage(this.value)">
-          </div>
-          <button class="book-nav-btn primary" id="brNextBtn" onclick="bookPageNav(1)">Next →</button>
-        </div>
-
-        <!-- Progress bar -->
-        <div class="book-progress-bar" style="margin-top:8px">
-          <div class="book-progress-fill" id="brProgressFill" style="width:0%"></div>
-        </div>
-        <div style="text-align:center;font-size:11.5px;color:var(--text3);margin-top:6px" id="brProgressLabel"></div>
-      </div>
-    </div>
-    <!-- Projects moved into Lessons sub-tabs -->
 
     <!-- PROJECT DETAIL -->
     <div class="page" id="page-project-detail">
@@ -4496,7 +4326,7 @@ function searchLessons(q) {
 ══════════════════════════════════════ */
 let currentFilter = 'All';
 const PAGE_TITLES = {
-  home:'Home', lessons:'Lessons', reader:'Lesson', books:'Books', 'book-reader':'Book', projects:'Projects',
+  home:'Home', lessons:'Lessons', reader:'Lesson', projects:'Projects',
   'project-detail':'Project', quiz:'Quiz', simulator:'Simulator',
   community:'Community', profile:'My Profile', settings:'Settings'
 };
@@ -4514,8 +4344,7 @@ function nav(pageId, triggerId) {
   document.getElementById('pageTitle').textContent = PAGE_TITLES[pageId] || pageId;
   document.querySelector('.content').scrollTop = 0;
   if (pageId==='lessons') { if(currentFilter==='All') renderSections(); else renderLessons(); }
-  if (pageId==='books') renderBooks();
-  if (pageId==='home') { updateHomeBookProgress(); updatePathway(); }
+  if (pageId==='home') { updatePathway(); }
   if (pageId==='quiz') initQuiz();
   if (pageId==='projects') renderProjects();
   if (pageId==='profile') applyProfileToUI();
@@ -4523,204 +4352,12 @@ function nav(pageId, triggerId) {
 }
 
 /* ══════════════════════════════════════
-   BOOKS
-══════════════════════════════════════ */
-const BOOKS = [];
-
-const BOOKS_DATA = {};
-
-let currentBookId = null;
-let currentBookPage = 1;  // 1-indexed
-
-function renderBooks() {
-  const grid = document.getElementById('booksGrid');
-  if (!grid) return;
-  grid.innerHTML = BOOKS.map(book => {
-    const saved = getBookmark(book.id);
-    const pct = getBookProgress(book.id);
-    const readPages = Math.round(pct * book.totalPages / 100);
-    return `<div class="book-card" onclick="openBook('${book.id}')">
-      <div class="book-cover">
-        <div class="book-cover-spine"></div>
-        ${book.emoji}
-      </div>
-      <div>
-        <div class="book-title">${book.title}</div>
-        <div class="book-author">${book.author}</div>
-      </div>
-      <div class="book-meta">
-        <span class="book-badge">${book.badge}</span>
-        <span>${book.totalPages} pages</span>
-        ${pct>0 ? `<span style="color:var(--blue);font-weight:600">${pct}%</span>` : ''}
-      </div>
-      <div class="book-progress-bar"><div class="book-progress-fill" style="width:${pct}%"></div></div>
-      <div style="font-size:11px;color:var(--text3)">${pct>=100 ? '✓ Finished' : pct>0 ? `Page ${readPages} of ${book.totalPages}` : 'Not started'}</div>
-    </div>`;
-  }).join('');
-}
-
-function getBookProgress(bookId) {
-  const pg = parseInt(localStorage.getItem('trybook_page_' + bookId) || '1');
-  const book = BOOKS.find(b=>b.id===bookId);
-  if (!book) return 0;
-  return Math.round(((pg-1) / (book.totalPages-1)) * 100);
-}
-
-function getBookmark(bookId) {
-  return parseInt(localStorage.getItem('trybook_bookmark_' + bookId) || '0');
-}
-
-function openBook(bookId) {
-  const book = BOOKS.find(b=>b.id===bookId);
-  if (!book) return;
-  currentBookId = bookId;
-
-  // Set title
-  document.getElementById('brTitle').textContent = book.title;
-  document.getElementById('brPageInput').max = book.totalPages;
-
-  // Build TOC
-  const tocList = document.getElementById('bookTocList');
-  tocList.innerHTML = book.toc.map(ch =>
-    `<div class="book-toc-item" onclick="jumpToPage(${ch.page})">
-      <span class="book-toc-num">${ch.num}</span>
-      <span class="book-toc-name">${ch.name}</span>
-      <span class="book-toc-page">p. ${ch.page}</span>
-    </div>`
-  ).join('');
-
-  // Get saved page
-  const savedPage = parseInt(localStorage.getItem('trybook_page_' + bookId) || '1');
-  const bookmark = getBookmark(bookId);
-
-  // Show resume banner if saved page > 1
-  const banner = document.getElementById('brResumeBanner');
-  const resumeText = document.getElementById('brResumeText');
-  if (savedPage > 1) {
-    banner.classList.add('show');
-    resumeText.innerHTML = `You were on page <strong>${savedPage}</strong> — continue where you left off?`;
-  } else {
-    banner.classList.remove('show');
-  }
-
-  // Navigate to book reader (start at page 1, let user resume)
-  nav('book-reader', null);
-  goToBookPage(1);
-}
-
-function resumeBook() {
-  const saved = parseInt(localStorage.getItem('trybook_page_' + currentBookId) || '1');
-  goToBookPage(saved);
-  document.getElementById('brResumeBanner').classList.remove('show');
-}
-
-function goToBookPage(pageNum) {
-  const book = BOOKS.find(b=>b.id===currentBookId);
-  if (!book) return;
-  pageNum = Math.max(1, Math.min(book.totalPages, pageNum));
-  currentBookPage = pageNum;
-
-  // Get page text
-  const pages = BOOKS_DATA[currentBookId];
-  const text = (pages && pages[pageNum-1]) ? pages[pageNum-1] : '';
-  document.getElementById('brPageText').innerHTML = text;
-
-  // Update indicator
-  document.getElementById('brPageIndicator').textContent = `p. ${pageNum} / ${book.totalPages}`;
-  document.getElementById('brPageInput').value = pageNum;
-
-  // Update nav buttons
-  document.getElementById('brPrevBtn').disabled = pageNum <= 1;
-  document.getElementById('brNextBtn').disabled = pageNum >= book.totalPages;
-
-  // Update progress
-  const pct = Math.round(((pageNum-1) / (book.totalPages-1)) * 100);
-  document.getElementById('brProgressFill').style.width = pct + '%';
-  document.getElementById('brProgressLabel').textContent = `${pct}% read · ${book.totalPages - pageNum} pages remaining`;
-
-  // Save progress
-  localStorage.setItem('trybook_page_' + currentBookId, pageNum);
-
-  // Update bookmark strip
-  updateBookmarkStrip();
-
-  // Scroll content to top
-  document.querySelector('.content').scrollTop = 0;
-}
-
-function bookPageNav(dir) {
-  goToBookPage(currentBookPage + dir);
-}
-
-function jumpToPage(val) {
-  const n = parseInt(val);
-  if (!isNaN(n)) {
-    // Close TOC if open
-    const toc = document.getElementById('bookTocList');
-    if (toc.classList.contains('open')) {
-      toc.classList.remove('open');
-      document.getElementById('tocToggleBtn').textContent = 'Show';
-    }
-    goToBookPage(n);
-  }
-}
-
-function toggleBookToc() {
-  const toc = document.getElementById('bookTocList');
-  const btn = document.getElementById('tocToggleBtn');
-  const open = toc.classList.toggle('open');
-  btn.textContent = open ? 'Hide' : 'Show';
-}
-
-function toggleBookBookmark() {
-  if (!currentBookId) return;
-  const key = 'trybook_bookmark_' + currentBookId;
-  const existing = getBookmark(currentBookId);
-  if (existing === currentBookPage) {
-    // Remove bookmark
-    localStorage.removeItem(key);
-    showToast('Bookmark removed');
-  } else {
-    localStorage.setItem(key, currentBookPage);
-    showToast('📌 Page ' + currentBookPage + ' bookmarked!');
-  }
-  updateBookmarkStrip();
-}
-
-function updateBookmarkStrip() {
-  const bookmark = getBookmark(currentBookId);
-  const info = document.getElementById('brBookmarkInfo');
-  const btn = document.getElementById('brBookmarkBtn');
-  if (bookmark) {
-    info.innerHTML = `Bookmarked: <strong>Page ${bookmark}</strong>`;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:${bookmark===currentBookPage?'currentColor':'none'};stroke-width:2;stroke-linecap:round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> ${bookmark===currentBookPage ? 'Bookmarked ✓' : 'Jump to bookmark (p.'+bookmark+')'}`;
-    btn.classList.toggle('marked', bookmark === currentBookPage);
-    // Make btn jump to bookmark if not on it
-    btn.onclick = bookmark === currentBookPage ? toggleBookBookmark : () => goToBookPage(bookmark);
-  } else {
-    info.textContent = 'No bookmark set';
-    btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmark this page`;
-    btn.classList.remove('marked');
-    btn.onclick = toggleBookBookmark;
-  }
-}
-
-function updateHomeBookProgress() {
-  const pct = getBookProgress('intro-arduino');
-  const fill = document.getElementById('homeBookProgressFill');
-  const label = document.getElementById('homeBookPct');
-  if (fill) fill.style.width = pct + '%';
-  if (label) label.textContent = pct > 0 ? pct + '% read →' : 'Start reading →';
-}
-
-/* ══════════════════════════════════════
    INIT
 ══════════════════════════════════════ */
 renderLessons();
 renderProjects();
-renderBooks();
-updateHomeBookProgress();
 buildEmojiPanel();
+
 // Dirty flag for profile inputs
 ['profileNameInput','profileBioInput'].forEach(id => {
   const el = document.getElementById(id);
