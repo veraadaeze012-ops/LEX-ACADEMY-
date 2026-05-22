@@ -640,6 +640,26 @@ body.dark .level-option.selected{border-color:#fff;background:#fff;color:#111}
 }
 .level-select-btn:hover{opacity:.88}
 .level-select-btn:disabled{opacity:.35;cursor:default}
+/* "Starts Week X" badges */
+.level-start-badge{
+  margin-left:auto;flex-shrink:0;
+  font-size:10.5px;font-weight:600;letter-spacing:.3px;
+  padding:3px 9px;border-radius:20px;white-space:nowrap;
+}
+.level-start-badge.week1{background:rgba(40,205,65,.15);color:#1a9c35}
+.level-start-badge.week2{background:rgba(0,102,255,.12);color:#0055d4}
+.level-option.selected .level-start-badge.week1{background:rgba(255,255,255,.25);color:#fff}
+.level-option.selected .level-start-badge.week2{background:rgba(255,255,255,.25);color:#fff}
+body.dark .level-option.selected .level-start-badge{background:rgba(0,0,0,.2);color:#111}
+/* Divider between beginner and intermediate */
+.level-divider{
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;color:var(--text3);font-weight:500;
+  letter-spacing:.2px;margin:4px 0;
+}
+.level-divider::before,.level-divider::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
 
 /* ── PATHWAY / LEARNING TRACK (Home page) ── */
 .pathway-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px 24px;margin-bottom:20px}
@@ -934,46 +954,59 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
 <div class="level-select-screen" id="levelSelectScreen">
   <div class="level-select-wrap">
     <div style="text-align:center;margin-bottom:28px">
-      <div style="font-size:42px;margin-bottom:12px">🤖</div>
-      <div class="level-select-heading">What's your robotics level?</div>
-      <div class="level-select-sub">We'll put you in the right place on your learning journey. You can always start from the beginning.</div>
+      <div style="font-size:48px;margin-bottom:14px">🤖</div>
+      <div class="level-select-heading" id="levelSelectHeading">What's your robotics level?</div>
+      <div class="level-select-sub" id="levelSelectSub">Pick your experience level and we'll put you in the right place. Beginners start at Week 1 — everyone else jumps straight to Week 2.</div>
     </div>
     <div class="level-options" id="levelOptions">
+
       <button class="level-option" onclick="selectLevel('beginner',this)">
         <div class="level-option-emoji">🌱</div>
         <div class="level-option-text">
           <div class="level-option-name">Absolute Beginner</div>
           <div class="level-option-desc">I've never done robotics or electronics before</div>
         </div>
+        <div class="level-start-badge week1">Starts Week 1</div>
       </button>
+
       <button class="level-option" onclick="selectLevel('elementary',this)">
         <div class="level-option-emoji">⚡</div>
         <div class="level-option-text">
           <div class="level-option-name">Elementary</div>
           <div class="level-option-desc">I know basic circuits and have tinkered a bit</div>
         </div>
+        <div class="level-start-badge week1">Starts Week 1</div>
       </button>
+
+      <div class="level-divider"><span>Skip Week 1 — straight to the action</span></div>
+
       <button class="level-option" onclick="selectLevel('intermediate',this)">
         <div class="level-option-emoji">🔧</div>
         <div class="level-option-text">
           <div class="level-option-name">Intermediate</div>
           <div class="level-option-desc">I've built projects and can write basic Arduino code</div>
         </div>
+        <div class="level-start-badge week2">Starts Week 2</div>
       </button>
+
       <button class="level-option" onclick="selectLevel('advanced',this)">
         <div class="level-option-emoji">🚀</div>
         <div class="level-option-text">
           <div class="level-option-name">Advanced</div>
           <div class="level-option-desc">I know sensors, motor drivers, I2C/SPI, and PID</div>
         </div>
+        <div class="level-start-badge week2">Starts Week 2</div>
       </button>
+
       <button class="level-option" onclick="selectLevel('expert',this)">
         <div class="level-option-emoji">🏆</div>
         <div class="level-option-text">
           <div class="level-option-name">Expert</div>
           <div class="level-option-desc">I build complex robots and write embedded C++</div>
         </div>
+        <div class="level-start-badge week2">Starts Week 2</div>
       </button>
+
     </div>
     <button class="level-select-btn" id="levelSelectBtn" onclick="confirmLevel()" disabled>Start Learning →</button>
   </div>
@@ -3971,12 +4004,14 @@ const SECTIONS = [
 ];
 
 // Section start indices in SECTIONS array based on entry level
+// Beginner/Elementary → Week 1 (index 0)  — full journey
+// Intermediate/Advanced/Expert → Week 2 (index 1) — skip Week 1
 const LEVEL_START = {
   beginner: 0,
   elementary: 0,
   intermediate: 1,
-  advanced: 2,
-  expert: 3,
+  advanced: 1,
+  expert: 1,
 };
 
 let userEntryLevel = null;        // 'beginner','elementary','intermediate','advanced','expert'
@@ -3994,10 +4029,10 @@ function confirmLevel() {
   if (!selectedLevelKey) return;
   userEntryLevel = selectedLevelKey;
   const uid = auth.currentUser?.uid;
+  const startIdx = LEVEL_START[userEntryLevel] || 0;
   if (uid) {
     db.ref(`users/${uid}/profile/entryLevel`).set(userEntryLevel);
     // Pre-unlock sections up to entry level
-    const startIdx = LEVEL_START[userEntryLevel] || 0;
     for (let i = 0; i < startIdx; i++) {
       sectionQuizPassed[SECTIONS[i].id] = true;
       db.ref(`users/${uid}/sectionQuiz/${SECTIONS[i].id}`).set(true);
@@ -4006,6 +4041,18 @@ function confirmLevel() {
   document.getElementById('levelSelectScreen').classList.remove('open');
   updatePathway();
   renderSections();
+  // Navigate straight to the correct starting week
+  const startSection = SECTIONS[startIdx];
+  if (startSection) {
+    setTimeout(() => {
+      showPage('learn');
+      const el = document.getElementById('sec-' + startSection.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+  }
+  // Toast to tell user where they're starting
+  const weekLabel = startIdx === 0 ? 'Week 1 — Foundations' : 'Week 2 — Motors & Sensing';
+  showToast('🚀 You're starting from ' + weekLabel + '!');
 }
 
 function isSectionUnlocked(sIdx) {
@@ -4293,15 +4340,39 @@ function showLevelSelect() {
   document.getElementById('levelSelectScreen').classList.add('open');
 }
 
+function showLevelSelectWithGreeting() {
+  // Personalise the heading with the user's first name
+  const user = auth.currentUser;
+  const firstName = user && user.displayName ? user.displayName.split(' ')[0] : null;
+  const headingEl = document.getElementById('levelSelectHeading');
+  const subEl     = document.getElementById('levelSelectSub');
+  if (headingEl) {
+    headingEl.textContent = firstName
+      ? `Welcome, ${firstName}! 👋`
+      : 'Welcome! 👋';
+  }
+  if (subEl) {
+    subEl.textContent = 'Pick your experience level and we'll put you in the right place. Beginners start at Week 1 — everyone else jumps straight to Week 2.';
+  }
+  document.getElementById('levelSelectScreen').classList.add('open');
+}
+
 function loadSectionProgress(uid) {
   db.ref(`users/${uid}/sectionQuiz`).once('value').then(snap => {
     sectionQuizPassed = snap.val() || {};
     // Also load entry level
     db.ref(`users/${uid}/profile/entryLevel`).once('value').then(s2 => {
       userEntryLevel = s2.val() || null;
-      if (!userEntryLevel) {
-        // New user — show level select
-        showLevelSelect();
+      if (!userEntryLevel && window._isNewRegistration) {
+        // Brand-new registration — show level select screen
+        window._isNewRegistration = false;
+        showLevelSelectWithGreeting();
+      } else if (!userEntryLevel) {
+        // Legacy user with no level set — default to beginner silently
+        userEntryLevel = 'beginner';
+        db.ref(`users/${uid}/profile/entryLevel`).set('beginner');
+        updatePathway();
+        renderSections();
       } else {
         updatePathway();
         renderSections();
@@ -4970,6 +5041,7 @@ async function handleSignup() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pw);
     await cred.user.updateProfile({ displayName: first+' '+last });
+    window._isNewRegistration = true; // flag so enterApp shows level screen
   } catch(e) {
     btn.textContent='Create account →'; btn.disabled=false;
     err.textContent=firebaseErrMsg(e.code); err.classList.add('show');
@@ -4983,7 +5055,11 @@ async function handleGoogleAuth() {
   btn.disabled=true;
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
-    await auth.signInWithPopup(provider);
+    const result = await auth.signInWithPopup(provider);
+    // Mark as new if this is their first Google sign-in
+    if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
+      window._isNewRegistration = true;
+    }
   } catch(e) {
     btn.innerHTML=orig; btn.disabled=false;
     if (e.code!=='auth/popup-closed-by-user') {
