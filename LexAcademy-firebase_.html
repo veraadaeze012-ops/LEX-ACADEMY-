@@ -1183,22 +1183,22 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
     <!-- SIMULATOR -->
     <div class="page" id="page-simulator">
       <div class="wokwi-wrap">
-        <div class="wokwi-toolbar">
-          <span class="wokwi-toolbar-label">Template:</span>
-          <button class="tpl-btn active" id="tpl-blink" onclick="loadWokwi('blink',this)"><span class="tpl-dot" style="background:var(--amber)"></span>Blink LED</button>
-          <button class="tpl-btn" id="tpl-servo" onclick="loadWokwi('servo',this)"><span class="tpl-dot" style="background:var(--blue)"></span>Servo Sweep</button>
-          <button class="tpl-btn" id="tpl-sensor" onclick="loadWokwi('sensor',this)"><span class="tpl-dot" style="background:var(--green)"></span>Ultrasonic</button>
-          <button class="tpl-btn" id="tpl-motor" onclick="loadWokwi('motor',this)"><span class="tpl-dot" style="background:var(--purple)"></span>DC Motor</button>
-          <button class="tpl-btn" id="tpl-i2c" onclick="loadWokwi('i2c',this)"><span class="tpl-dot" style="background:var(--red)"></span>I2C LCD</button>
-          <button class="tpl-btn" id="tpl-pid" onclick="loadWokwi('pid',this)"><span class="tpl-dot" style="background:var(--green)"></span>PID Demo</button>
-          <a class="wokwi-open-btn" id="wokwiOpenBtn" href="https://wokwi.com/projects/322062421191774803" target="_blank">
-            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Open in Wokwi
-          </a>
+        <!-- Info banner above simulator -->
+        <div style="display:flex;align-items:flex-start;gap:10px;background:linear-gradient(135deg,rgba(0,113,227,.10),rgba(0,113,227,.04));border:1px solid rgba(0,113,227,.22);border-radius:12px;padding:12px 16px;margin-bottom:12px">
+          <span style="font-size:18px;flex-shrink:0;margin-top:1px">💡</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Using the Simulator</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.6">
+              If you see a <strong>"Return to Homepage"</strong> page inside the simulator below, just click that button inside the frame — it will take you to the Wokwi site. Come back here and navigate through the app lessons to launch specific circuits directly in the simulator.
+            </div>
+          </div>
         </div>
-        <div class="wokwi-frame" id="wokwiFrame">
+        <div class="wokwi-frame" id="wokwiFrame" style="position:relative">
           <div class="wokwi-loading" id="wokwiLoading"><div class="wokwi-loading-dot"></div><span>Loading Wokwi simulator…</span></div>
-          <iframe id="wokwiIframe" src="https://wokwi.com/projects/322062421191774803?embed=1&theme=dark" allowfullscreen allow="cross-origin-isolated" onload="document.getElementById('wokwiLoading').style.opacity='0';this.style.opacity='1'" style="opacity:0;transition:opacity .4s"></iframe>
+          <iframe id="wokwiIframe" src="https://wokwi.com/projects/322062421191774803?embed=1&theme=dark" allowfullscreen allow="cross-origin-isolated" onload="document.getElementById('wokwiLoading').style.opacity='0';this.style.opacity='1'" style="opacity:0;transition:opacity .4s;margin-top:-46px;height:calc(100% + 46px)"></iframe>
+          <!-- Overlay to hide Wokwi's template bar (top ~44px) and sign-up button (top-right ~44px wide) -->
+          <div style="position:absolute;top:0;left:0;right:0;height:46px;background:#1a1a1a;pointer-events:none;z-index:10"></div>
+          <div style="position:absolute;top:0;right:0;width:110px;height:46px;background:#1a1a1a;pointer-events:none;z-index:11"></div>
         </div>
         <div class="wokwi-credit">Powered by <a href="https://wokwi.com" target="_blank">Wokwi</a> — edit code, add components, and run simulations in real time</div>
       </div>
