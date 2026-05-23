@@ -4052,7 +4052,7 @@ function confirmLevel() {
   }
   // Toast to tell user where they're starting
   const weekLabel = startIdx === 0 ? 'Week 1 — Foundations' : 'Week 2 — Motors & Sensing';
-  showToast('🚀 You're starting from ' + weekLabel + '!');
+  showToast("🚀 You're starting from " + weekLabel + "!");
 }
 
 function isSectionUnlocked(sIdx) {
@@ -4352,7 +4352,7 @@ function showLevelSelectWithGreeting() {
       : 'Welcome! 👋';
   }
   if (subEl) {
-    subEl.textContent = 'Pick your experience level and we'll put you in the right place. Beginners start at Week 1 — everyone else jumps straight to Week 2.';
+    subEl.textContent = "Pick your experience level and we'll put you in the right place. Beginners start at Week 1 — everyone else jumps straight to Week 2.";
   }
   document.getElementById('levelSelectScreen').classList.add('open');
 }
