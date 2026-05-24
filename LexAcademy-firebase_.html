@@ -5613,8 +5613,7 @@ IMPORTANT RULES:
   }
 
   /* ── Send message ── */
-  const GROQ_KEY = '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';
-  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+  const GROQ_URL = 'https://snowy-rice-53ea.veraadaeze012.workers.dev/';
 
   window.sendToLeon = async function(){
     if(isThinking) return;
@@ -5637,7 +5636,7 @@ IMPORTANT RULES:
         method:'POST',
         headers:{
           'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + GROQ_KEY
+          'Authorization': ''
         },
         body: JSON.stringify({
           model: 'llama-3.1-8b-instant',
