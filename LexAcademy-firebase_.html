@@ -11,6 +11,28 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<!-- Google Apps Script notifier — no third-party account needed -->
+<script>
+  // ⬇️  Paste your deployed Apps Script URL here (see notify.gs)
+  const NOTIFIER_URL = "https://script.google.com/macros/s/AKfycbzBaQdU36_jRXOLm_Qyzf_2qg1r6HxHXuz8wS16hQFE95Vk9FzKCNwfoTsndg5vztEdTQ/exec";
+
+  async function sendNotification(payload) {
+    if (!NOTIFIER_URL || NOTIFIER_URL === "YOUR_APPS_SCRIPT_URL") {
+      console.warn("Notifier URL not set — skipping email notification.");
+      return;
+    }
+    try {
+      await fetch(NOTIFIER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        mode: "no-cors"   // Apps Script allows cross-origin POST with no-cors
+      });
+    } catch(e) {
+      console.warn("Notification failed:", e);
+    }
+  }
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -931,6 +953,21 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
         <div class="auth-name-row">
           <div class="auth-field"><label class="auth-label">First name</label><input class="auth-input" id="signupFirst" type="text" placeholder="Alex" autocomplete="given-name"></div>
           <div class="auth-field"><label class="auth-label">Last name</label><input class="auth-input" id="signupLast" type="text" placeholder="Chen" autocomplete="family-name"></div>
+        </div>
+        <div class="auth-name-row">
+          <div class="auth-field">
+            <label class="auth-label">Age</label>
+            <input class="auth-input" id="signupAge" type="number" min="5" max="99" placeholder="e.g. 18" autocomplete="off">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Sex</label>
+            <select class="auth-select" id="signupSex">
+              <option value="" disabled selected>Select…</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
         </div>
         <div class="auth-field"><label class="auth-label">Email address</label><input class="auth-input" id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
         <div class="auth-field">
@@ -4328,6 +4365,11 @@ function markSectionPassed(sectionId) {
   if (uid) db.ref(`users/${uid}/profile/quizXp`).set(current + earned);
   userProfile.quizXp = current + earned;
   updateProfileStats();
+  // 🧪 Show beta feedback popup after completing the first (Beginner) section
+  const beginnerSectionId = SECTIONS[0]?.id;
+  if (sectionId === beginnerSectionId) {
+    setTimeout(openBetaPopup, 900); // slight delay so toast shows first
+  }
 }
 
 // Close overlay clicking backdrop
@@ -5018,6 +5060,8 @@ async function handleLogin() {
 async function handleSignup() {
   const first = document.getElementById('signupFirst').value.trim();
   const last  = document.getElementById('signupLast').value.trim();
+  const age   = document.getElementById('signupAge').value.trim();
+  const sex   = document.getElementById('signupSex').value;
   const email = document.getElementById('signupEmail').value.trim();
   const pw    = document.getElementById('signupPw').value;
   const err   = document.getElementById('signupError');
@@ -5041,6 +5085,24 @@ async function handleSignup() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pw);
     await cred.user.updateProfile({ displayName: first+' '+last });
+    // Save extra profile fields to Firebase
+    const uid = cred.user.uid;
+    await db.ref('users/'+uid+'/profile').update({
+      firstName: first, lastName: last,
+      age: age || 'Not provided',
+      sex: sex || 'Not provided',
+      email: email,
+      registeredAt: new Date().toISOString()
+    });
+    // 📧 Send registration notification via Google Apps Script
+    sendNotification({
+      type: 'registration',
+      name: first + ' ' + last,
+      email: email,
+      age: age || 'Not provided',
+      sex: sex || 'Not provided',
+      time: new Date().toLocaleString()
+    });
     window._isNewRegistration = true; // flag so enterApp shows level screen
   } catch(e) {
     btn.textContent='Create account →'; btn.disabled=false;
@@ -5613,7 +5675,7 @@ IMPORTANT RULES:
   }
 
   /* ── Send message ── */
-  const GROQ_KEY = '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';
+  const GROQ_KEY = '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';
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
   window.sendToLeon = async function(){
@@ -5675,5 +5737,107 @@ IMPORTANT RULES:
 })();
 </script>
 
+
+<script>
+/* ══════════════════════════════════════════════════════
+   BETA FEEDBACK POPUP — functions
+   ══════════════════════════════════════════════════════ */
+let _betaSelections = { rating: null, challenge: null };
+
+function selectBetaOpt(btn, group) {
+  const containerId = group === 'rating' ? 'betaRatingOpts' : 'betaChallengeOpts';
+  document.querySelectorAll('#'+containerId+' .beta-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  _betaSelections[group] = btn.textContent.trim();
+}
+
+function openBetaPopup() {
+  _betaSelections = { rating: null, challenge: null };
+  document.getElementById('betaForm').style.display = '';
+  document.getElementById('betaThankyou').style.display = 'none';
+  document.querySelectorAll('.beta-opt').forEach(b => b.classList.remove('selected'));
+  document.getElementById('betaComment').value = '';
+  document.getElementById('betaOverlay').classList.add('open');
+}
+
+function closeBetaPopup() {
+  document.getElementById('betaOverlay').classList.remove('open');
+}
+
+async function submitBetaFeedback() {
+  const rating    = _betaSelections.rating    || 'No answer';
+  const challenge = _betaSelections.challenge || 'No answer';
+  const comment   = document.getElementById('betaComment').value.trim() || 'None';
+  const user      = auth.currentUser;
+  const name      = user?.displayName || 'Unknown';
+  const email     = user?.email       || 'Unknown';
+
+  const uid = user?.uid;
+  if (uid) {
+    db.ref('betaFeedback/' + uid).set({
+      name, email, rating, challenge, comment,
+      section: 'Beginner Level Completion',
+      submittedAt: new Date().toISOString()
+    });
+  }
+
+  sendNotification({
+    type: 'feedback',
+    name: name,
+    email: email,
+    rating: rating,
+    challenge: challenge,
+    comment: comment,
+    time: new Date().toLocaleString()
+  });
+
+  document.getElementById('betaForm').style.display = 'none';
+  document.getElementById('betaThankyou').style.display = '';
+}
+
+document.getElementById('betaOverlay').addEventListener('click', function(e) {
+  if (e.target === document.getElementById('betaOverlay')) closeBetaPopup();
+});
+</script>
+<!-- ═══════════════════════════════════════════════════
+     BETA FEEDBACK POPUP — shown after passing Beginner section quiz
+     ═══════════════════════════════════════════════════ -->
+<div class="beta-overlay" id="betaOverlay">
+  <div class="beta-popup" id="betaPopup">
+    <!-- Active state -->
+    <div id="betaForm">
+      <div class="beta-badge">🧪 Beta Tester</div>
+      <div class="beta-title">Congrats on finishing Beginner! 🎉</div>
+      <div class="beta-sub">You've just unlocked the next level. As one of our early testers, your feedback shapes the app — it'll only take 60 seconds.</div>
+      <div class="beta-q">How would you rate the Beginner level content so far?</div>
+      <div class="beta-opts" id="betaRatingOpts">
+        <button class="beta-opt" onclick="selectBetaOpt(this,'rating')">⭐ Needs work — confusing or too slow</button>
+        <button class="beta-opt" onclick="selectBetaOpt(this,'rating')">⭐⭐ OK — but could be better</button>
+        <button class="beta-opt" onclick="selectBetaOpt(this,'rating')">⭐⭐⭐ Good — I enjoyed it</button>
+        <button class="beta-opt" onclick="selectBetaOpt(this,'rating')">⭐⭐⭐⭐ Excellent — very clear and fun!</button>
+      </div>
+      <div class="beta-q">What did you find most challenging?</div>
+      <div class="beta-opts" id="betaChallengeOpts">
+        <button class="beta-opt" onclick="selectBetaOpt(this,'challenge')">The technical concepts</button>
+        <button class="beta-opt" onclick="selectBetaOpt(this,'challenge')">The quiz questions</button>
+        <button class="beta-opt" onclick="selectBetaOpt(this,'challenge')">Navigating the app</button>
+        <button class="beta-opt" onclick="selectBetaOpt(this,'challenge')">Nothing — it was easy!</button>
+      </div>
+      <div class="beta-q">Any other feedback? (optional)</div>
+      <textarea class="beta-text" id="betaComment" placeholder="Tell us anything — what to add, fix, or change…"></textarea>
+      <div class="beta-actions">
+        <button class="beta-submit" onclick="submitBetaFeedback()">Send Feedback →</button>
+        <button class="beta-skip" onclick="closeBetaPopup()">Skip</button>
+      </div>
+    </div>
+    <!-- Thank-you state -->
+    <div id="betaThankyou" style="display:none" class="beta-thankyou">
+      <div class="beta-thankyou-icon">🙏</div>
+      <div class="beta-thankyou-title">Thank you so much!</div>
+      <div class="beta-thankyou-sub">Your feedback has been sent and will directly improve the app. Keep going — Intermediate awaits!</div>
+      <button class="beta-submit" style="margin-top:18px;width:100%" onclick="closeBetaPopup()">Let's keep learning →</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
