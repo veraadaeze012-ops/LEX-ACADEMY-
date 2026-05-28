@@ -1183,24 +1183,16 @@ body.dark .lq-btn.primary{background:#fff;color:#111}
     <!-- SIMULATOR -->
     <div class="page" id="page-simulator">
       <div class="wokwi-wrap">
-        <div class="wokwi-toolbar">
-          <span class="wokwi-toolbar-label">Template:</span>
-          <button class="tpl-btn active" id="tpl-blink" onclick="loadWokwi('blink',this)"><span class="tpl-dot" style="background:var(--amber)"></span>Blink LED</button>
-          <button class="tpl-btn" id="tpl-servo" onclick="loadWokwi('servo',this)"><span class="tpl-dot" style="background:var(--blue)"></span>Servo Sweep</button>
-          <button class="tpl-btn" id="tpl-sensor" onclick="loadWokwi('sensor',this)"><span class="tpl-dot" style="background:var(--green)"></span>Ultrasonic</button>
-          <button class="tpl-btn" id="tpl-motor" onclick="loadWokwi('motor',this)"><span class="tpl-dot" style="background:var(--purple)"></span>DC Motor</button>
-          <button class="tpl-btn" id="tpl-i2c" onclick="loadWokwi('i2c',this)"><span class="tpl-dot" style="background:var(--red)"></span>I2C LCD</button>
-          <button class="tpl-btn" id="tpl-pid" onclick="loadWokwi('pid',this)"><span class="tpl-dot" style="background:var(--green)"></span>PID Demo</button>
-          <a class="wokwi-open-btn" id="wokwiOpenBtn" href="https://wokwi.com/projects/322062421191774803" target="_blank">
-            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Open in Wokwi
-          </a>
+        <div style="padding-bottom:10px">
+          <button onclick="nav('home')" style="display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);color:var(--text1);border-radius:20px;padding:8px 16px;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to Home
+          </button>
         </div>
         <div class="wokwi-frame" id="wokwiFrame">
           <div class="wokwi-loading" id="wokwiLoading"><div class="wokwi-loading-dot"></div><span>Loading Wokwi simulator…</span></div>
           <iframe id="wokwiIframe" src="https://wokwi.com/projects/322062421191774803?embed=1&theme=dark" allowfullscreen allow="cross-origin-isolated" onload="document.getElementById('wokwiLoading').style.opacity='0';this.style.opacity='1'" style="opacity:0;transition:opacity .4s"></iframe>
         </div>
-        <div class="wokwi-credit">Powered by <a href="https://wokwi.com" target="_blank">Wokwi</a> — edit code, add components, and run simulations in real time</div>
       </div>
     </div>
 
