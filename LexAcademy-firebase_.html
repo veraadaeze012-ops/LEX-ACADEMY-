@@ -5971,21 +5971,25 @@ function createBattleRoom() {
   if (!uid) return;
   const code = randCode();
   const qs = pickBattleQuestions();
-  battleState = { room:code, myScore:0, theirScore:0, qIdx:0, questions:qs, answered:false, role:'creator', theirName:'Opponent' };
+  battleState = { room:code, myScore:0, theirScore:0, qIdx:0, questions:qs, answered:false, role:'creator', started:false };
   battleRef = db.ref('battles/'+code);
-  const myName = userProfile.displayName || 'Student';
-  battleRef.set({ code, questions: qs, creator: { uid, name: myName, score:0 }, joiner: null, status:'waiting', created: Date.now() });
+  battleRef.set({ code, questions: qs, creator: { uid, score:0, done:false }, joiner: null, status:'waiting', created: Date.now() });
   renderBattleWaiting(code);
   battleListener = battleRef.on('value', snap => {
     const data = snap.val();
     if (!data) return;
-    if (data.status === 'active' && data.joiner) {
-      battleState.theirName = data.joiner.name || 'Opponent';
-      battleRef.off('value', battleListener);
+    // Live opponent score during game
+    if (data.joiner) battleState.theirScore = data.joiner.score || 0;
+    // Joiner joined — start the game (only once)
+    if (data.status === 'active' && data.joiner && !battleState.started) {
+      battleState.started = true;
       renderBattleQ();
     }
-    // Watch their score
-    if (data.joiner) battleState.theirScore = data.joiner.score || 0;
+    // Both finished — read real scores from Firebase and show result
+    if (data.creator && data.joiner && data.creator.done && data.joiner.done) {
+      battleRef.off('value', battleListener);
+      renderBattleResult(data.creator.score, data.joiner.score, 'creator');
+    }
   });
 }
 
@@ -5994,7 +5998,8 @@ function renderBattleWaiting(code) {
     '<div class="battle-title">⚔️ Room Created!</div>'
    +'<div class="battle-sub">Share this code with your classmate:</div>'
    +'<div class="battle-code">'+code+'</div>'
-   +'<div class="battle-waiting"><div class="battle-waiting-pulse">⏳</div><div style="font-size:13px;color:var(--text3)">Waiting for opponent to join…</div></div>'
+   +'<div class="battle-sub" style="margin-top:4px;font-size:12px;color:var(--text3)">You are <strong>Player 1</strong></div>'
+   +'<div class="battle-waiting"><div class="battle-waiting-pulse">⏳</div><div style="font-size:13px;color:var(--text3)">Waiting for Player 2 to join…</div></div>'
    +'<button class="battle-btn secondary" onclick="closeBattle({target:document.getElementById(\'battleOverlay\')})">Cancel</button>';
 }
 
@@ -6008,29 +6013,36 @@ function joinBattleRoom() {
     const data = snap.val();
     if (!data) { showToast('Room not found — check the code!'); return; }
     if (data.status !== 'waiting') { showToast('This battle has already started'); return; }
-    const myName = userProfile.displayName || 'Student';
-    battleState = { room:code, myScore:0, theirScore:0, qIdx:0, questions:data.questions, answered:false, role:'joiner', theirName:data.creator?.name||'Opponent' };
-    battleRef.update({ joiner: { uid, name: myName, score:0 }, status:'active' });
-    battleRef.on('value', snap2 => {
+    battleState = { room:code, myScore:0, theirScore:0, qIdx:0, questions:data.questions, answered:false, role:'joiner', started:true };
+    battleRef.update({ joiner: { uid, score:0, done:false }, status:'active' });
+    battleListener = battleRef.on('value', snap2 => {
       const d = snap2.val();
-      if (d) battleState.theirScore = d.creator?.score || 0;
+      if (!d) return;
+      // Live opponent score during game
+      if (d.creator) battleState.theirScore = d.creator.score || 0;
+      // Both finished — read real scores from Firebase and show result
+      if (d.creator && d.joiner && d.creator.done && d.joiner.done) {
+        battleRef.off('value', battleListener);
+        renderBattleResult(d.creator.score, d.joiner.score, 'joiner');
+      }
     });
     renderBattleQ();
   });
 }
 
 function renderBattleQ() {
-  if (battleState.qIdx >= battleState.questions.length) { renderBattleResult(); return; }
   const q = battleState.questions[battleState.qIdx];
   battleState.answered = false;
+  const myLabel   = battleState.role === 'creator' ? 'Player 1 (You)' : 'Player 2 (You)';
+  const themLabel = battleState.role === 'creator' ? 'Player 2' : 'Player 1';
   document.getElementById('battleContent').innerHTML =
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
      +'<div class="battle-title" style="margin:0">⚔️ Battle!</div>'
      +'<span style="font-size:12px;color:var(--text3)">Q '+(battleState.qIdx+1)+'/'+battleState.questions.length+'</span>'
      +'</div>'
     +'<div class="battle-scores">'
-      +'<div class="battle-score-card you"><div class="battle-score-name">You</div><div class="battle-score-num">'+battleState.myScore+'</div></div>'
-      +'<div class="battle-score-card them"><div class="battle-score-name">'+escHtml(battleState.theirName)+'</div><div class="battle-score-num">'+battleState.theirScore+'</div></div>'
+      +'<div class="battle-score-card you"><div class="battle-score-name">'+myLabel+'</div><div class="battle-score-num">'+battleState.myScore+'</div></div>'
+      +'<div class="battle-score-card them"><div class="battle-score-name">'+themLabel+'</div><div class="battle-score-num">'+battleState.theirScore+'</div></div>'
     +'</div>'
     +'<div class="battle-q">'+escHtml(q.q)+'</div>'
     +'<div class="battle-opts">'
@@ -6046,28 +6058,65 @@ function answerBattle(chosen, correct) {
   if (chosen !== correct) document.querySelectorAll('.battle-opt')[chosen].classList.add('wrong');
   if (chosen === correct) battleState.myScore++;
   const uid = auth.currentUser?.uid;
-  const role = battleState.role;
-  if (uid && battleRef) battleRef.child(role === 'creator' ? 'creator/score' : 'joiner/score').set(battleState.myScore);
-  setTimeout(() => { battleState.qIdx++; renderBattleQ(); }, 1200);
+  const field = battleState.role === 'creator' ? 'creator' : 'joiner';
+  // Write updated score to Firebase
+  if (uid && battleRef) battleRef.child(field+'/score').set(battleState.myScore);
+
+  setTimeout(() => {
+    battleState.qIdx++;
+    if (battleState.qIdx >= battleState.questions.length) {
+      // Done with all questions — mark done in Firebase, wait for opponent
+      if (uid && battleRef) battleRef.child(field+'/done').set(true);
+      renderBattleWaitingFinish();
+    } else {
+      renderBattleQ();
+    }
+  }, 1200);
 }
 
-function renderBattleResult() {
-  const won = battleState.myScore > battleState.theirScore;
-  const tied = battleState.myScore === battleState.theirScore;
+function renderBattleWaitingFinish() {
+  const myLabel   = battleState.role === 'creator' ? 'Player 1 (You)' : 'Player 2 (You)';
+  const themLabel = battleState.role === 'creator' ? 'Player 2' : 'Player 1';
+  document.getElementById('battleContent').innerHTML =
+    '<div class="battle-title">⏳ Waiting for opponent…</div>'
+   +'<div class="battle-sub" style="text-align:center">You finished! Waiting for your opponent to complete their questions…</div>'
+   +'<div class="battle-scores" style="margin-top:20px">'
+     +'<div class="battle-score-card you"><div class="battle-score-name">'+myLabel+'</div><div class="battle-score-num">'+battleState.myScore+'</div></div>'
+     +'<div class="battle-score-card them"><div class="battle-score-name">'+themLabel+'</div><div class="battle-score-num">'+battleState.theirScore+'</div></div>'
+   +'</div>';
+}
+
+function renderBattleResult(creatorScore, joinerScore, myRole) {
+  // Use scores straight from Firebase — single source of truth, no race condition
+  const myScore    = myRole === 'creator' ? creatorScore : joinerScore;
+  const theirScore = myRole === 'creator' ? joinerScore  : creatorScore;
+  const myLabel    = myRole === 'creator' ? 'Player 1 (You)' : 'Player 2 (You)';
+  const themLabel  = myRole === 'creator' ? 'Player 2' : 'Player 1';
+  const won  = myScore > theirScore;
+  const tied = myScore === theirScore;
   document.getElementById('battleContent').innerHTML =
     '<div class="battle-win">'
      +'<div class="battle-win-emoji">'+(won?'🏆':tied?'🤝':'💪')+'</div>'
-     +'<div class="battle-win-title">'+(won?'You Won!':tied?'It\'s a tie!':'Good game!')+'</div>'
-     +'<div class="battle-win-sub">Final score: You '+battleState.myScore+' — '+battleState.theirScore+' '+escHtml(battleState.theirName)+'</div>'
+     +'<div class="battle-win-title">'+(won?'You Won!':tied?"It's a tie!":'Good game!')+'</div>'
+     +'<div class="battle-win-sub">Final score: '+(myRole==='creator'?'Player 1':'Player 2')+' '+creatorScore+' — '+joinerScore+' '+(myRole==='creator'?'Player 2':'Player 1')+'</div>'
     +'</div>'
     +'<div class="battle-scores">'
-      +'<div class="battle-score-card you"><div class="battle-score-name">You</div><div class="battle-score-num">'+battleState.myScore+'</div></div>'
-      +'<div class="battle-score-card them"><div class="battle-score-name">'+escHtml(battleState.theirName)+'</div><div class="battle-score-num">'+battleState.theirScore+'</div></div>'
+      +'<div class="battle-score-card you"><div class="battle-score-name">'+myLabel+'</div><div class="battle-score-num">'+myScore+'</div></div>'
+      +'<div class="battle-score-card them"><div class="battle-score-name">'+themLabel+'</div><div class="battle-score-num">'+theirScore+'</div></div>'
     +'</div>'
     +'<button class="battle-btn" onclick="renderBattleMenu()">Play Again</button>'
     +'<button class="battle-btn secondary" onclick="closeBattle({target:document.getElementById(\'battleOverlay\')})">Close</button>';
-  if (won) { const xp=getMyTotalXp(); showToast('🏆 Battle won! +75 XP'); const uid=auth.currentUser?.uid; if(uid){const c=userProfile.quizXp||0;db.ref('users/'+uid+'/profile/quizXp').set(c+75);userProfile.quizXp=c+75;addWeeklyXp(uid,75);setTimeout(()=>checkLevelUp(getMyTotalXp()),800);} }
-  if (battleRef && battleListener) { battleRef.off('value', battleListener); }
+  if (won) {
+    showToast('🏆 Battle won! +75 XP');
+    const uid = auth.currentUser?.uid;
+    if (uid) {
+      const c = userProfile.quizXp || 0;
+      db.ref('users/'+uid+'/profile/quizXp').set(c+75);
+      userProfile.quizXp = c+75;
+      addWeeklyXp(uid, 75);
+      setTimeout(() => checkLevelUp(getMyTotalXp()), 800);
+    }
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
