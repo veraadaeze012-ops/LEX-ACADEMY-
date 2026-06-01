@@ -6430,7 +6430,7 @@ body.dark .leon-mode-btn.active{background:#fff;color:#111}
 .leon-mode-desc{font-size:10.5px;color:var(--text3);margin-top:6px;min-height:14px;transition:opacity .15s}
 
 /* ── API Key Setup ── */
-.leon-apikey-wrap{
+.leon-apikey-wrap{display:none !important;}
   padding:16px;display:none;flex-direction:column;gap:10px;
   border-bottom:1px solid var(--border);flex-shrink:0;
 }
@@ -6848,7 +6848,7 @@ IMPORTANT RULES:
   }
 
   /* ── Send message ── */
-  let GROQ_KEY = localStorage.getItem('leon-apikey') || '';
+  let GROQ_KEY = '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';
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
   /* check key */
@@ -7153,3 +7153,4 @@ document.getElementById('betaOverlay').addEventListener('click', function(e) {
 </div>
 </body>
 </html>
+  
